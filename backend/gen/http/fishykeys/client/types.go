@@ -21,11 +21,25 @@ type CreateMasterKeyRequestBody struct {
 	MinShares int `form:"min_shares" json:"min_shares" xml:"min_shares"`
 }
 
+// AddShareRequestBody is the type of the "fishykeys" service "add_share"
+// endpoint HTTP request body.
+type AddShareRequestBody struct {
+	// One of the shares need to unlock the master key
+	Share int `form:"share" json:"share" xml:"share"`
+}
+
 // CreateMasterKeyResponseBody is the type of the "fishykeys" service
 // "create_master_key" endpoint HTTP response body.
 type CreateMasterKeyResponseBody struct {
 	// The generated key shares
 	Shares []string `form:"shares,omitempty" json:"shares,omitempty" xml:"shares,omitempty"`
+}
+
+// AddShareResponseBody is the type of the "fishykeys" service "add_share"
+// endpoint HTTP response body.
+type AddShareResponseBody struct {
+	// The index of the share added
+	Index *int `form:"index,omitempty" json:"index,omitempty" xml:"index,omitempty"`
 }
 
 // GetKeyStatusResponseBody is the type of the "fishykeys" service
@@ -47,6 +61,15 @@ func NewCreateMasterKeyRequestBody(p *fishykeys.CreateMasterKeyPayload) *CreateM
 	body := &CreateMasterKeyRequestBody{
 		TotalShares: p.TotalShares,
 		MinShares:   p.MinShares,
+	}
+	return body
+}
+
+// NewAddShareRequestBody builds the HTTP request body from the payload of the
+// "add_share" endpoint of the "fishykeys" service.
+func NewAddShareRequestBody(p *fishykeys.AddSharePayload) *AddShareRequestBody {
+	body := &AddShareRequestBody{
+		Share: p.Share,
 	}
 	return body
 }
@@ -77,6 +100,48 @@ func NewCreateMasterKeyInternalError(body string) fishykeys.InternalError {
 // create_master_key endpoint invalid_parameters error.
 func NewCreateMasterKeyInvalidParameters(body string) fishykeys.InvalidParameters {
 	v := fishykeys.InvalidParameters(body)
+
+	return v
+}
+
+// NewCreateMasterKeyKeyAlreadyExists builds a fishykeys service
+// create_master_key endpoint key_already_exists error.
+func NewCreateMasterKeyKeyAlreadyExists(body string) fishykeys.KeyAlreadyExists {
+	v := fishykeys.KeyAlreadyExists(body)
+
+	return v
+}
+
+// NewAddShareResultCreated builds a "fishykeys" service "add_share" endpoint
+// result from a HTTP "Created" response.
+func NewAddShareResultCreated(body *AddShareResponseBody) *fishykeys.AddShareResult {
+	v := &fishykeys.AddShareResult{
+		Index: body.Index,
+	}
+
+	return v
+}
+
+// NewAddShareInternalError builds a fishykeys service add_share endpoint
+// internal_error error.
+func NewAddShareInternalError(body string) fishykeys.InternalError {
+	v := fishykeys.InternalError(body)
+
+	return v
+}
+
+// NewAddShareInvalidParameters builds a fishykeys service add_share endpoint
+// invalid_parameters error.
+func NewAddShareInvalidParameters(body string) fishykeys.InvalidParameters {
+	v := fishykeys.InvalidParameters(body)
+
+	return v
+}
+
+// NewAddShareTooManyShares builds a fishykeys service add_share endpoint
+// too_many_shares error.
+func NewAddShareTooManyShares(body string) fishykeys.TooManyShares {
+	v := fishykeys.TooManyShares(body)
 
 	return v
 }

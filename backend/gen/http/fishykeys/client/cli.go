@@ -32,3 +32,21 @@ func BuildCreateMasterKeyPayload(fishykeysCreateMasterKeyBody string) (*fishykey
 
 	return v, nil
 }
+
+// BuildAddSharePayload builds the payload for the fishykeys add_share endpoint
+// from CLI flags.
+func BuildAddSharePayload(fishykeysAddShareBody string) (*fishykeys.AddSharePayload, error) {
+	var err error
+	var body AddShareRequestBody
+	{
+		err = json.Unmarshal([]byte(fishykeysAddShareBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"share\": 5\n   }'")
+		}
+	}
+	v := &fishykeys.AddSharePayload{
+		Share: body.Share,
+	}
+
+	return v, nil
+}

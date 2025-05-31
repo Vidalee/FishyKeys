@@ -21,6 +21,10 @@ type Client struct {
 	// create_master_key endpoint.
 	CreateMasterKeyDoer goahttp.Doer
 
+	// AddShare Doer is the HTTP client used to make requests to the add_share
+	// endpoint.
+	AddShareDoer goahttp.Doer
+
 	// GetKeyStatus Doer is the HTTP client used to make requests to the
 	// get_key_status endpoint.
 	GetKeyStatusDoer goahttp.Doer
@@ -46,6 +50,7 @@ func NewClient(
 ) *Client {
 	return &Client{
 		CreateMasterKeyDoer: doer,
+		AddShareDoer:        doer,
 		GetKeyStatusDoer:    doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -74,6 +79,30 @@ func (c *Client) CreateMasterKey() goa.Endpoint {
 		resp, err := c.CreateMasterKeyDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("fishykeys", "create_master_key", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// AddShare returns an endpoint that makes HTTP requests to the fishykeys
+// service add_share server.
+func (c *Client) AddShare() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeAddShareRequest(c.encoder)
+		decodeResponse = DecodeAddShareResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildAddShareRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AddShareDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("fishykeys", "add_share", err)
 		}
 		return decodeResponse(resp)
 	}

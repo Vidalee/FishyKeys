@@ -21,11 +21,25 @@ type CreateMasterKeyRequestBody struct {
 	MinShares *int `form:"min_shares,omitempty" json:"min_shares,omitempty" xml:"min_shares,omitempty"`
 }
 
+// AddShareRequestBody is the type of the "fishykeys" service "add_share"
+// endpoint HTTP request body.
+type AddShareRequestBody struct {
+	// One of the shares need to unlock the master key
+	Share *int `form:"share,omitempty" json:"share,omitempty" xml:"share,omitempty"`
+}
+
 // CreateMasterKeyResponseBody is the type of the "fishykeys" service
 // "create_master_key" endpoint HTTP response body.
 type CreateMasterKeyResponseBody struct {
 	// The generated key shares
 	Shares []string `form:"shares,omitempty" json:"shares,omitempty" xml:"shares,omitempty"`
+}
+
+// AddShareResponseBody is the type of the "fishykeys" service "add_share"
+// endpoint HTTP response body.
+type AddShareResponseBody struct {
+	// The index of the share added
+	Index *int `form:"index,omitempty" json:"index,omitempty" xml:"index,omitempty"`
 }
 
 // GetKeyStatusResponseBody is the type of the "fishykeys" service
@@ -54,6 +68,15 @@ func NewCreateMasterKeyResponseBody(res *fishykeys.CreateMasterKeyResult) *Creat
 	return body
 }
 
+// NewAddShareResponseBody builds the HTTP response body from the result of the
+// "add_share" endpoint of the "fishykeys" service.
+func NewAddShareResponseBody(res *fishykeys.AddShareResult) *AddShareResponseBody {
+	body := &AddShareResponseBody{
+		Index: res.Index,
+	}
+	return body
+}
+
 // NewGetKeyStatusResponseBody builds the HTTP response body from the result of
 // the "get_key_status" endpoint of the "fishykeys" service.
 func NewGetKeyStatusResponseBody(res *fishykeys.GetKeyStatusResult) *GetKeyStatusResponseBody {
@@ -77,6 +100,15 @@ func NewCreateMasterKeyPayload(body *CreateMasterKeyRequestBody) *fishykeys.Crea
 	return v
 }
 
+// NewAddSharePayload builds a fishykeys service add_share endpoint payload.
+func NewAddSharePayload(body *AddShareRequestBody) *fishykeys.AddSharePayload {
+	v := &fishykeys.AddSharePayload{
+		Share: *body.Share,
+	}
+
+	return v
+}
+
 // ValidateCreateMasterKeyRequestBody runs the validations defined on
 // create_master_key_request_body
 func ValidateCreateMasterKeyRequestBody(body *CreateMasterKeyRequestBody) (err error) {
@@ -85,6 +117,15 @@ func ValidateCreateMasterKeyRequestBody(body *CreateMasterKeyRequestBody) (err e
 	}
 	if body.MinShares == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("min_shares", "body"))
+	}
+	return
+}
+
+// ValidateAddShareRequestBody runs the validations defined on
+// add_share_request_body
+func ValidateAddShareRequestBody(body *AddShareRequestBody) (err error) {
+	if body.Share == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("share", "body"))
 	}
 	return
 }

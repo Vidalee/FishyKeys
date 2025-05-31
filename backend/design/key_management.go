@@ -29,6 +29,30 @@ var _ = Service("fishykeys", func() {
 			Response(StatusCreated)
 			Response("invalid_parameters", StatusBadRequest)
 			Response("internal_error", StatusInternalServerError)
+			Response("key_already_exists", StatusConflict)
+		})
+	})
+
+	Method("add_share", func() {
+		Description("Add a share to unlock the master key")
+		Payload(func() {
+			Attribute("share", Int, "One of the shares need to unlock the master key", func() {
+				Example(5)
+			})
+			Required("share")
+		})
+		Result(func() {
+			Attribute("index", Int, "The index of the share added")
+		})
+		Error("invalid_parameters", String, "Invalid parameters provided")
+		Error("internal_error", String, "Internal server error")
+		Error("too_many_shares", String, "The maximum number of shares has been reached")
+		HTTP(func() {
+			POST("/key_management/create_master_key")
+			Response(StatusCreated)
+			Response("invalid_parameters", StatusBadRequest)
+			Response("internal_error", StatusInternalServerError)
+			Response("too_many_shares", StatusConflict)
 		})
 	})
 

@@ -22,7 +22,7 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `fishykeys (create-master-key|get-key-status)
+	return `fishykeys (create-master-key|add-share|get-key-status)
 `
 }
 
@@ -50,10 +50,14 @@ func ParseEndpoint(
 		fishykeysCreateMasterKeyFlags    = flag.NewFlagSet("create-master-key", flag.ExitOnError)
 		fishykeysCreateMasterKeyBodyFlag = fishykeysCreateMasterKeyFlags.String("body", "REQUIRED", "")
 
+		fishykeysAddShareFlags    = flag.NewFlagSet("add-share", flag.ExitOnError)
+		fishykeysAddShareBodyFlag = fishykeysAddShareFlags.String("body", "REQUIRED", "")
+
 		fishykeysGetKeyStatusFlags = flag.NewFlagSet("get-key-status", flag.ExitOnError)
 	)
 	fishykeysFlags.Usage = fishykeysUsage
 	fishykeysCreateMasterKeyFlags.Usage = fishykeysCreateMasterKeyUsage
+	fishykeysAddShareFlags.Usage = fishykeysAddShareUsage
 	fishykeysGetKeyStatusFlags.Usage = fishykeysGetKeyStatusUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
@@ -93,6 +97,9 @@ func ParseEndpoint(
 			case "create-master-key":
 				epf = fishykeysCreateMasterKeyFlags
 
+			case "add-share":
+				epf = fishykeysAddShareFlags
+
 			case "get-key-status":
 				epf = fishykeysGetKeyStatusFlags
 
@@ -124,6 +131,9 @@ func ParseEndpoint(
 			case "create-master-key":
 				endpoint = c.CreateMasterKey()
 				data, err = fishykeysc.BuildCreateMasterKeyPayload(*fishykeysCreateMasterKeyBodyFlag)
+			case "add-share":
+				endpoint = c.AddShare()
+				data, err = fishykeysc.BuildAddSharePayload(*fishykeysAddShareBodyFlag)
 			case "get-key-status":
 				endpoint = c.GetKeyStatus()
 			}
@@ -145,6 +155,7 @@ Usage:
 
 COMMAND:
     create-master-key: Create a new master key and split it into shares
+    add-share: Add a share to unlock the master key
     get-key-status: Get the current status of the master key
 
 Additional help:
@@ -161,6 +172,19 @@ Example:
     %[1]s fishykeys create-master-key --body '{
       "min_shares": 3,
       "total_shares": 5
+   }'
+`, os.Args[0])
+}
+
+func fishykeysAddShareUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] fishykeys add-share -body JSON
+
+Add a share to unlock the master key
+    -body JSON: 
+
+Example:
+    %[1]s fishykeys add-share --body '{
+      "share": 5
    }'
 `, os.Args[0])
 }

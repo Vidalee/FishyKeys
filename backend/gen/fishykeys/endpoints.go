@@ -16,6 +16,7 @@ import (
 // Endpoints wraps the "fishykeys" service endpoints.
 type Endpoints struct {
 	CreateMasterKey goa.Endpoint
+	AddShare        goa.Endpoint
 	GetKeyStatus    goa.Endpoint
 }
 
@@ -23,6 +24,7 @@ type Endpoints struct {
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
 		CreateMasterKey: NewCreateMasterKeyEndpoint(s),
+		AddShare:        NewAddShareEndpoint(s),
 		GetKeyStatus:    NewGetKeyStatusEndpoint(s),
 	}
 }
@@ -30,6 +32,7 @@ func NewEndpoints(s Service) *Endpoints {
 // Use applies the given middleware to all the "fishykeys" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.CreateMasterKey = m(e.CreateMasterKey)
+	e.AddShare = m(e.AddShare)
 	e.GetKeyStatus = m(e.GetKeyStatus)
 }
 
@@ -39,6 +42,15 @@ func NewCreateMasterKeyEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*CreateMasterKeyPayload)
 		return s.CreateMasterKey(ctx, p)
+	}
+}
+
+// NewAddShareEndpoint returns an endpoint function that calls the method
+// "add_share" of service "fishykeys".
+func NewAddShareEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*AddSharePayload)
+		return s.AddShare(ctx, p)
 	}
 }
 

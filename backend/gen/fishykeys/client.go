@@ -16,13 +16,15 @@ import (
 // Client is the "fishykeys" service client.
 type Client struct {
 	CreateMasterKeyEndpoint goa.Endpoint
+	AddShareEndpoint        goa.Endpoint
 	GetKeyStatusEndpoint    goa.Endpoint
 }
 
 // NewClient initializes a "fishykeys" service client given the endpoints.
-func NewClient(createMasterKey, getKeyStatus goa.Endpoint) *Client {
+func NewClient(createMasterKey, addShare, getKeyStatus goa.Endpoint) *Client {
 	return &Client{
 		CreateMasterKeyEndpoint: createMasterKey,
+		AddShareEndpoint:        addShare,
 		GetKeyStatusEndpoint:    getKeyStatus,
 	}
 }
@@ -41,6 +43,21 @@ func (c *Client) CreateMasterKey(ctx context.Context, p *CreateMasterKeyPayload)
 		return
 	}
 	return ires.(*CreateMasterKeyResult), nil
+}
+
+// AddShare calls the "add_share" endpoint of the "fishykeys" service.
+// AddShare may return the following errors:
+//   - "invalid_parameters" (type InvalidParameters)
+//   - "internal_error" (type InternalError)
+//   - "too_many_shares" (type TooManyShares)
+//   - error: internal error
+func (c *Client) AddShare(ctx context.Context, p *AddSharePayload) (res *AddShareResult, err error) {
+	var ires any
+	ires, err = c.AddShareEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*AddShareResult), nil
 }
 
 // GetKeyStatus calls the "get_key_status" endpoint of the "fishykeys" service.

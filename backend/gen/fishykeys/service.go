@@ -15,6 +15,8 @@ import (
 type Service interface {
 	// Create a new master key and split it into shares
 	CreateMasterKey(context.Context, *CreateMasterKeyPayload) (res *CreateMasterKeyResult, err error)
+	// Add a share to unlock the master key
+	AddShare(context.Context, *AddSharePayload) (res *AddShareResult, err error)
 	// Get the current status of the master key
 	GetKeyStatus(context.Context) (res *GetKeyStatusResult, err error)
 }
@@ -33,7 +35,20 @@ const ServiceName = "fishykeys"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [2]string{"create_master_key", "get_key_status"}
+var MethodNames = [3]string{"create_master_key", "add_share", "get_key_status"}
+
+// AddSharePayload is the payload type of the fishykeys service add_share
+// method.
+type AddSharePayload struct {
+	// One of the shares need to unlock the master key
+	Share int
+}
+
+// AddShareResult is the result type of the fishykeys service add_share method.
+type AddShareResult struct {
+	// The index of the share added
+	Index *int
+}
 
 // CreateMasterKeyPayload is the payload type of the fishykeys service
 // create_master_key method.
@@ -75,6 +90,9 @@ type KeyAlreadyExists string
 
 // No master key has been set
 type NoKeySet string
+
+// The maximum number of shares has been reached
+type TooManyShares string
 
 // Error returns an error description.
 func (e InternalError) Error() string {
@@ -142,4 +160,21 @@ func (e NoKeySet) ErrorName() string {
 // GoaErrorName returns "no_key_set".
 func (e NoKeySet) GoaErrorName() string {
 	return "no_key_set"
+}
+
+// Error returns an error description.
+func (e TooManyShares) Error() string {
+	return "The maximum number of shares has been reached"
+}
+
+// ErrorName returns "too_many_shares".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e TooManyShares) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "too_many_shares".
+func (e TooManyShares) GoaErrorName() string {
+	return "too_many_shares"
 }
