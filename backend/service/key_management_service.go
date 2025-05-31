@@ -32,16 +32,16 @@ func NewKeyManagementService(keyManager *crypto.KeyManager, repo repository.Glob
 	keySettings, err := repo.GetSettings(context.Background(), columnMasterKeyChecksum, columnTotalShares, columnMinShares)
 	if err != nil {
 		if !errors.Is(err, repository.ErrSettingNotFound) {
-			log.Println("error retrieving key settings on service init:", err)
+			log.Fatalf("error retrieving key settings on service init: %v", err)
 		}
 	} else {
 		minShares, err := strconv.Atoi(keySettings[columnMinShares])
 		if err != nil {
-			log.Fatalf("error parsing min shares from db:", err)
+			log.Fatalf("error parsing min shares from db: %v", err)
 		}
 		totalShares, err := strconv.Atoi(keySettings[columnTotalShares])
 		if err != nil {
-			log.Fatalf("error parsing total shares from db:", err)
+			log.Fatalf("error parsing total shares from db: %v", err)
 		}
 		err = keyManager.ConfigureKeySystem(minShares, totalShares)
 		if err != nil {
