@@ -1,4 +1,4 @@
-package shamir
+package crypto
 
 import (
 	"bytes"

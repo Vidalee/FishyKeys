@@ -1,0 +1,9 @@
+pg:
+  user: "fishykeys"
+  pass: "fishykeys"
+  address: "localhost:5432"
+  database: "fishykeys"
+
+server:
+  address: "localhost"
+  port: 8080
