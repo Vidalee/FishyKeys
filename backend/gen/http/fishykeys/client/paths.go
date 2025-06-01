@@ -12,12 +12,17 @@ func CreateMasterKeyFishykeysPath() string {
 	return "/key_management/create_master_key"
 }
 
-// AddShareFishykeysPath returns the URL path to the fishykeys service add_share HTTP endpoint.
-func AddShareFishykeysPath() string {
-	return "/key_management/create_master_key"
-}
-
 // GetKeyStatusFishykeysPath returns the URL path to the fishykeys service get_key_status HTTP endpoint.
 func GetKeyStatusFishykeysPath() string {
 	return "/key_management/status"
+}
+
+// AddShareFishykeysPath returns the URL path to the fishykeys service add_share HTTP endpoint.
+func AddShareFishykeysPath() string {
+	return "/key_management/add_share"
+}
+
+// DeleteShareFishykeysPath returns the URL path to the fishykeys service delete_share HTTP endpoint.
+func DeleteShareFishykeysPath() string {
+	return "/key_management/delete_share"
 }

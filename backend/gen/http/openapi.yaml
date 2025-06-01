@@ -13,7 +13,7 @@ produces:
     - application/xml
     - application/gob
 paths:
-    /key_management/create_master_key:
+    /key_management/add_share:
         post:
             tags:
                 - fishykeys
@@ -33,8 +33,86 @@ paths:
                     description: Created response.
                     schema:
                         $ref: '#/definitions/FishykeysAddShareResponseBody'
+                        required:
+                            - index
+                            - unlocked
                 "400":
                     description: Bad Request response.
+                    schema:
+                        type: string
+                "404":
+                    description: Not Found response.
+                    schema:
+                        type: string
+                "409":
+                    description: Conflict response.
+                    schema:
+                        type: string
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
+            schemes:
+                - http
+    /key_management/create_master_key:
+        post:
+            tags:
+                - fishykeys
+            summary: create_master_key fishykeys
+            description: Create a new master key and split it into shares
+            operationId: fishykeys#create_master_key
+            parameters:
+                - name: create_master_key_request_body
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/FishykeysCreateMasterKeyRequestBody'
+                    required:
+                        - total_shares
+                        - min_shares
+            responses:
+                "201":
+                    description: Created response.
+                    schema:
+                        $ref: '#/definitions/FishykeysCreateMasterKeyResponseBody'
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        type: string
+                "409":
+                    description: Conflict response.
+                    schema:
+                        type: string
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
+            schemes:
+                - http
+    /key_management/delete_share:
+        delete:
+            tags:
+                - fishykeys
+            summary: delete_share fishykeys
+            description: Delete a share from the key management system
+            operationId: fishykeys#delete_share
+            parameters:
+                - name: delete_share_request_body
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/FishykeysDeleteShareRequestBody'
+                    required:
+                        - index
+            responses:
+                "200":
+                    description: OK response.
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        type: string
+                "404":
+                    description: Not Found response.
                     schema:
                         type: string
                 "409":
@@ -80,12 +158,11 @@ definitions:
         type: object
         properties:
             share:
-                type: integer
+                type: string
                 description: One of the shares need to unlock the master key
-                example: 5
-                format: int64
+                example: EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0
         example:
-            share: 5
+            share: EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0
         required:
             - share
     FishykeysAddShareResponseBody:
@@ -95,10 +172,18 @@ definitions:
             index:
                 type: integer
                 description: The index of the share added
-                example: 3773266613403734291
+                example: 1009166832579766622
                 format: int64
+            unlocked:
+                type: boolean
+                description: Whether the master key has been unlocked
+                example: true
         example:
-            index: 1713451832187604687
+            index: 6662091457102477057
+            unlocked: true
+        required:
+            - index
+            - unlocked
     FishykeysCreateMasterKeyRequestBody:
         title: FishykeysCreateMasterKeyRequestBody
         type: object
@@ -127,17 +212,31 @@ definitions:
                 type: array
                 items:
                     type: string
-                    example: Quo et reprehenderit.
+                    example: Est voluptatem pariatur voluptatem.
                 description: The generated key shares
                 example:
-                    - Cumque et ratione autem sunt.
-                    - Vitae quia enim ut.
-                    - Maxime voluptas qui quia possimus.
-                    - Magnam quia consequatur rem beatae a maxime.
+                    - Ratione qui itaque amet ipsum error.
+                    - Et assumenda.
+                    - Commodi repudiandae sit est consequuntur animi.
         example:
             shares:
-                - Autem voluptate occaecati minima fugiat laboriosam.
-                - Dolores nesciunt occaecati neque cum.
+                - Ratione dolorum perspiciatis consectetur.
+                - Quia libero vel quod dignissimos libero.
+                - Nobis praesentium non numquam maxime rem quisquam.
+                - Sunt eos in ut.
+    FishykeysDeleteShareRequestBody:
+        title: FishykeysDeleteShareRequestBody
+        type: object
+        properties:
+            index:
+                type: integer
+                description: The index of the share to delete
+                example: 1
+                format: int64
+        example:
+            index: 1
+        required:
+            - index
     FishykeysGetKeyStatusResponseBody:
         title: FishykeysGetKeyStatusResponseBody
         type: object
@@ -145,27 +244,27 @@ definitions:
             current_shares:
                 type: integer
                 description: Number of shares currently held
-                example: 1825174946653460072
+                example: 6518574107503557211
                 format: int64
             is_locked:
                 type: boolean
                 description: Whether the key is currently locked
-                example: true
+                example: false
             min_shares:
                 type: integer
                 description: Minimum number of shares required
-                example: 2721240584742661603
+                example: 5594704514197726645
                 format: int64
             total_shares:
                 type: integer
                 description: Total number of shares
-                example: 1050104123142298514
+                example: 4934522018738475179
                 format: int64
         example:
-            current_shares: 5011669276897181081
-            is_locked: false
-            min_shares: 8790618916521164378
-            total_shares: 7582538673232719918
+            current_shares: 1686211336919984919
+            is_locked: true
+            min_shares: 3002255462360240987
+            total_shares: 9117224753253597825
         required:
             - is_locked
             - current_shares

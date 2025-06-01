@@ -41,11 +41,29 @@ func BuildAddSharePayload(fishykeysAddShareBody string) (*fishykeys.AddSharePayl
 	{
 		err = json.Unmarshal([]byte(fishykeysAddShareBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"share\": 5\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"share\": \"EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0\"\n   }'")
 		}
 	}
 	v := &fishykeys.AddSharePayload{
 		Share: body.Share,
+	}
+
+	return v, nil
+}
+
+// BuildDeleteSharePayload builds the payload for the fishykeys delete_share
+// endpoint from CLI flags.
+func BuildDeleteSharePayload(fishykeysDeleteShareBody string) (*fishykeys.DeleteSharePayload, error) {
+	var err error
+	var body DeleteShareRequestBody
+	{
+		err = json.Unmarshal([]byte(fishykeysDeleteShareBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"index\": 1\n   }'")
+		}
+	}
+	v := &fishykeys.DeleteSharePayload{
+		Index: body.Index,
 	}
 
 	return v, nil

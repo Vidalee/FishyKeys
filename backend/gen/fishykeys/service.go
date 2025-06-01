@@ -15,10 +15,12 @@ import (
 type Service interface {
 	// Create a new master key and split it into shares
 	CreateMasterKey(context.Context, *CreateMasterKeyPayload) (res *CreateMasterKeyResult, err error)
-	// Add a share to unlock the master key
-	AddShare(context.Context, *AddSharePayload) (res *AddShareResult, err error)
 	// Get the current status of the master key
 	GetKeyStatus(context.Context) (res *GetKeyStatusResult, err error)
+	// Add a share to unlock the master key
+	AddShare(context.Context, *AddSharePayload) (res *AddShareResult, err error)
+	// Delete a share from the key management system
+	DeleteShare(context.Context, *DeleteSharePayload) (err error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -35,19 +37,21 @@ const ServiceName = "fishykeys"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [3]string{"create_master_key", "add_share", "get_key_status"}
+var MethodNames = [4]string{"create_master_key", "get_key_status", "add_share", "delete_share"}
 
 // AddSharePayload is the payload type of the fishykeys service add_share
 // method.
 type AddSharePayload struct {
 	// One of the shares need to unlock the master key
-	Share int
+	Share string
 }
 
 // AddShareResult is the result type of the fishykeys service add_share method.
 type AddShareResult struct {
 	// The index of the share added
-	Index *int
+	Index int
+	// Whether the master key has been unlocked
+	Unlocked bool
 }
 
 // CreateMasterKeyPayload is the payload type of the fishykeys service
@@ -66,6 +70,13 @@ type CreateMasterKeyResult struct {
 	Shares []string
 }
 
+// DeleteSharePayload is the payload type of the fishykeys service delete_share
+// method.
+type DeleteSharePayload struct {
+	// The index of the share to delete
+	Index int
+}
+
 // GetKeyStatusResult is the result type of the fishykeys service
 // get_key_status method.
 type GetKeyStatusResult struct {
@@ -79,6 +90,9 @@ type GetKeyStatusResult struct {
 	TotalShares int
 }
 
+// Could not recombine the shares to unlock the key
+type CouldNotRecombine string
+
 // Internal server error
 type InternalError string
 
@@ -88,11 +102,37 @@ type InvalidParameters string
 // A master key already exists
 type KeyAlreadyExists string
 
+// The master key is already unlocked
+type KeyAlreadyUnlocked string
+
 // No master key has been set
 type NoKeySet string
 
 // The maximum number of shares has been reached
 type TooManyShares string
+
+// The index provided does not match any share
+type WrongIndex string
+
+// The key recombined from the shares is not the correct key
+type WrongShares string
+
+// Error returns an error description.
+func (e CouldNotRecombine) Error() string {
+	return "Could not recombine the shares to unlock the key"
+}
+
+// ErrorName returns "could_not_recombine".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e CouldNotRecombine) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "could_not_recombine".
+func (e CouldNotRecombine) GoaErrorName() string {
+	return "could_not_recombine"
+}
 
 // Error returns an error description.
 func (e InternalError) Error() string {
@@ -146,6 +186,23 @@ func (e KeyAlreadyExists) GoaErrorName() string {
 }
 
 // Error returns an error description.
+func (e KeyAlreadyUnlocked) Error() string {
+	return "The master key is already unlocked"
+}
+
+// ErrorName returns "key_already_unlocked".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e KeyAlreadyUnlocked) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "key_already_unlocked".
+func (e KeyAlreadyUnlocked) GoaErrorName() string {
+	return "key_already_unlocked"
+}
+
+// Error returns an error description.
 func (e NoKeySet) Error() string {
 	return "No master key has been set"
 }
@@ -177,4 +234,38 @@ func (e TooManyShares) ErrorName() string {
 // GoaErrorName returns "too_many_shares".
 func (e TooManyShares) GoaErrorName() string {
 	return "too_many_shares"
+}
+
+// Error returns an error description.
+func (e WrongIndex) Error() string {
+	return "The index provided does not match any share"
+}
+
+// ErrorName returns "wrong_index".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e WrongIndex) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "wrong_index".
+func (e WrongIndex) GoaErrorName() string {
+	return "wrong_index"
+}
+
+// Error returns an error description.
+func (e WrongShares) Error() string {
+	return "The key recombined from the shares is not the correct key"
+}
+
+// ErrorName returns "wrong_shares".
+//
+// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
+func (e WrongShares) ErrorName() string {
+	return e.GoaErrorName()
+}
+
+// GoaErrorName returns "wrong_shares".
+func (e WrongShares) GoaErrorName() string {
+	return "wrong_shares"
 }

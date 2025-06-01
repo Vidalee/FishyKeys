@@ -33,29 +33,6 @@ var _ = Service("fishykeys", func() {
 		})
 	})
 
-	Method("add_share", func() {
-		Description("Add a share to unlock the master key")
-		Payload(func() {
-			Attribute("share", Int, "One of the shares need to unlock the master key", func() {
-				Example(5)
-			})
-			Required("share")
-		})
-		Result(func() {
-			Attribute("index", Int, "The index of the share added")
-		})
-		Error("invalid_parameters", String, "Invalid parameters provided")
-		Error("internal_error", String, "Internal server error")
-		Error("too_many_shares", String, "The maximum number of shares has been reached")
-		HTTP(func() {
-			POST("/key_management/create_master_key")
-			Response(StatusCreated)
-			Response("invalid_parameters", StatusBadRequest)
-			Response("internal_error", StatusInternalServerError)
-			Response("too_many_shares", StatusConflict)
-		})
-	})
-
 	Method("get_key_status", func() {
 		Description("Get the current status of the master key")
 		Result(func() {
@@ -72,6 +49,61 @@ var _ = Service("fishykeys", func() {
 			Response(StatusOK)
 			Response("no_key_set", StatusNotFound)
 			Response("internal_error", StatusInternalServerError)
+		})
+	})
+
+	Method("add_share", func() {
+		Description("Add a share to unlock the master key")
+		Payload(func() {
+			Attribute("share", String, "One of the shares need to unlock the master key", func() {
+				Example("EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0")
+			})
+			Required("share")
+		})
+		Result(func() {
+			Attribute("index", Int, "The index of the share added")
+			Attribute("unlocked", Boolean, "Whether the master key has been unlocked")
+			Required("index", "unlocked")
+		})
+		Error("invalid_parameters", String, "Invalid parameters provided")
+		Error("internal_error", String, "Internal server error")
+		Error("too_many_shares", String, "The maximum number of shares has been reached")
+		Error("could_not_recombine", String, "Could not recombine the shares to unlock the key")
+		Error("wrong_shares", String, "The key recombined from the shares is not the correct key")
+		Error("no_key_set", String, "No master key has been set")
+		Error("key_already_unlocked", String, "The master key is already unlocked")
+		HTTP(func() {
+			POST("/key_management/add_share")
+			Response(StatusCreated)
+			Response("invalid_parameters", StatusBadRequest)
+			Response("internal_error", StatusInternalServerError)
+			Response("too_many_shares", StatusConflict)
+			Response("could_not_recombine", StatusBadRequest)
+			Response("wrong_shares", StatusBadRequest)
+			Response("no_key_set", StatusNotFound)
+			Response("key_already_unlocked", StatusConflict)
+		})
+	})
+
+	Method("delete_share", func() {
+		Description("Delete a share from the key management system")
+		Payload(func() {
+			Attribute("index", Int, "The index of the share to delete", func() {
+				Example(1)
+			})
+			Required("index")
+		})
+		Error("no_key_set", String, "No master key has been set")
+		Error("internal_error", String, "Internal server error")
+		Error("key_already_unlocked", String, "The master key is already unlocked")
+		Error("wrong_index", String, "The index provided does not match any share")
+		HTTP(func() {
+			DELETE("/key_management/delete_share")
+			Response(StatusOK)
+			Response("no_key_set", StatusNotFound)
+			Response("internal_error", StatusInternalServerError)
+			Response("key_already_unlocked", StatusConflict)
+			Response("wrong_index", StatusBadRequest)
 		})
 	})
 })

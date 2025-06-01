@@ -20,8 +20,9 @@ import (
 type Server struct {
 	Mounts          []*MountPoint
 	CreateMasterKey http.Handler
-	AddShare        http.Handler
 	GetKeyStatus    http.Handler
+	AddShare        http.Handler
+	DeleteShare     http.Handler
 }
 
 // MountPoint holds information about the mounted endpoints.
@@ -52,12 +53,14 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"CreateMasterKey", "POST", "/key_management/create_master_key"},
-			{"AddShare", "POST", "/key_management/create_master_key"},
 			{"GetKeyStatus", "GET", "/key_management/status"},
+			{"AddShare", "POST", "/key_management/add_share"},
+			{"DeleteShare", "DELETE", "/key_management/delete_share"},
 		},
 		CreateMasterKey: NewCreateMasterKeyHandler(e.CreateMasterKey, mux, decoder, encoder, errhandler, formatter),
-		AddShare:        NewAddShareHandler(e.AddShare, mux, decoder, encoder, errhandler, formatter),
 		GetKeyStatus:    NewGetKeyStatusHandler(e.GetKeyStatus, mux, decoder, encoder, errhandler, formatter),
+		AddShare:        NewAddShareHandler(e.AddShare, mux, decoder, encoder, errhandler, formatter),
+		DeleteShare:     NewDeleteShareHandler(e.DeleteShare, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -67,8 +70,9 @@ func (s *Server) Service() string { return "fishykeys" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.CreateMasterKey = m(s.CreateMasterKey)
-	s.AddShare = m(s.AddShare)
 	s.GetKeyStatus = m(s.GetKeyStatus)
+	s.AddShare = m(s.AddShare)
+	s.DeleteShare = m(s.DeleteShare)
 }
 
 // MethodNames returns the methods served.
@@ -77,8 +81,9 @@ func (s *Server) MethodNames() []string { return fishykeys.MethodNames[:] }
 // Mount configures the mux to serve the fishykeys endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountCreateMasterKeyHandler(mux, h.CreateMasterKey)
-	MountAddShareHandler(mux, h.AddShare)
 	MountGetKeyStatusHandler(mux, h.GetKeyStatus)
+	MountAddShareHandler(mux, h.AddShare)
+	MountDeleteShareHandler(mux, h.DeleteShare)
 }
 
 // Mount configures the mux to serve the fishykeys endpoints.
@@ -137,6 +142,50 @@ func NewCreateMasterKeyHandler(
 	})
 }
 
+// MountGetKeyStatusHandler configures the mux to serve the "fishykeys" service
+// "get_key_status" endpoint.
+func MountGetKeyStatusHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/key_management/status", f)
+}
+
+// NewGetKeyStatusHandler creates a HTTP handler which loads the HTTP request
+// and calls the "fishykeys" service "get_key_status" endpoint.
+func NewGetKeyStatusHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		encodeResponse = EncodeGetKeyStatusResponse(encoder)
+		encodeError    = EncodeGetKeyStatusError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "get_key_status")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "fishykeys")
+		var err error
+		res, err := endpoint(ctx, nil)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountAddShareHandler configures the mux to serve the "fishykeys" service
 // "add_share" endpoint.
 func MountAddShareHandler(mux goahttp.Muxer, h http.Handler) {
@@ -146,7 +195,7 @@ func MountAddShareHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/key_management/create_master_key", f)
+	mux.Handle("POST", "/key_management/add_share", f)
 }
 
 // NewAddShareHandler creates a HTTP handler which loads the HTTP request and
@@ -188,21 +237,21 @@ func NewAddShareHandler(
 	})
 }
 
-// MountGetKeyStatusHandler configures the mux to serve the "fishykeys" service
-// "get_key_status" endpoint.
-func MountGetKeyStatusHandler(mux goahttp.Muxer, h http.Handler) {
+// MountDeleteShareHandler configures the mux to serve the "fishykeys" service
+// "delete_share" endpoint.
+func MountDeleteShareHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := h.(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/key_management/status", f)
+	mux.Handle("DELETE", "/key_management/delete_share", f)
 }
 
-// NewGetKeyStatusHandler creates a HTTP handler which loads the HTTP request
-// and calls the "fishykeys" service "get_key_status" endpoint.
-func NewGetKeyStatusHandler(
+// NewDeleteShareHandler creates a HTTP handler which loads the HTTP request
+// and calls the "fishykeys" service "delete_share" endpoint.
+func NewDeleteShareHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -211,15 +260,22 @@ func NewGetKeyStatusHandler(
 	formatter func(ctx context.Context, err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		encodeResponse = EncodeGetKeyStatusResponse(encoder)
-		encodeError    = EncodeGetKeyStatusError(encoder, formatter)
+		decodeRequest  = DecodeDeleteShareRequest(mux, decoder)
+		encodeResponse = EncodeDeleteShareResponse(encoder)
+		encodeError    = EncodeDeleteShareError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "get_key_status")
+		ctx = context.WithValue(ctx, goa.MethodKey, "delete_share")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "fishykeys")
-		var err error
-		res, err := endpoint(ctx, nil)
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
 		if err != nil {
 			if err := encodeError(ctx, w, err); err != nil {
 				errhandler(ctx, w, err)

@@ -67,12 +67,12 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 
 	masterKey, err := crypto.GenerateSecret()
 	if err != nil {
-		return nil, err
+		return nil, genkey.InternalError("error generating master key: " + err.Error())
 	}
 	checksum, err := crypto.Encrypt(masterKey, []byte(checksumExpectedValue))
 	shares, err := crypto.SplitSecret(masterKey, payload.TotalShares, payload.MinShares)
 	if err != nil {
-		return nil, err
+		return nil, genkey.InternalError("error splitting secret into shares: " + err.Error())
 	}
 
 	encodedShares := make([]string, len(shares))
@@ -86,12 +86,12 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		columnMasterKeyChecksum: base64.StdEncoding.EncodeToString(checksum),
 	})
 	if err != nil {
-		return nil, err
+		return nil, genkey.InternalError("error storing key settings: " + err.Error())
 	}
 
 	err = s.keyManager.SetNewMasterKey(masterKey, payload.MinShares, payload.TotalShares)
 	if err != nil {
-		return nil, err
+		return nil, genkey.InternalError("error setting new master key: " + err.Error())
 	}
 
 	return &genkey.CreateMasterKeyResult{
@@ -105,7 +105,7 @@ func (s *KeyManagementService) GetKeyStatus(ctx context.Context) (*genkey.GetKey
 		if errors.Is(err, repository.ErrSettingNotFound) {
 			return nil, genkey.NoKeySet("master key not set")
 		}
-		return nil, err
+		return nil, genkey.InternalError("error retrieving key status: " + err.Error())
 	}
 
 	state, currentSharesNumber, minShares, totalShares := s.keyManager.Status()
@@ -117,10 +117,85 @@ func (s *KeyManagementService) GetKeyStatus(ctx context.Context) (*genkey.GetKey
 	}, nil
 }
 
-func (s *KeyManagementService) AddShare() {
-	//s.keyManager.AddShare()
+func (s *KeyManagementService) AddShare(ctx context.Context, payload *genkey.AddSharePayload) (*genkey.AddShareResult, error) {
+	state := s.keyManager.GetState()
+	if state == crypto.StateUninitialized {
+		return nil, genkey.NoKeySet("no master key configured")
+	} else if state == crypto.StateUnlocked {
+		return nil, genkey.KeyAlreadyUnlocked("key is already unlocked, cannot add share")
+	}
+
+	decodedShare, err := base64.StdEncoding.DecodeString(payload.Share)
+	index, unlocked, err := s.keyManager.AddShare(decodedShare)
+	if err != nil {
+		if errors.Is(err, crypto.ErrMaxSharesReached) {
+			return nil, genkey.TooManyShares("maximum number of shares reached")
+		}
+		if errors.Is(err, crypto.ErrNoKeyConfigured) {
+			return nil, genkey.NoKeySet("no master key configured")
+		}
+		if errors.Is(err, crypto.ErrCouldNotRecombine) {
+			return nil, genkey.CouldNotRecombine("could not recombine shares: " + err.Error())
+		}
+		return nil, genkey.InternalError("error adding share: " + err.Error())
+	}
+
+	if unlocked {
+		checksum, err := s.settingsRepository.GetSetting(ctx, columnMasterKeyChecksum)
+		decodedChecksum, err := base64.StdEncoding.DecodeString(checksum)
+		if err != nil {
+			s.keyManager.RollbackToLocked()
+			return nil, genkey.InternalError("error retrieving master key checksum: " + err.Error())
+		}
+		masterKey, err := s.keyManager.GetMasterKey()
+		if err != nil {
+			s.keyManager.RollbackToLocked()
+			return nil, genkey.InternalError("error retrieving master key: " + err.Error())
+		}
+		decryptedChecksum, err := crypto.Decrypt(masterKey, decodedChecksum)
+		if err != nil {
+			s.keyManager.RollbackToLocked()
+			return nil, genkey.WrongShares("error decrypting master key checksum: " + err.Error())
+		}
+		if string(decryptedChecksum) != checksumExpectedValue {
+			s.keyManager.RollbackToLocked()
+			return nil, genkey.WrongShares("master key checksum does not match expected value")
+		}
+	}
+
+	return &genkey.AddShareResult{
+		Index:    index,
+		Unlocked: unlocked,
+	}, nil
 }
 
-func (s *KeyManagementService) RemoveShare() {
-	//s.keyManager.RemoveShare()
+//	Method("share", func() {
+//		Description("Delete a share from the key management system")
+//		Error("no_key_set", String, "No master key has been set")
+//		Error("internal_error", String, "Internal server error")
+//		Error("key_already_unlocked", String, "The master key is already unlocked")
+//		Error("wrong_index", String, "The index provided does not match any share")
+//		HTTP(func() {
+//			DELETE("/key_management/status")
+//			Response(StatusOK)
+//			Response("no_key_set", StatusNotFound)
+//			Response("internal_error", StatusInternalServerError)
+//			Response("key_already_unlocked", StatusConflict)
+//			Response("wrong_index", StatusBadRequest)
+//		})
+//	})
+func (s *KeyManagementService) DeleteShare(ctx context.Context, payload *genkey.DeleteSharePayload) error {
+	state, _, _, maxShares := s.keyManager.Status()
+	if state == crypto.StateUninitialized {
+		return genkey.NoKeySet("no master key configured")
+	} else if state == crypto.StateUnlocked {
+		return genkey.KeyAlreadyUnlocked("key is already unlocked, cannot delete share")
+	}
+
+	if payload.Index < 0 || payload.Index >= maxShares {
+		return genkey.WrongIndex("index provided does not match any share")
+	}
+	s.keyManager.RemoveShare(payload.Index)
+
+	return nil
 }

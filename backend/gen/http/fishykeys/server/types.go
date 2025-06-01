@@ -25,7 +25,14 @@ type CreateMasterKeyRequestBody struct {
 // endpoint HTTP request body.
 type AddShareRequestBody struct {
 	// One of the shares need to unlock the master key
-	Share *int `form:"share,omitempty" json:"share,omitempty" xml:"share,omitempty"`
+	Share *string `form:"share,omitempty" json:"share,omitempty" xml:"share,omitempty"`
+}
+
+// DeleteShareRequestBody is the type of the "fishykeys" service "delete_share"
+// endpoint HTTP request body.
+type DeleteShareRequestBody struct {
+	// The index of the share to delete
+	Index *int `form:"index,omitempty" json:"index,omitempty" xml:"index,omitempty"`
 }
 
 // CreateMasterKeyResponseBody is the type of the "fishykeys" service
@@ -33,13 +40,6 @@ type AddShareRequestBody struct {
 type CreateMasterKeyResponseBody struct {
 	// The generated key shares
 	Shares []string `form:"shares,omitempty" json:"shares,omitempty" xml:"shares,omitempty"`
-}
-
-// AddShareResponseBody is the type of the "fishykeys" service "add_share"
-// endpoint HTTP response body.
-type AddShareResponseBody struct {
-	// The index of the share added
-	Index *int `form:"index,omitempty" json:"index,omitempty" xml:"index,omitempty"`
 }
 
 // GetKeyStatusResponseBody is the type of the "fishykeys" service
@@ -55,6 +55,15 @@ type GetKeyStatusResponseBody struct {
 	TotalShares int `form:"total_shares" json:"total_shares" xml:"total_shares"`
 }
 
+// AddShareResponseBody is the type of the "fishykeys" service "add_share"
+// endpoint HTTP response body.
+type AddShareResponseBody struct {
+	// The index of the share added
+	Index int `form:"index" json:"index" xml:"index"`
+	// Whether the master key has been unlocked
+	Unlocked bool `form:"unlocked" json:"unlocked" xml:"unlocked"`
+}
+
 // NewCreateMasterKeyResponseBody builds the HTTP response body from the result
 // of the "create_master_key" endpoint of the "fishykeys" service.
 func NewCreateMasterKeyResponseBody(res *fishykeys.CreateMasterKeyResult) *CreateMasterKeyResponseBody {
@@ -68,15 +77,6 @@ func NewCreateMasterKeyResponseBody(res *fishykeys.CreateMasterKeyResult) *Creat
 	return body
 }
 
-// NewAddShareResponseBody builds the HTTP response body from the result of the
-// "add_share" endpoint of the "fishykeys" service.
-func NewAddShareResponseBody(res *fishykeys.AddShareResult) *AddShareResponseBody {
-	body := &AddShareResponseBody{
-		Index: res.Index,
-	}
-	return body
-}
-
 // NewGetKeyStatusResponseBody builds the HTTP response body from the result of
 // the "get_key_status" endpoint of the "fishykeys" service.
 func NewGetKeyStatusResponseBody(res *fishykeys.GetKeyStatusResult) *GetKeyStatusResponseBody {
@@ -85,6 +85,16 @@ func NewGetKeyStatusResponseBody(res *fishykeys.GetKeyStatusResult) *GetKeyStatu
 		CurrentShares: res.CurrentShares,
 		MinShares:     res.MinShares,
 		TotalShares:   res.TotalShares,
+	}
+	return body
+}
+
+// NewAddShareResponseBody builds the HTTP response body from the result of the
+// "add_share" endpoint of the "fishykeys" service.
+func NewAddShareResponseBody(res *fishykeys.AddShareResult) *AddShareResponseBody {
+	body := &AddShareResponseBody{
+		Index:    res.Index,
+		Unlocked: res.Unlocked,
 	}
 	return body
 }
@@ -109,6 +119,16 @@ func NewAddSharePayload(body *AddShareRequestBody) *fishykeys.AddSharePayload {
 	return v
 }
 
+// NewDeleteSharePayload builds a fishykeys service delete_share endpoint
+// payload.
+func NewDeleteSharePayload(body *DeleteShareRequestBody) *fishykeys.DeleteSharePayload {
+	v := &fishykeys.DeleteSharePayload{
+		Index: *body.Index,
+	}
+
+	return v
+}
+
 // ValidateCreateMasterKeyRequestBody runs the validations defined on
 // create_master_key_request_body
 func ValidateCreateMasterKeyRequestBody(body *CreateMasterKeyRequestBody) (err error) {
@@ -126,6 +146,15 @@ func ValidateCreateMasterKeyRequestBody(body *CreateMasterKeyRequestBody) (err e
 func ValidateAddShareRequestBody(body *AddShareRequestBody) (err error) {
 	if body.Share == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("share", "body"))
+	}
+	return
+}
+
+// ValidateDeleteShareRequestBody runs the validations defined on
+// delete_share_request_body
+func ValidateDeleteShareRequestBody(body *DeleteShareRequestBody) (err error) {
+	if body.Index == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("index", "body"))
 	}
 	return
 }

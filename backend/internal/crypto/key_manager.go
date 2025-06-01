@@ -2,13 +2,16 @@ package crypto
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 )
 
 var (
-	ErrKeyLocked       = errors.New("master key is locked")
-	ErrNoKeyConfigured = errors.New("no key system configured")
-	ErrInvalidShares   = errors.New("invalid number of shares")
+	ErrKeyLocked         = errors.New("master key is locked")
+	ErrNoKeyConfigured   = errors.New("no key system configured")
+	ErrInvalidShares     = errors.New("invalid number of shares")
+	ErrMaxSharesReached  = errors.New("maximum number of shares reached")
+	ErrCouldNotRecombine = errors.New("could not recombine shares to unlock key")
 )
 
 type State int
@@ -80,25 +83,35 @@ func (km *KeyManager) SetNewMasterKey(masterKey []byte, minShares, maxShares int
 }
 
 // AddShare adds a share and attempts to unlock the key if enough are present
-func (km *KeyManager) AddShare(share []byte) error {
+// Returns the index of the added share
+func (km *KeyManager) AddShare(share []byte) (index int, unlocked bool, err error) {
 	km.mu.Lock()
 	defer km.mu.Unlock()
 
 	if km.state == StateUninitialized {
-		return ErrNoKeyConfigured
+		return -1, false, ErrNoKeyConfigured
 	}
 	if len(km.shares) >= km.maxShares {
-		return errors.New("maximum number of shares reached")
+		return -1, false, ErrMaxSharesReached
 	}
 
 	km.shares = append(km.shares, share)
 
 	if len(km.shares) >= km.minShares && km.state != StateUnlocked {
-		//km.masterKey = key
-		//km.state = StateUnlocked
+		masterKey, err := CombineShares(km.shares)
+		if err != nil {
+			return -1, false, fmt.Errorf("%w: %v", ErrCouldNotRecombine, err)
+		}
+		if len(masterKey) == 0 {
+			return -1, false, fmt.Errorf("%w: no valid master key reconstructed", ErrCouldNotRecombine)
+		}
+		km.masterKey = make([]byte, len(masterKey))
+		copy(km.masterKey, masterKey)
+		km.state = StateUnlocked
+		return len(km.shares) - 1, true, nil
 	}
 
-	return nil
+	return len(km.shares) - 1, false, nil
 }
 
 // RemoveShare removes a share at the given index.
@@ -133,7 +146,16 @@ func (km *KeyManager) GetState() State {
 	return km.state
 }
 
-func (km *KeyManager) Status() (state State, currentSharesNumber int, min int, max int) {
+// RollbackToLocked rollback state to locked, called when key is wrong
+func (km *KeyManager) RollbackToLocked() {
+	km.mu.Lock()
+	defer km.mu.Unlock()
+
+	km.state = StateLocked
+	km.masterKey = nil
+}
+
+func (km *KeyManager) Status() (state State, currentSharesNumber int, minShares int, maxShares int) {
 	km.mu.RLock()
 	defer km.mu.RUnlock()
 	return km.state, len(km.shares), km.minShares, km.maxShares

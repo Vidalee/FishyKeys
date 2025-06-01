@@ -16,16 +16,18 @@ import (
 // Client is the "fishykeys" service client.
 type Client struct {
 	CreateMasterKeyEndpoint goa.Endpoint
-	AddShareEndpoint        goa.Endpoint
 	GetKeyStatusEndpoint    goa.Endpoint
+	AddShareEndpoint        goa.Endpoint
+	DeleteShareEndpoint     goa.Endpoint
 }
 
 // NewClient initializes a "fishykeys" service client given the endpoints.
-func NewClient(createMasterKey, addShare, getKeyStatus goa.Endpoint) *Client {
+func NewClient(createMasterKey, getKeyStatus, addShare, deleteShare goa.Endpoint) *Client {
 	return &Client{
 		CreateMasterKeyEndpoint: createMasterKey,
-		AddShareEndpoint:        addShare,
 		GetKeyStatusEndpoint:    getKeyStatus,
+		AddShareEndpoint:        addShare,
+		DeleteShareEndpoint:     deleteShare,
 	}
 }
 
@@ -45,21 +47,6 @@ func (c *Client) CreateMasterKey(ctx context.Context, p *CreateMasterKeyPayload)
 	return ires.(*CreateMasterKeyResult), nil
 }
 
-// AddShare calls the "add_share" endpoint of the "fishykeys" service.
-// AddShare may return the following errors:
-//   - "invalid_parameters" (type InvalidParameters)
-//   - "internal_error" (type InternalError)
-//   - "too_many_shares" (type TooManyShares)
-//   - error: internal error
-func (c *Client) AddShare(ctx context.Context, p *AddSharePayload) (res *AddShareResult, err error) {
-	var ires any
-	ires, err = c.AddShareEndpoint(ctx, p)
-	if err != nil {
-		return
-	}
-	return ires.(*AddShareResult), nil
-}
-
 // GetKeyStatus calls the "get_key_status" endpoint of the "fishykeys" service.
 // GetKeyStatus may return the following errors:
 //   - "no_key_set" (type NoKeySet)
@@ -72,4 +59,35 @@ func (c *Client) GetKeyStatus(ctx context.Context) (res *GetKeyStatusResult, err
 		return
 	}
 	return ires.(*GetKeyStatusResult), nil
+}
+
+// AddShare calls the "add_share" endpoint of the "fishykeys" service.
+// AddShare may return the following errors:
+//   - "invalid_parameters" (type InvalidParameters)
+//   - "internal_error" (type InternalError)
+//   - "too_many_shares" (type TooManyShares)
+//   - "could_not_recombine" (type CouldNotRecombine)
+//   - "wrong_shares" (type WrongShares)
+//   - "no_key_set" (type NoKeySet)
+//   - "key_already_unlocked" (type KeyAlreadyUnlocked)
+//   - error: internal error
+func (c *Client) AddShare(ctx context.Context, p *AddSharePayload) (res *AddShareResult, err error) {
+	var ires any
+	ires, err = c.AddShareEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*AddShareResult), nil
+}
+
+// DeleteShare calls the "delete_share" endpoint of the "fishykeys" service.
+// DeleteShare may return the following errors:
+//   - "no_key_set" (type NoKeySet)
+//   - "internal_error" (type InternalError)
+//   - "key_already_unlocked" (type KeyAlreadyUnlocked)
+//   - "wrong_index" (type WrongIndex)
+//   - error: internal error
+func (c *Client) DeleteShare(ctx context.Context, p *DeleteSharePayload) (err error) {
+	_, err = c.DeleteShareEndpoint(ctx, p)
+	return
 }

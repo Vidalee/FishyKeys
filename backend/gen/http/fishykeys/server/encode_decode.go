@@ -99,6 +99,50 @@ func EncodeCreateMasterKeyError(encoder func(context.Context, http.ResponseWrite
 	}
 }
 
+// EncodeGetKeyStatusResponse returns an encoder for responses returned by the
+// fishykeys get_key_status endpoint.
+func EncodeGetKeyStatusResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+	return func(ctx context.Context, w http.ResponseWriter, v any) error {
+		res, _ := v.(*fishykeys.GetKeyStatusResult)
+		enc := encoder(ctx, w)
+		body := NewGetKeyStatusResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// EncodeGetKeyStatusError returns an encoder for errors returned by the
+// get_key_status fishykeys endpoint.
+func EncodeGetKeyStatusError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en goa.GoaErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.GoaErrorName() {
+		case "internal_error":
+			var res fishykeys.InternalError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "no_key_set":
+			var res fishykeys.NoKeySet
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // EncodeAddShareResponse returns an encoder for responses returned by the
 // fishykeys add_share endpoint.
 func EncodeAddShareResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
@@ -150,13 +194,13 @@ func EncodeAddShareError(encoder func(context.Context, http.ResponseWriter) goah
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
-		case "internal_error":
-			var res fishykeys.InternalError
+		case "could_not_recombine":
+			var res fishykeys.CouldNotRecombine
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
 			body := res
 			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		case "invalid_parameters":
 			var res fishykeys.InvalidParameters
@@ -166,6 +210,30 @@ func EncodeAddShareError(encoder func(context.Context, http.ResponseWriter) goah
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
+		case "wrong_shares":
+			var res fishykeys.WrongShares
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "internal_error":
+			var res fishykeys.InternalError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "key_already_unlocked":
+			var res fishykeys.KeyAlreadyUnlocked
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusConflict)
+			return enc.Encode(body)
 		case "too_many_shares":
 			var res fishykeys.TooManyShares
 			errors.As(v, &res)
@@ -174,27 +242,61 @@ func EncodeAddShareError(encoder func(context.Context, http.ResponseWriter) goah
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusConflict)
 			return enc.Encode(body)
+		case "no_key_set":
+			var res fishykeys.NoKeySet
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
 		}
 	}
 }
 
-// EncodeGetKeyStatusResponse returns an encoder for responses returned by the
-// fishykeys get_key_status endpoint.
-func EncodeGetKeyStatusResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+// EncodeDeleteShareResponse returns an encoder for responses returned by the
+// fishykeys delete_share endpoint.
+func EncodeDeleteShareResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
 	return func(ctx context.Context, w http.ResponseWriter, v any) error {
-		res, _ := v.(*fishykeys.GetKeyStatusResult)
-		enc := encoder(ctx, w)
-		body := NewGetKeyStatusResponseBody(res)
 		w.WriteHeader(http.StatusOK)
-		return enc.Encode(body)
+		return nil
 	}
 }
 
-// EncodeGetKeyStatusError returns an encoder for errors returned by the
-// get_key_status fishykeys endpoint.
-func EncodeGetKeyStatusError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// DecodeDeleteShareRequest returns a decoder for requests sent to the
+// fishykeys delete_share endpoint.
+func DecodeDeleteShareRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
+	return func(r *http.Request) (any, error) {
+		var (
+			body DeleteShareRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			var gerr *goa.ServiceError
+			if errors.As(err, &gerr) {
+				return nil, gerr
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateDeleteShareRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewDeleteSharePayload(&body)
+
+		return payload, nil
+	}
+}
+
+// EncodeDeleteShareError returns an encoder for errors returned by the
+// delete_share fishykeys endpoint.
+func EncodeDeleteShareError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		var en goa.GoaErrorNamer
@@ -210,6 +312,14 @@ func EncodeGetKeyStatusError(encoder func(context.Context, http.ResponseWriter) 
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
+		case "key_already_unlocked":
+			var res fishykeys.KeyAlreadyUnlocked
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusConflict)
+			return enc.Encode(body)
 		case "no_key_set":
 			var res fishykeys.NoKeySet
 			errors.As(v, &res)
@@ -217,6 +327,14 @@ func EncodeGetKeyStatusError(encoder func(context.Context, http.ResponseWriter) 
 			body := res
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "wrong_index":
+			var res fishykeys.WrongIndex
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			body := res
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)

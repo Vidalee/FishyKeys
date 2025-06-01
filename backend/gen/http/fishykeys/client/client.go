@@ -21,13 +21,17 @@ type Client struct {
 	// create_master_key endpoint.
 	CreateMasterKeyDoer goahttp.Doer
 
+	// GetKeyStatus Doer is the HTTP client used to make requests to the
+	// get_key_status endpoint.
+	GetKeyStatusDoer goahttp.Doer
+
 	// AddShare Doer is the HTTP client used to make requests to the add_share
 	// endpoint.
 	AddShareDoer goahttp.Doer
 
-	// GetKeyStatus Doer is the HTTP client used to make requests to the
-	// get_key_status endpoint.
-	GetKeyStatusDoer goahttp.Doer
+	// DeleteShare Doer is the HTTP client used to make requests to the
+	// delete_share endpoint.
+	DeleteShareDoer goahttp.Doer
 
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
@@ -50,8 +54,9 @@ func NewClient(
 ) *Client {
 	return &Client{
 		CreateMasterKeyDoer: doer,
-		AddShareDoer:        doer,
 		GetKeyStatusDoer:    doer,
+		AddShareDoer:        doer,
+		DeleteShareDoer:     doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -84,6 +89,25 @@ func (c *Client) CreateMasterKey() goa.Endpoint {
 	}
 }
 
+// GetKeyStatus returns an endpoint that makes HTTP requests to the fishykeys
+// service get_key_status server.
+func (c *Client) GetKeyStatus() goa.Endpoint {
+	var (
+		decodeResponse = DecodeGetKeyStatusResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildGetKeyStatusRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.GetKeyStatusDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("fishykeys", "get_key_status", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
 // AddShare returns an endpoint that makes HTTP requests to the fishykeys
 // service add_share server.
 func (c *Client) AddShare() goa.Endpoint {
@@ -108,20 +132,25 @@ func (c *Client) AddShare() goa.Endpoint {
 	}
 }
 
-// GetKeyStatus returns an endpoint that makes HTTP requests to the fishykeys
-// service get_key_status server.
-func (c *Client) GetKeyStatus() goa.Endpoint {
+// DeleteShare returns an endpoint that makes HTTP requests to the fishykeys
+// service delete_share server.
+func (c *Client) DeleteShare() goa.Endpoint {
 	var (
-		decodeResponse = DecodeGetKeyStatusResponse(c.decoder, c.RestoreResponseBody)
+		encodeRequest  = EncodeDeleteShareRequest(c.encoder)
+		decodeResponse = DecodeDeleteShareResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {
-		req, err := c.BuildGetKeyStatusRequest(ctx, v)
+		req, err := c.BuildDeleteShareRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.GetKeyStatusDoer.Do(req)
+		err = encodeRequest(req, v)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("fishykeys", "get_key_status", err)
+			return nil, err
+		}
+		resp, err := c.DeleteShareDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("fishykeys", "delete_share", err)
 		}
 		return decodeResponse(resp)
 	}

@@ -16,24 +16,27 @@ import (
 // Endpoints wraps the "fishykeys" service endpoints.
 type Endpoints struct {
 	CreateMasterKey goa.Endpoint
-	AddShare        goa.Endpoint
 	GetKeyStatus    goa.Endpoint
+	AddShare        goa.Endpoint
+	DeleteShare     goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "fishykeys" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
 		CreateMasterKey: NewCreateMasterKeyEndpoint(s),
-		AddShare:        NewAddShareEndpoint(s),
 		GetKeyStatus:    NewGetKeyStatusEndpoint(s),
+		AddShare:        NewAddShareEndpoint(s),
+		DeleteShare:     NewDeleteShareEndpoint(s),
 	}
 }
 
 // Use applies the given middleware to all the "fishykeys" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.CreateMasterKey = m(e.CreateMasterKey)
-	e.AddShare = m(e.AddShare)
 	e.GetKeyStatus = m(e.GetKeyStatus)
+	e.AddShare = m(e.AddShare)
+	e.DeleteShare = m(e.DeleteShare)
 }
 
 // NewCreateMasterKeyEndpoint returns an endpoint function that calls the
@@ -42,6 +45,14 @@ func NewCreateMasterKeyEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*CreateMasterKeyPayload)
 		return s.CreateMasterKey(ctx, p)
+	}
+}
+
+// NewGetKeyStatusEndpoint returns an endpoint function that calls the method
+// "get_key_status" of service "fishykeys".
+func NewGetKeyStatusEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		return s.GetKeyStatus(ctx)
 	}
 }
 
@@ -54,10 +65,11 @@ func NewAddShareEndpoint(s Service) goa.Endpoint {
 	}
 }
 
-// NewGetKeyStatusEndpoint returns an endpoint function that calls the method
-// "get_key_status" of service "fishykeys".
-func NewGetKeyStatusEndpoint(s Service) goa.Endpoint {
+// NewDeleteShareEndpoint returns an endpoint function that calls the method
+// "delete_share" of service "fishykeys".
+func NewDeleteShareEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
-		return s.GetKeyStatus(ctx)
+		p := req.(*DeleteSharePayload)
+		return nil, s.DeleteShare(ctx, p)
 	}
 }

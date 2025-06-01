@@ -25,7 +25,14 @@ type CreateMasterKeyRequestBody struct {
 // endpoint HTTP request body.
 type AddShareRequestBody struct {
 	// One of the shares need to unlock the master key
-	Share int `form:"share" json:"share" xml:"share"`
+	Share string `form:"share" json:"share" xml:"share"`
+}
+
+// DeleteShareRequestBody is the type of the "fishykeys" service "delete_share"
+// endpoint HTTP request body.
+type DeleteShareRequestBody struct {
+	// The index of the share to delete
+	Index int `form:"index" json:"index" xml:"index"`
 }
 
 // CreateMasterKeyResponseBody is the type of the "fishykeys" service
@@ -33,13 +40,6 @@ type AddShareRequestBody struct {
 type CreateMasterKeyResponseBody struct {
 	// The generated key shares
 	Shares []string `form:"shares,omitempty" json:"shares,omitempty" xml:"shares,omitempty"`
-}
-
-// AddShareResponseBody is the type of the "fishykeys" service "add_share"
-// endpoint HTTP response body.
-type AddShareResponseBody struct {
-	// The index of the share added
-	Index *int `form:"index,omitempty" json:"index,omitempty" xml:"index,omitempty"`
 }
 
 // GetKeyStatusResponseBody is the type of the "fishykeys" service
@@ -53,6 +53,15 @@ type GetKeyStatusResponseBody struct {
 	MinShares *int `form:"min_shares,omitempty" json:"min_shares,omitempty" xml:"min_shares,omitempty"`
 	// Total number of shares
 	TotalShares *int `form:"total_shares,omitempty" json:"total_shares,omitempty" xml:"total_shares,omitempty"`
+}
+
+// AddShareResponseBody is the type of the "fishykeys" service "add_share"
+// endpoint HTTP response body.
+type AddShareResponseBody struct {
+	// The index of the share added
+	Index *int `form:"index,omitempty" json:"index,omitempty" xml:"index,omitempty"`
+	// Whether the master key has been unlocked
+	Unlocked *bool `form:"unlocked,omitempty" json:"unlocked,omitempty" xml:"unlocked,omitempty"`
 }
 
 // NewCreateMasterKeyRequestBody builds the HTTP request body from the payload
@@ -70,6 +79,15 @@ func NewCreateMasterKeyRequestBody(p *fishykeys.CreateMasterKeyPayload) *CreateM
 func NewAddShareRequestBody(p *fishykeys.AddSharePayload) *AddShareRequestBody {
 	body := &AddShareRequestBody{
 		Share: p.Share,
+	}
+	return body
+}
+
+// NewDeleteShareRequestBody builds the HTTP request body from the payload of
+// the "delete_share" endpoint of the "fishykeys" service.
+func NewDeleteShareRequestBody(p *fishykeys.DeleteSharePayload) *DeleteShareRequestBody {
+	body := &DeleteShareRequestBody{
+		Index: p.Index,
 	}
 	return body
 }
@@ -112,40 +130,6 @@ func NewCreateMasterKeyKeyAlreadyExists(body string) fishykeys.KeyAlreadyExists 
 	return v
 }
 
-// NewAddShareResultCreated builds a "fishykeys" service "add_share" endpoint
-// result from a HTTP "Created" response.
-func NewAddShareResultCreated(body *AddShareResponseBody) *fishykeys.AddShareResult {
-	v := &fishykeys.AddShareResult{
-		Index: body.Index,
-	}
-
-	return v
-}
-
-// NewAddShareInternalError builds a fishykeys service add_share endpoint
-// internal_error error.
-func NewAddShareInternalError(body string) fishykeys.InternalError {
-	v := fishykeys.InternalError(body)
-
-	return v
-}
-
-// NewAddShareInvalidParameters builds a fishykeys service add_share endpoint
-// invalid_parameters error.
-func NewAddShareInvalidParameters(body string) fishykeys.InvalidParameters {
-	v := fishykeys.InvalidParameters(body)
-
-	return v
-}
-
-// NewAddShareTooManyShares builds a fishykeys service add_share endpoint
-// too_many_shares error.
-func NewAddShareTooManyShares(body string) fishykeys.TooManyShares {
-	v := fishykeys.TooManyShares(body)
-
-	return v
-}
-
 // NewGetKeyStatusResultOK builds a "fishykeys" service "get_key_status"
 // endpoint result from a HTTP "OK" response.
 func NewGetKeyStatusResultOK(body *GetKeyStatusResponseBody) *fishykeys.GetKeyStatusResult {
@@ -175,6 +159,105 @@ func NewGetKeyStatusNoKeySet(body string) fishykeys.NoKeySet {
 	return v
 }
 
+// NewAddShareResultCreated builds a "fishykeys" service "add_share" endpoint
+// result from a HTTP "Created" response.
+func NewAddShareResultCreated(body *AddShareResponseBody) *fishykeys.AddShareResult {
+	v := &fishykeys.AddShareResult{
+		Index:    *body.Index,
+		Unlocked: *body.Unlocked,
+	}
+
+	return v
+}
+
+// NewAddShareCouldNotRecombine builds a fishykeys service add_share endpoint
+// could_not_recombine error.
+func NewAddShareCouldNotRecombine(body string) fishykeys.CouldNotRecombine {
+	v := fishykeys.CouldNotRecombine(body)
+
+	return v
+}
+
+// NewAddShareInvalidParameters builds a fishykeys service add_share endpoint
+// invalid_parameters error.
+func NewAddShareInvalidParameters(body string) fishykeys.InvalidParameters {
+	v := fishykeys.InvalidParameters(body)
+
+	return v
+}
+
+// NewAddShareWrongShares builds a fishykeys service add_share endpoint
+// wrong_shares error.
+func NewAddShareWrongShares(body string) fishykeys.WrongShares {
+	v := fishykeys.WrongShares(body)
+
+	return v
+}
+
+// NewAddShareInternalError builds a fishykeys service add_share endpoint
+// internal_error error.
+func NewAddShareInternalError(body string) fishykeys.InternalError {
+	v := fishykeys.InternalError(body)
+
+	return v
+}
+
+// NewAddShareKeyAlreadyUnlocked builds a fishykeys service add_share endpoint
+// key_already_unlocked error.
+func NewAddShareKeyAlreadyUnlocked(body string) fishykeys.KeyAlreadyUnlocked {
+	v := fishykeys.KeyAlreadyUnlocked(body)
+
+	return v
+}
+
+// NewAddShareTooManyShares builds a fishykeys service add_share endpoint
+// too_many_shares error.
+func NewAddShareTooManyShares(body string) fishykeys.TooManyShares {
+	v := fishykeys.TooManyShares(body)
+
+	return v
+}
+
+// NewAddShareNoKeySet builds a fishykeys service add_share endpoint no_key_set
+// error.
+func NewAddShareNoKeySet(body string) fishykeys.NoKeySet {
+	v := fishykeys.NoKeySet(body)
+
+	return v
+}
+
+// NewDeleteShareInternalError builds a fishykeys service delete_share endpoint
+// internal_error error.
+func NewDeleteShareInternalError(body string) fishykeys.InternalError {
+	v := fishykeys.InternalError(body)
+
+	return v
+}
+
+// NewDeleteShareKeyAlreadyUnlocked builds a fishykeys service delete_share
+// endpoint key_already_unlocked error.
+func NewDeleteShareKeyAlreadyUnlocked(body string) fishykeys.KeyAlreadyUnlocked {
+	v := fishykeys.KeyAlreadyUnlocked(body)
+
+	return v
+}
+
+// NewDeleteShareNoKeySet builds a fishykeys service delete_share endpoint
+// no_key_set error.
+func NewDeleteShareNoKeySet(body string) fishykeys.NoKeySet {
+	v := fishykeys.NoKeySet(body)
+
+	return v
+}
+
+// NewDeleteShareWrongIndex builds a fishykeys service delete_share endpoint
+// wrong_index error.
+func NewDeleteShareWrongIndex(body string) fishykeys.WrongIndex {
+	v := fishykeys.WrongIndex(body)
+
+	return v
+}
+
 // ValidateGetKeyStatusResponseBody runs the validations defined on
 // get_key_status_response_body
 func ValidateGetKeyStatusResponseBody(body *GetKeyStatusResponseBody) (err error) {
@@ -189,6 +272,18 @@ func ValidateGetKeyStatusResponseBody(body *GetKeyStatusResponseBody) (err error
 	}
 	if body.TotalShares == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("total_shares", "body"))
+	}
+	return
+}
+
+// ValidateAddShareResponseBody runs the validations defined on
+// add_share_response_body
+func ValidateAddShareResponseBody(body *AddShareResponseBody) (err error) {
+	if body.Index == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("index", "body"))
+	}
+	if body.Unlocked == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("unlocked", "body"))
 	}
 	return
 }

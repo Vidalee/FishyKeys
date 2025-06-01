@@ -22,7 +22,7 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `fishykeys (create-master-key|add-share|get-key-status)
+	return `fishykeys (create-master-key|get-key-status|add-share|delete-share)
 `
 }
 
@@ -50,15 +50,19 @@ func ParseEndpoint(
 		fishykeysCreateMasterKeyFlags    = flag.NewFlagSet("create-master-key", flag.ExitOnError)
 		fishykeysCreateMasterKeyBodyFlag = fishykeysCreateMasterKeyFlags.String("body", "REQUIRED", "")
 
+		fishykeysGetKeyStatusFlags = flag.NewFlagSet("get-key-status", flag.ExitOnError)
+
 		fishykeysAddShareFlags    = flag.NewFlagSet("add-share", flag.ExitOnError)
 		fishykeysAddShareBodyFlag = fishykeysAddShareFlags.String("body", "REQUIRED", "")
 
-		fishykeysGetKeyStatusFlags = flag.NewFlagSet("get-key-status", flag.ExitOnError)
+		fishykeysDeleteShareFlags    = flag.NewFlagSet("delete-share", flag.ExitOnError)
+		fishykeysDeleteShareBodyFlag = fishykeysDeleteShareFlags.String("body", "REQUIRED", "")
 	)
 	fishykeysFlags.Usage = fishykeysUsage
 	fishykeysCreateMasterKeyFlags.Usage = fishykeysCreateMasterKeyUsage
-	fishykeysAddShareFlags.Usage = fishykeysAddShareUsage
 	fishykeysGetKeyStatusFlags.Usage = fishykeysGetKeyStatusUsage
+	fishykeysAddShareFlags.Usage = fishykeysAddShareUsage
+	fishykeysDeleteShareFlags.Usage = fishykeysDeleteShareUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -97,11 +101,14 @@ func ParseEndpoint(
 			case "create-master-key":
 				epf = fishykeysCreateMasterKeyFlags
 
+			case "get-key-status":
+				epf = fishykeysGetKeyStatusFlags
+
 			case "add-share":
 				epf = fishykeysAddShareFlags
 
-			case "get-key-status":
-				epf = fishykeysGetKeyStatusFlags
+			case "delete-share":
+				epf = fishykeysDeleteShareFlags
 
 			}
 
@@ -131,11 +138,14 @@ func ParseEndpoint(
 			case "create-master-key":
 				endpoint = c.CreateMasterKey()
 				data, err = fishykeysc.BuildCreateMasterKeyPayload(*fishykeysCreateMasterKeyBodyFlag)
+			case "get-key-status":
+				endpoint = c.GetKeyStatus()
 			case "add-share":
 				endpoint = c.AddShare()
 				data, err = fishykeysc.BuildAddSharePayload(*fishykeysAddShareBodyFlag)
-			case "get-key-status":
-				endpoint = c.GetKeyStatus()
+			case "delete-share":
+				endpoint = c.DeleteShare()
+				data, err = fishykeysc.BuildDeleteSharePayload(*fishykeysDeleteShareBodyFlag)
 			}
 		}
 	}
@@ -155,8 +165,9 @@ Usage:
 
 COMMAND:
     create-master-key: Create a new master key and split it into shares
-    add-share: Add a share to unlock the master key
     get-key-status: Get the current status of the master key
+    add-share: Add a share to unlock the master key
+    delete-share: Delete a share from the key management system
 
 Additional help:
     %[1]s fishykeys COMMAND --help
@@ -176,6 +187,16 @@ Example:
 `, os.Args[0])
 }
 
+func fishykeysGetKeyStatusUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] fishykeys get-key-status
+
+Get the current status of the master key
+
+Example:
+    %[1]s fishykeys get-key-status
+`, os.Args[0])
+}
+
 func fishykeysAddShareUsage() {
 	fmt.Fprintf(os.Stderr, `%[1]s [flags] fishykeys add-share -body JSON
 
@@ -184,17 +205,20 @@ Add a share to unlock the master key
 
 Example:
     %[1]s fishykeys add-share --body '{
-      "share": 5
+      "share": "EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0"
    }'
 `, os.Args[0])
 }
 
-func fishykeysGetKeyStatusUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] fishykeys get-key-status
+func fishykeysDeleteShareUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] fishykeys delete-share -body JSON
 
-Get the current status of the master key
+Delete a share from the key management system
+    -body JSON: 
 
 Example:
-    %[1]s fishykeys get-key-status
+    %[1]s fishykeys delete-share --body '{
+      "index": 1
+   }'
 `, os.Args[0])
 }
