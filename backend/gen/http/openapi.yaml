@@ -13,7 +13,42 @@ produces:
     - application/xml
     - application/gob
 paths:
-    /key_management/add_share:
+    /key_management/create_master_key:
+        post:
+            tags:
+                - fishykeys
+            summary: create_master_key fishykeys
+            description: Create a new master key and split it into shares
+            operationId: fishykeys#create_master_key
+            parameters:
+                - name: create_master_key_request_body
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/FishykeysCreateMasterKeyRequestBody'
+                    required:
+                        - total_shares
+                        - min_shares
+            responses:
+                "201":
+                    description: Created response.
+                    schema:
+                        $ref: '#/definitions/FishykeysCreateMasterKeyResponseBody'
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        type: string
+                "409":
+                    description: Conflict response.
+                    schema:
+                        type: string
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
+            schemes:
+                - http
+    /key_management/share:
         post:
             tags:
                 - fishykeys
@@ -54,42 +89,6 @@ paths:
                         type: string
             schemes:
                 - http
-    /key_management/create_master_key:
-        post:
-            tags:
-                - fishykeys
-            summary: create_master_key fishykeys
-            description: Create a new master key and split it into shares
-            operationId: fishykeys#create_master_key
-            parameters:
-                - name: create_master_key_request_body
-                  in: body
-                  required: true
-                  schema:
-                    $ref: '#/definitions/FishykeysCreateMasterKeyRequestBody'
-                    required:
-                        - total_shares
-                        - min_shares
-            responses:
-                "201":
-                    description: Created response.
-                    schema:
-                        $ref: '#/definitions/FishykeysCreateMasterKeyResponseBody'
-                "400":
-                    description: Bad Request response.
-                    schema:
-                        type: string
-                "409":
-                    description: Conflict response.
-                    schema:
-                        type: string
-                "500":
-                    description: Internal Server Error response.
-                    schema:
-                        type: string
-            schemes:
-                - http
-    /key_management/delete_share:
         delete:
             tags:
                 - fishykeys

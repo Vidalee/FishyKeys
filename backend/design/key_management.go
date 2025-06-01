@@ -73,7 +73,7 @@ var _ = Service("fishykeys", func() {
 		Error("no_key_set", String, "No master key has been set")
 		Error("key_already_unlocked", String, "The master key is already unlocked")
 		HTTP(func() {
-			POST("/key_management/add_share")
+			POST("/key_management/share")
 			Response(StatusCreated)
 			Response("invalid_parameters", StatusBadRequest)
 			Response("internal_error", StatusInternalServerError)
@@ -98,7 +98,7 @@ var _ = Service("fishykeys", func() {
 		Error("key_already_unlocked", String, "The master key is already unlocked")
 		Error("wrong_index", String, "The index provided does not match any share")
 		HTTP(func() {
-			DELETE("/key_management/delete_share")
+			DELETE("/key_management/share")
 			Response(StatusOK)
 			Response("no_key_set", StatusNotFound)
 			Response("internal_error", StatusInternalServerError)

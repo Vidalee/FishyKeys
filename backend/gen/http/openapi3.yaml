@@ -6,7 +6,107 @@ info:
 servers:
     - url: http://localhost:8080
 paths:
-    /key_management/add_share:
+    /key_management/create_master_key:
+        post:
+            tags:
+                - fishykeys
+            summary: create_master_key fishykeys
+            description: Create a new master key and split it into shares
+            operationId: fishykeys#create_master_key
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateMasterKeyRequestBody'
+                        example:
+                            min_shares: 3
+                            total_shares: 5
+            responses:
+                "201":
+                    description: Created response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateMasterKeyResponseBody'
+                            example:
+                                shares:
+                                    - Eligendi et dolorum corporis.
+                                    - Perspiciatis pariatur fuga.
+                "400":
+                    description: 'invalid_parameters: Bad Request response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Saepe suscipit fuga impedit.
+                            example: Occaecati est inventore.
+                "409":
+                    description: 'key_already_exists: Conflict response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Iure esse error consequatur.
+                            example: Minus ullam vel dolorum exercitationem.
+                "500":
+                    description: 'internal_error: Internal Server Error response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Maxime earum.
+                            example: Qui excepturi.
+    /key_management/share:
+        delete:
+            tags:
+                - fishykeys
+            summary: delete_share fishykeys
+            description: Delete a share from the key management system
+            operationId: fishykeys#delete_share
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DeleteShareRequestBody'
+                        example:
+                            index: 1
+            responses:
+                "200":
+                    description: OK response.
+                "400":
+                    description: 'wrong_index: Bad Request response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Non optio reiciendis dolore animi deleniti aut.
+                            example: Sint ipsa debitis voluptatum non ducimus natus.
+                "404":
+                    description: 'no_key_set: Not Found response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Molestiae nesciunt architecto sint.
+                            example: Cum ipsum tenetur blanditiis est pariatur.
+                "409":
+                    description: 'key_already_unlocked: Conflict response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Qui quia corrupti.
+                            example: Et quis vel reiciendis.
+                "500":
+                    description: 'internal_error: Internal Server Error response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Quos doloribus repellendus.
+                            example: Laborum ratione minima.
         post:
             tags:
                 - fishykeys
@@ -63,107 +163,6 @@ paths:
                                 type: string
                                 example: Occaecati nesciunt eos commodi.
                             example: Nulla aut hic maiores officia.
-    /key_management/create_master_key:
-        post:
-            tags:
-                - fishykeys
-            summary: create_master_key fishykeys
-            description: Create a new master key and split it into shares
-            operationId: fishykeys#create_master_key
-            requestBody:
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/CreateMasterKeyRequestBody'
-                        example:
-                            min_shares: 3
-                            total_shares: 5
-            responses:
-                "201":
-                    description: Created response.
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/CreateMasterKeyResponseBody'
-                            example:
-                                shares:
-                                    - Eligendi et dolorum corporis.
-                                    - Perspiciatis pariatur fuga.
-                "400":
-                    description: 'invalid_parameters: Bad Request response.'
-                    content:
-                        application/json:
-                            schema:
-                                type: string
-                                example: Saepe suscipit fuga impedit.
-                            example: Occaecati est inventore.
-                "409":
-                    description: 'key_already_exists: Conflict response.'
-                    content:
-                        application/json:
-                            schema:
-                                type: string
-                                example: Iure esse error consequatur.
-                            example: Minus ullam vel dolorum exercitationem.
-                "500":
-                    description: 'internal_error: Internal Server Error response.'
-                    content:
-                        application/json:
-                            schema:
-                                type: string
-                                example: Maxime earum.
-                            example: Qui excepturi.
-    /key_management/delete_share:
-        delete:
-            tags:
-                - fishykeys
-            summary: delete_share fishykeys
-            description: Delete a share from the key management system
-            operationId: fishykeys#delete_share
-            requestBody:
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/DeleteShareRequestBody'
-                        example:
-                            index: 1
-            responses:
-                "200":
-                    description: OK response.
-                "400":
-                    description: 'wrong_index: Bad Request response.'
-                    content:
-                        application/json:
-                            schema:
-                                type: string
-                                example: Non optio reiciendis dolore animi deleniti aut.
-                            example: Sint ipsa debitis voluptatum non ducimus natus.
-                "404":
-                    description: 'no_key_set: Not Found response.'
-                    content:
-                        application/json:
-                            schema:
-                                type: string
-                                example: Molestiae nesciunt architecto sint.
-                            example: Cum ipsum tenetur blanditiis est pariatur.
-                "409":
-                    description: 'key_already_unlocked: Conflict response.'
-                    content:
-                        application/json:
-                            schema:
-                                type: string
-                                example: Qui quia corrupti.
-                            example: Et quis vel reiciendis.
-                "500":
-                    description: 'internal_error: Internal Server Error response.'
-                    content:
-                        application/json:
-                            schema:
-                                type: string
-                                example: Quos doloribus repellendus.
-                            example: Laborum ratione minima.
     /key_management/status:
         get:
             tags:

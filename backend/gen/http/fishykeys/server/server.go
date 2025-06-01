@@ -54,8 +54,8 @@ func New(
 		Mounts: []*MountPoint{
 			{"CreateMasterKey", "POST", "/key_management/create_master_key"},
 			{"GetKeyStatus", "GET", "/key_management/status"},
-			{"AddShare", "POST", "/key_management/add_share"},
-			{"DeleteShare", "DELETE", "/key_management/delete_share"},
+			{"AddShare", "POST", "/key_management/share"},
+			{"DeleteShare", "DELETE", "/key_management/share"},
 		},
 		CreateMasterKey: NewCreateMasterKeyHandler(e.CreateMasterKey, mux, decoder, encoder, errhandler, formatter),
 		GetKeyStatus:    NewGetKeyStatusHandler(e.GetKeyStatus, mux, decoder, encoder, errhandler, formatter),
@@ -195,7 +195,7 @@ func MountAddShareHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/key_management/add_share", f)
+	mux.Handle("POST", "/key_management/share", f)
 }
 
 // NewAddShareHandler creates a HTTP handler which loads the HTTP request and
@@ -246,7 +246,7 @@ func MountDeleteShareHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("DELETE", "/key_management/delete_share", f)
+	mux.Handle("DELETE", "/key_management/share", f)
 }
 
 // NewDeleteShareHandler creates a HTTP handler which loads the HTTP request

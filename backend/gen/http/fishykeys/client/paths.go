@@ -19,10 +19,10 @@ func GetKeyStatusFishykeysPath() string {
 
 // AddShareFishykeysPath returns the URL path to the fishykeys service add_share HTTP endpoint.
 func AddShareFishykeysPath() string {
-	return "/key_management/add_share"
+	return "/key_management/share"
 }
 
 // DeleteShareFishykeysPath returns the URL path to the fishykeys service delete_share HTTP endpoint.
 func DeleteShareFishykeysPath() string {
-	return "/key_management/delete_share"
+	return "/key_management/share"
 }
