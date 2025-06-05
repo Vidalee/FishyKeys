@@ -100,9 +100,11 @@ func (km *KeyManager) AddShare(share []byte) (index int, unlocked bool, err erro
 	if len(km.shares) >= km.minShares && km.state != StateUnlocked {
 		masterKey, err := CombineShares(km.shares)
 		if err != nil {
+			km.shares = km.shares[:len(km.shares)-1]
 			return -1, false, fmt.Errorf("%w: %v", ErrCouldNotRecombine, err)
 		}
 		if len(masterKey) == 0 {
+			km.shares = km.shares[:len(km.shares)-1]
 			return -1, false, fmt.Errorf("%w: no valid master key reconstructed", ErrCouldNotRecombine)
 		}
 		km.masterKey = make([]byte, len(masterKey))

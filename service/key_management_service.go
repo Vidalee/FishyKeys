@@ -169,21 +169,6 @@ func (s *KeyManagementService) AddShare(ctx context.Context, payload *genkey.Add
 	}, nil
 }
 
-//	Method("share", func() {
-//		Description("Delete a share from the key management system")
-//		Error("no_key_set", String, "No master key has been set")
-//		Error("internal_error", String, "Internal server error")
-//		Error("key_already_unlocked", String, "The master key is already unlocked")
-//		Error("wrong_index", String, "The index provided does not match any share")
-//		HTTP(func() {
-//			DELETE("/key_management/status")
-//			Response(StatusOK)
-//			Response("no_key_set", StatusNotFound)
-//			Response("internal_error", StatusInternalServerError)
-//			Response("key_already_unlocked", StatusConflict)
-//			Response("wrong_index", StatusBadRequest)
-//		})
-//	})
 func (s *KeyManagementService) DeleteShare(ctx context.Context, payload *genkey.DeleteSharePayload) error {
 	state, _, _, maxShares := s.keyManager.Status()
 	if state == crypto.StateUninitialized {
