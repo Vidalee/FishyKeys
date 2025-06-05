@@ -14,6 +14,7 @@ import (
 	fishykeys "github.com/Vidalee/FishyKeys/backend/gen/fishykeys"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
+	"goa.design/plugins/v3/cors"
 )
 
 // Server lists the fishykeys service endpoint HTTP handlers.
@@ -23,6 +24,7 @@ type Server struct {
 	GetKeyStatus    http.Handler
 	AddShare        http.Handler
 	DeleteShare     http.Handler
+	CORS            http.Handler
 }
 
 // MountPoint holds information about the mounted endpoints.
@@ -56,11 +58,15 @@ func New(
 			{"GetKeyStatus", "GET", "/key_management/status"},
 			{"AddShare", "POST", "/key_management/share"},
 			{"DeleteShare", "DELETE", "/key_management/share"},
+			{"CORS", "OPTIONS", "/key_management/create_master_key"},
+			{"CORS", "OPTIONS", "/key_management/status"},
+			{"CORS", "OPTIONS", "/key_management/share"},
 		},
 		CreateMasterKey: NewCreateMasterKeyHandler(e.CreateMasterKey, mux, decoder, encoder, errhandler, formatter),
 		GetKeyStatus:    NewGetKeyStatusHandler(e.GetKeyStatus, mux, decoder, encoder, errhandler, formatter),
 		AddShare:        NewAddShareHandler(e.AddShare, mux, decoder, encoder, errhandler, formatter),
 		DeleteShare:     NewDeleteShareHandler(e.DeleteShare, mux, decoder, encoder, errhandler, formatter),
+		CORS:            NewCORSHandler(),
 	}
 }
 
@@ -73,6 +79,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.GetKeyStatus = m(s.GetKeyStatus)
 	s.AddShare = m(s.AddShare)
 	s.DeleteShare = m(s.DeleteShare)
+	s.CORS = m(s.CORS)
 }
 
 // MethodNames returns the methods served.
@@ -84,6 +91,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetKeyStatusHandler(mux, h.GetKeyStatus)
 	MountAddShareHandler(mux, h.AddShare)
 	MountDeleteShareHandler(mux, h.DeleteShare)
+	MountCORSHandler(mux, h.CORS)
 }
 
 // Mount configures the mux to serve the fishykeys endpoints.
@@ -94,7 +102,7 @@ func (s *Server) Mount(mux goahttp.Muxer) {
 // MountCreateMasterKeyHandler configures the mux to serve the "fishykeys"
 // service "create_master_key" endpoint.
 func MountCreateMasterKeyHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
+	f, ok := HandleFishykeysOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
@@ -145,7 +153,7 @@ func NewCreateMasterKeyHandler(
 // MountGetKeyStatusHandler configures the mux to serve the "fishykeys" service
 // "get_key_status" endpoint.
 func MountGetKeyStatusHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
+	f, ok := HandleFishykeysOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
@@ -189,7 +197,7 @@ func NewGetKeyStatusHandler(
 // MountAddShareHandler configures the mux to serve the "fishykeys" service
 // "add_share" endpoint.
 func MountAddShareHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
+	f, ok := HandleFishykeysOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
@@ -240,7 +248,7 @@ func NewAddShareHandler(
 // MountDeleteShareHandler configures the mux to serve the "fishykeys" service
 // "delete_share" endpoint.
 func MountDeleteShareHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
+	f, ok := HandleFishykeysOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
@@ -285,5 +293,50 @@ func NewDeleteShareHandler(
 		if err := encodeResponse(ctx, w, res); err != nil {
 			errhandler(ctx, w, err)
 		}
+	})
+}
+
+// MountCORSHandler configures the mux to serve the CORS endpoints for the
+// service fishykeys.
+func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
+	h = HandleFishykeysOrigin(h)
+	mux.Handle("OPTIONS", "/key_management/create_master_key", h.ServeHTTP)
+	mux.Handle("OPTIONS", "/key_management/status", h.ServeHTTP)
+	mux.Handle("OPTIONS", "/key_management/share", h.ServeHTTP)
+}
+
+// NewCORSHandler creates a HTTP handler which returns a simple 204 response.
+func NewCORSHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(204)
+	})
+}
+
+// HandleFishykeysOrigin applies the CORS response headers corresponding to the
+// origin for the service fishykeys.
+func HandleFishykeysOrigin(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		if origin == "" {
+			// Not a CORS request
+			h.ServeHTTP(w, r)
+			return
+		}
+		if cors.MatchOrigin(origin, "http://localhost:5173") {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Max-Age", "3600")
+			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+				w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+				w.WriteHeader(204)
+				return
+			}
+			h.ServeHTTP(w, r)
+			return
+		}
+		h.ServeHTTP(w, r)
+		return
 	})
 }

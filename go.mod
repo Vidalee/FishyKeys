@@ -9,6 +9,7 @@ require (
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	goa.design/goa/v3 v3.21.1
+	goa.design/plugins/v3 v3.21.1
 )
 
 require (
