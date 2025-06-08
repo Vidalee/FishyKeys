@@ -1,0 +1,127 @@
+.card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 40px 48px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 24px;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 12px;
+}
+
+.statusGrid {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.statusBox {
+  flex: 1 1 180px;
+  background: #f6f6f6;
+  border-radius: 8px;
+  padding: 16px 0;
+  text-align: center;
+  min-width: 120px;
+}
+
+.statusLabel {
+  font-size: 0.95rem;
+  color: #888;
+}
+
+.statusValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #222;
+}
+
+.inputRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.input {
+  flex: 1;
+  padding: 8px 18px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.button {
+  padding: 8px 18px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.button:disabled {
+  background: #b3c6f7;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  font-size: 0.98rem;
+}
+
+.sharesList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.shareItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f6f6f6;
+  border-radius: 7px;
+  padding: 12px 14px;
+}
+
+.shareLabel {
+  font-size: 1rem;
+  color: #222;
+  font-weight: 500;
+}
+
+.shareType {
+  font-size: 0.95rem;
+  color: #888;
+}
+
+.deleteBtn {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 12px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.deleteBtn:hover {
+  background: #fecaca;
+} 

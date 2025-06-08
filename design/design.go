@@ -15,7 +15,7 @@ var _ = API("fishykeys", func() {
 		})
 	})
 
-	cors.Origin("http://localhost:5173", func() {
+	cors.Origin("http://localhost:3000", func() {
 		cors.Methods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
 		cors.Headers("Content-Type")
 		cors.MaxAge(3600)

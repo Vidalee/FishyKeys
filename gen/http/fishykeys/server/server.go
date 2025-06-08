@@ -322,7 +322,7 @@ func HandleFishykeysOrigin(h http.Handler) http.Handler {
 			h.ServeHTTP(w, r)
 			return
 		}
-		if cors.MatchOrigin(origin, "http://localhost:5173") {
+		if cors.MatchOrigin(origin, "http://localhost:3000") {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Max-Age", "3600")
