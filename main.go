@@ -1,6 +1,6 @@
 package main
 
-import "github.com/Vidalee/FishyKeys/backend/cmd"
+import "github.com/Vidalee/FishyKeys/cmd"
 
 func main() {
 	cmd.Execute()

@@ -1,13 +1,13 @@
 package server
 
 import (
-	"github.com/Vidalee/FishyKeys/backend/repository"
-	"github.com/Vidalee/FishyKeys/backend/service"
+	"github.com/Vidalee/FishyKeys/repository"
+	"github.com/Vidalee/FishyKeys/service"
 	"net/http"
 
-	"github.com/Vidalee/FishyKeys/backend/gen/fishykeys"
-	fishykeyssvr "github.com/Vidalee/FishyKeys/backend/gen/http/fishykeys/server"
-	"github.com/Vidalee/FishyKeys/backend/internal/crypto"
+	"github.com/Vidalee/FishyKeys/gen/fishykeys"
+	fishykeyssvr "github.com/Vidalee/FishyKeys/gen/http/fishykeys/server"
+	"github.com/Vidalee/FishyKeys/internal/crypto"
 	"github.com/jackc/pgx/v5/pgxpool"
 	goahttp "goa.design/goa/v3/http"
 )

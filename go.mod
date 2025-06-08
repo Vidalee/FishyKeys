@@ -1,4 +1,4 @@
-module github.com/Vidalee/FishyKeys/backend
+module github.com/Vidalee/FishyKeys
 
 go 1.24.2
 

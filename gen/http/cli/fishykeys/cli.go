@@ -13,7 +13,7 @@ import (
 	"net/http"
 	"os"
 
-	fishykeysc "github.com/Vidalee/FishyKeys/backend/gen/http/fishykeys/client"
+	fishykeysc "github.com/Vidalee/FishyKeys/gen/http/fishykeys/client"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )

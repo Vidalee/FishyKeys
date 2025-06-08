@@ -11,7 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	fishykeys "github.com/Vidalee/FishyKeys/backend/gen/fishykeys"
+	fishykeys "github.com/Vidalee/FishyKeys/gen/fishykeys"
 )
 
 // BuildCreateMasterKeyPayload builds the payload for the fishykeys

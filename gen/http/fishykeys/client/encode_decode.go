@@ -14,7 +14,7 @@ import (
 	"net/http"
 	"net/url"
 
-	fishykeys "github.com/Vidalee/FishyKeys/backend/gen/fishykeys"
+	fishykeys "github.com/Vidalee/FishyKeys/gen/fishykeys"
 	goahttp "goa.design/goa/v3/http"
 )
 

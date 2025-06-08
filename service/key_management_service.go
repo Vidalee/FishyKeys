@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
-	"github.com/Vidalee/FishyKeys/backend/repository"
+	"github.com/Vidalee/FishyKeys/repository"
 	"log"
 	"strconv"
 
-	genkey "github.com/Vidalee/FishyKeys/backend/gen/fishykeys"
-	"github.com/Vidalee/FishyKeys/backend/internal/crypto"
+	genkey "github.com/Vidalee/FishyKeys/gen/fishykeys"
+	"github.com/Vidalee/FishyKeys/internal/crypto"
 )
 
 var (
@@ -169,7 +169,7 @@ func (s *KeyManagementService) AddShare(ctx context.Context, payload *genkey.Add
 	}, nil
 }
 
-func (s *KeyManagementService) DeleteShare(ctx context.Context, payload *genkey.DeleteSharePayload) error {
+func (s *KeyManagementService) DeleteShare(_ context.Context, payload *genkey.DeleteSharePayload) error {
 	state, _, _, maxShares := s.keyManager.Status()
 	if state == crypto.StateUninitialized {
 		return genkey.NoKeySet("no master key configured")
