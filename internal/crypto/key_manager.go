@@ -46,6 +46,15 @@ func GetKeyManager() *KeyManager {
 	return instance
 }
 
+// ResetKeyManager resets the singleton instance of the key manager
+// Mostly used to facilitate testing
+func ResetKeyManager() {
+	once = sync.Once{} // Reset the singleton instance
+	instance = &KeyManager{
+		state: StateUninitialized,
+	}
+}
+
 // ConfigureKeySystem initializes the system with share thresholds, called only if a key was previously configured
 func (km *KeyManager) ConfigureKeySystem(minShares, maxShares int) error {
 	km.mu.Lock()

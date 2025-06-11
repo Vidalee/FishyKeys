@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -29,8 +31,17 @@ func RunMigrations(pool *pgxpool.Pool) error {
 		return fmt.Errorf("could not create migration driver: %v", err)
 	}
 
+	// Not very cool hotfix for not having to change the working directory
+	// when running tests individually in GoLand...
+	migrationPath := "file://migrations"
+	if _, err := os.Stat("migrations"); os.IsNotExist(err) {
+		if _, err := os.Stat("../migrations"); err == nil {
+			migrationPath = "file://" + filepath.ToSlash("../migrations")
+		}
+	}
+
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://migrations",
+		migrationPath,
 		"postgres",
 		driver,
 	)
