@@ -278,6 +278,73 @@ func TestKeyManagementService_AddShare(t *testing.T) {
 	})
 }
 
+func TestKeyManagementService_EndToEndUnlock(t *testing.T) {
+	ctx := context.Background()
+	// Clear DB
+	err := testutil.ClearTable(ctx, "global_settings")
+	require.NoError(t, err)
+	setupService := setupTestService()
+
+	// Step 1: Create master key with 5 total, 3 min shares
+	createPayload := &genkey.CreateMasterKeyPayload{
+		TotalShares: 5,
+		MinShares:   3,
+	}
+	createResult, err := setupService.CreateMasterKey(ctx, createPayload)
+	require.NoError(t, err)
+	require.Len(t, createResult.Shares, 5)
+
+	service := setupTestService()
+
+	// Step 2: Add a wrong share (mutate one letter from a correct share)
+	wrongShareBytes := []byte(createResult.Shares[0])
+	if wrongShareBytes[len(wrongShareBytes)-1] != 'A' {
+		wrongShareBytes[len(wrongShareBytes)-1] = 'A'
+	} else {
+		wrongShareBytes[len(wrongShareBytes)-1] = 'B'
+	}
+	wrongShare := string(wrongShareBytes)
+	addPayloadWrong := &genkey.AddSharePayload{Share: wrongShare}
+	addResultWrong, err := service.AddShare(ctx, addPayloadWrong)
+	assert.NoError(t, err)
+	assert.NotNil(t, addResultWrong)
+	assert.False(t, addResultWrong.Unlocked)
+
+	// Step 3: Add a good share (index 1)
+	addPayload1 := &genkey.AddSharePayload{Share: createResult.Shares[1]}
+	addResult1, err := service.AddShare(ctx, addPayload1)
+	assert.NoError(t, err)
+	assert.NotNil(t, addResult1)
+	assert.False(t, addResult1.Unlocked)
+
+	// Step 4: Remove share at index 0 (the wrong one)
+	deletePayload := &genkey.DeleteSharePayload{Index: 0}
+	err = service.DeleteShare(ctx, deletePayload)
+	assert.NoError(t, err)
+
+	// Step 5: Add two more good shares (index 2 and 3)
+	addPayload2 := &genkey.AddSharePayload{Share: createResult.Shares[2]}
+	addResult2, err := service.AddShare(ctx, addPayload2)
+	assert.NoError(t, err)
+	assert.NotNil(t, addResult2)
+	assert.False(t, addResult2.Unlocked)
+
+	addPayload3 := &genkey.AddSharePayload{Share: createResult.Shares[3]}
+	addResult3, err := service.AddShare(ctx, addPayload3)
+	assert.NoError(t, err)
+	assert.NotNil(t, addResult3)
+	// Should unlock now
+	assert.True(t, addResult3.Unlocked)
+
+	// Step 6: Check if unlocked
+	finalStatus, err := service.GetKeyStatus(ctx)
+	assert.NoError(t, err)
+	assert.False(t, finalStatus.IsLocked)
+	assert.Equal(t, 3, finalStatus.MinShares)
+	assert.Equal(t, 5, finalStatus.TotalShares)
+	assert.Equal(t, 3, finalStatus.CurrentShares)
+}
+
 func TestKeyManagementService_DeleteShare(t *testing.T) {
 	ctx := context.Background()
 

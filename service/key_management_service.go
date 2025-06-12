@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
-	"github.com/Vidalee/FishyKeys/repository"
 	"log"
 	"strconv"
+
+	"github.com/Vidalee/FishyKeys/repository"
 
 	genkey "github.com/Vidalee/FishyKeys/gen/fishykeys"
 	"github.com/Vidalee/FishyKeys/internal/crypto"
@@ -70,6 +71,9 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		return nil, genkey.InternalError("error generating master key: " + err.Error())
 	}
 	checksum, err := crypto.Encrypt(masterKey, []byte(checksumExpectedValue))
+	if err != nil {
+		return nil, genkey.InternalError("error encrypting master key checksum: " + err.Error())
+	}
 	shares, err := crypto.SplitSecret(masterKey, payload.TotalShares, payload.MinShares)
 	if err != nil {
 		return nil, genkey.InternalError("error splitting secret into shares: " + err.Error())
@@ -126,6 +130,10 @@ func (s *KeyManagementService) AddShare(ctx context.Context, payload *genkey.Add
 	}
 
 	decodedShare, err := base64.StdEncoding.DecodeString(payload.Share)
+	if err != nil {
+		return nil, genkey.InternalError("error decoding share: " + err.Error())
+	}
+
 	index, unlocked, err := s.keyManager.AddShare(decodedShare)
 	if err != nil {
 		if errors.Is(err, crypto.ErrMaxSharesReached) {
@@ -142,6 +150,10 @@ func (s *KeyManagementService) AddShare(ctx context.Context, payload *genkey.Add
 
 	if unlocked {
 		checksum, err := s.settingsRepository.GetSetting(ctx, columnMasterKeyChecksum)
+		if err != nil {
+			return nil, genkey.InternalError("error retrieving master key checksum: " + err.Error())
+		}
+
 		decodedChecksum, err := base64.StdEncoding.DecodeString(checksum)
 		if err != nil {
 			s.keyManager.RollbackToLocked()
