@@ -238,6 +238,48 @@ func TestKeyManagementService_AddShare(t *testing.T) {
 		assert.Nil(t, result)
 	})
 
+	t.Run("valid shares but checksum wrong", func(t *testing.T) {
+		err := testutil.ClearTable(ctx, "global_settings")
+		require.NoError(t, err)
+		setupService := setupTestService()
+
+		createPayload := &genkey.CreateMasterKeyPayload{
+			TotalShares: 5,
+			MinShares:   3,
+		}
+		createResult, err := setupService.CreateMasterKey(ctx, createPayload)
+		require.NoError(t, err)
+
+		service := setupTestService()
+
+		// Tamper with the checksum in the DB
+		err = service.settingsRepository.StoreSetting(ctx, columnMasterKeyChecksum, "d3adbeef")
+		require.NoError(t, err)
+
+		for i := range 3 {
+			payload := &genkey.AddSharePayload{
+				Share: createResult.Shares[i],
+			}
+
+			result, err := service.AddShare(ctx, payload)
+			fmt.Println("Adding share:", createResult, err)
+			if i < 2 {
+				assert.NoError(t, err)
+				assert.NotNil(t, result)
+				assert.Equal(t, i, result.Index)
+				assert.False(t, result.Unlocked)
+			} else {
+				assert.Error(t, err)
+				assert.Nil(t, result)
+				assert.Equal(t, "The key recombined from the shares is not the correct key", err.Error())
+			}
+
+			status, err := service.GetKeyStatus(ctx)
+			require.NoError(t, err)
+			assert.True(t, status.IsLocked)
+		}
+	})
+
 	t.Run("invalid share", func(t *testing.T) {
 		err := testutil.ClearTable(ctx, "global_settings")
 		require.NoError(t, err)
