@@ -9,10 +9,10 @@ paths:
     /key_management/create_master_key:
         post:
             tags:
-                - fishykeys
-            summary: create_master_key fishykeys
+                - key_management
+            summary: create_master_key key_management
             description: Create a new master key and split it into shares
-            operationId: fishykeys#create_master_key
+            operationId: key_management#create_master_key
             requestBody:
                 required: true
                 content:
@@ -31,39 +31,40 @@ paths:
                                 $ref: '#/components/schemas/CreateMasterKeyResponseBody'
                             example:
                                 shares:
-                                    - Eligendi et dolorum corporis.
-                                    - Perspiciatis pariatur fuga.
+                                    - Repudiandae blanditiis id cupiditate unde eos.
+                                    - Sit ratione.
+                                    - Et ut magnam labore molestiae.
                 "400":
                     description: 'invalid_parameters: Bad Request response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Saepe suscipit fuga impedit.
-                            example: Occaecati est inventore.
+                                example: Ipsam eos ut repellendus sunt.
+                            example: Ab qui harum distinctio.
                 "409":
                     description: 'key_already_exists: Conflict response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Iure esse error consequatur.
-                            example: Minus ullam vel dolorum exercitationem.
+                                example: Voluptatem ad amet sint est.
+                            example: Excepturi dolorum sed consequatur eos doloribus sit.
                 "500":
                     description: 'internal_error: Internal Server Error response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Maxime earum.
-                            example: Qui excepturi.
+                                example: Qui sint sapiente architecto.
+                            example: Cumque amet et.
     /key_management/share:
         delete:
             tags:
-                - fishykeys
-            summary: delete_share fishykeys
+                - key_management
+            summary: delete_share key_management
             description: Delete a share from the key management system
-            operationId: fishykeys#delete_share
+            operationId: key_management#delete_share
             requestBody:
                 required: true
                 content:
@@ -81,38 +82,38 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Non optio reiciendis dolore animi deleniti aut.
-                            example: Sint ipsa debitis voluptatum non ducimus natus.
+                                example: Natus dignissimos.
+                            example: Maiores at et ut occaecati harum maiores.
                 "404":
                     description: 'no_key_set: Not Found response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Molestiae nesciunt architecto sint.
-                            example: Cum ipsum tenetur blanditiis est pariatur.
+                                example: Fugiat ut.
+                            example: Doloremque possimus.
                 "409":
                     description: 'key_already_unlocked: Conflict response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Qui quia corrupti.
-                            example: Et quis vel reiciendis.
+                                example: Inventore nostrum minima et.
+                            example: Ducimus eum qui est.
                 "500":
                     description: 'internal_error: Internal Server Error response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Quos doloribus repellendus.
-                            example: Laborum ratione minima.
+                                example: Consequatur illum totam officiis.
+                            example: Commodi rerum quo excepturi.
         post:
             tags:
-                - fishykeys
-            summary: add_share fishykeys
+                - key_management
+            summary: add_share key_management
             description: Add a share to unlock the master key
-            operationId: fishykeys#add_share
+            operationId: key_management#add_share
             requestBody:
                 required: true
                 content:
@@ -129,47 +130,47 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/AddShareResponseBody'
                             example:
-                                index: 1063698717744459219
-                                unlocked: false
+                                index: 5890167680709064409
+                                unlocked: true
                 "400":
                     description: 'wrong_shares: Bad Request response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Sequi accusantium fugit sed.
-                            example: Esse in.
+                                example: Est temporibus nam.
+                            example: Rerum ab et aliquam.
                 "404":
                     description: 'no_key_set: Not Found response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Ratione eos voluptates sunt quia.
-                            example: Sint asperiores repudiandae deleniti sit rerum eveniet.
+                                example: Omnis quia et repellat natus quidem impedit.
+                            example: Asperiores architecto similique quia illo eos quasi.
                 "409":
                     description: 'key_already_unlocked: Conflict response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Quo aut eum et.
-                            example: Tenetur maxime quasi veniam autem temporibus.
+                                example: Vel non nam magnam beatae ipsa.
+                            example: Dolorem fuga cupiditate alias quis voluptatibus dignissimos.
                 "500":
                     description: 'internal_error: Internal Server Error response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Occaecati nesciunt eos commodi.
-                            example: Nulla aut hic maiores officia.
+                                example: Natus rerum optio est laborum.
+                            example: Et eveniet.
     /key_management/status:
         get:
             tags:
-                - fishykeys
-            summary: get_key_status fishykeys
+                - key_management
+            summary: get_key_status key_management
             description: Get the current status of the master key
-            operationId: fishykeys#get_key_status
+            operationId: key_management#get_key_status
             responses:
                 "200":
                     description: OK response.
@@ -178,26 +179,193 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/GetKeyStatusResponseBody'
                             example:
-                                current_shares: 231914414474347689
+                                current_shares: 6718364374947157668
                                 is_locked: false
-                                min_shares: 3263566952308650166
-                                total_shares: 6077150294396154200
+                                min_shares: 7654723300438466742
+                                total_shares: 53511470712771686
                 "404":
                     description: 'no_key_set: Not Found response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Id eos sapiente culpa.
-                            example: Non quos veniam.
+                                example: Et qui et quis eaque eius.
+                            example: Magni veniam occaecati.
                 "500":
                     description: 'internal_error: Internal Server Error response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Eos cumque.
-                            example: Placeat dignissimos error minus.
+                                example: Dignissimos vel.
+                            example: Rerum autem rerum omnis reiciendis.
+    /users:
+        get:
+            tags:
+                - users
+            summary: list users
+            description: List all users
+            operationId: users#list
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/User'
+                                example:
+                                    - created_at: Id fuga in numquam voluptatem.
+                                      updated_at: Eveniet laudantium est incidunt ut.
+                                      username: Saepe nesciunt aut.
+                                    - created_at: Id fuga in numquam voluptatem.
+                                      updated_at: Eveniet laudantium est incidunt ut.
+                                      username: Saepe nesciunt aut.
+                                    - created_at: Id fuga in numquam voluptatem.
+                                      updated_at: Eveniet laudantium est incidunt ut.
+                                      username: Saepe nesciunt aut.
+                            example:
+                                - created_at: Id fuga in numquam voluptatem.
+                                  updated_at: Eveniet laudantium est incidunt ut.
+                                  username: Saepe nesciunt aut.
+                                - created_at: Id fuga in numquam voluptatem.
+                                  updated_at: Eveniet laudantium est incidunt ut.
+                                  username: Saepe nesciunt aut.
+                "500":
+                    description: 'internal_error: Internal Server Error response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Officia earum totam esse quaerat velit.
+                            example: Quas ut.
+        post:
+            tags:
+                - users
+            summary: create users
+            description: Create a new user
+            operationId: users#create
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateRequestBody'
+                        example:
+                            password: s3cr3t
+                            username: alice
+            responses:
+                "201":
+                    description: Created response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateResponseBody'
+                            example:
+                                username: Dignissimos libero ea nobis praesentium non.
+                "400":
+                    description: 'invalid_input: Bad Request response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Nam voluptatem maiores qui velit.
+                            example: Est et expedita doloremque architecto commodi rerum.
+                "409":
+                    description: 'username_taken: Conflict response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Corrupti aut.
+                            example: Aut quis.
+                "500":
+                    description: 'internal_error: Internal Server Error response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Excepturi deserunt omnis aliquam.
+                            example: Nam nobis libero repudiandae.
+    /users/{username}:
+        delete:
+            tags:
+                - users
+            summary: delete users
+            description: Delete a user by username
+            operationId: users#delete
+            parameters:
+                - name: username
+                  in: path
+                  description: Username of the user to delete
+                  required: true
+                  schema:
+                    type: string
+                    description: Username of the user to delete
+                    example: alice
+                  example: alice
+            responses:
+                "200":
+                    description: OK response.
+                "404":
+                    description: 'user_not_found: Not Found response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Sint porro.
+                            example: Ex hic placeat maxime.
+                "500":
+                    description: 'internal_error: Internal Server Error response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Est et corrupti culpa minus velit.
+                            example: Eligendi quae adipisci occaecati.
+    /users/auth:
+        post:
+            tags:
+                - users
+            summary: auth users
+            description: Authenticate a user with username and password
+            operationId: users#auth
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateRequestBody'
+                        example:
+                            password: s3cr3t
+                            username: alice
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AuthResponseBody'
+                            example:
+                                token: Occaecati nesciunt eos commodi.
+                                username: Sequi accusantium fugit sed.
+                "401":
+                    description: 'unauthorized: Unauthorized response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Itaque magnam atque est.
+                            example: Quam modi.
+                "500":
+                    description: 'internal_error: Internal Server Error response.'
+                    content:
+                        application/json:
+                            schema:
+                                type: string
+                                example: Sit sit in rem.
+                            example: Ipsum sapiente et quia.
 components:
     schemas:
         AddShareRequestBody:
@@ -217,18 +385,32 @@ components:
                 index:
                     type: integer
                     description: The index of the share added
-                    example: 4530504450280615223
+                    example: 6424931001824332862
                     format: int64
                 unlocked:
                     type: boolean
                     description: Whether the master key has been unlocked
                     example: false
             example:
-                index: 1193827041301060708
+                index: 945154162230229594
                 unlocked: true
             required:
                 - index
                 - unlocked
+        AuthResponseBody:
+            type: object
+            properties:
+                token:
+                    type: string
+                    description: JWT or session token
+                    example: Sint voluptas aspernatur.
+                username:
+                    type: string
+                    description: The username of the authenticated user
+                    example: Est sit dignissimos.
+            example:
+                token: Dolorem sed incidunt id dolore sed.
+                username: Cupiditate sint molestiae adipisci architecto.
         CreateMasterKeyRequestBody:
             type: object
             properties:
@@ -255,15 +437,42 @@ components:
                     type: array
                     items:
                         type: string
-                        example: Impedit tempore et quod excepturi necessitatibus dicta.
+                        example: Qui quia et similique.
                     description: The generated key shares
                     example:
-                        - Eos ducimus repudiandae et distinctio.
-                        - Saepe nesciunt aut.
+                        - Et animi.
+                        - Sed sed accusantium commodi.
             example:
                 shares:
-                    - Fuga in numquam voluptatem est.
-                    - Laudantium est incidunt.
+                    - Molestias quasi.
+                    - Cupiditate eos et nisi eos beatae.
+                    - Eligendi consequatur voluptas.
+        CreateRequestBody:
+            type: object
+            properties:
+                password:
+                    type: string
+                    description: Password (hashed or plain depending on implementation)
+                    example: s3cr3t
+                username:
+                    type: string
+                    description: Username of the new user
+                    example: alice
+            example:
+                password: s3cr3t
+                username: alice
+            required:
+                - username
+                - password
+        CreateResponseBody:
+            type: object
+            properties:
+                username:
+                    type: string
+                    description: The username of the created user
+                    example: Voluptatem qui et.
+            example:
+                username: Quos officiis.
         DeleteShareRequestBody:
             type: object
             properties:
@@ -282,7 +491,7 @@ components:
                 current_shares:
                     type: integer
                     description: Number of shares currently held
-                    example: 5355986795941107789
+                    example: 3204362017974806603
                     format: int64
                 is_locked:
                     type: boolean
@@ -291,23 +500,48 @@ components:
                 min_shares:
                     type: integer
                     description: Minimum number of shares required
-                    example: 245603797818085730
+                    example: 7390922679859328998
                     format: int64
                 total_shares:
                     type: integer
                     description: Total number of shares
-                    example: 1982298599828541056
+                    example: 7362036207563285969
                     format: int64
             example:
-                current_shares: 892481737442494027
-                is_locked: true
-                min_shares: 8439783739481616722
-                total_shares: 6071307034643610298
+                current_shares: 1961684668140663594
+                is_locked: false
+                min_shares: 3468115806578446057
+                total_shares: 7109564824357408988
             required:
                 - is_locked
                 - current_shares
                 - min_shares
                 - total_shares
+        User:
+            type: object
+            properties:
+                created_at:
+                    type: string
+                    description: User creation timestamp
+                    example: Illo impedit debitis quia.
+                updated_at:
+                    type: string
+                    description: User last update timestamp
+                    example: Autem ut necessitatibus dolor earum aut.
+                username:
+                    type: string
+                    description: The username
+                    example: Voluptatem consequatur sint asperiores natus aliquam.
+            example:
+                created_at: Eum necessitatibus perspiciatis.
+                updated_at: Aperiam nemo et rerum quidem expedita.
+                username: Esse dolores aut quia ea.
+            required:
+                - username
+                - created_at
+                - updated_at
 tags:
-    - name: fishykeys
+    - name: key_management
       description: The FishyKeys server handles master key operations
+    - name: users
+      description: User service manages user accounts and authentication

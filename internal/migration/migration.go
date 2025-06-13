@@ -65,9 +65,6 @@ func RunMigrations(pool *pgxpool.Pool) error {
 		return fmt.Errorf("could not run migrations: %v", err)
 	}
 
-	// Only print success message if we actually ran migrations
-	if errors.Is(err, migrate.ErrNilVersion) || dirty {
-		log.Println("Database migrations completed successfully")
-	}
+	log.Println("Database migrations completed successfully")
 	return nil
 }

@@ -16,16 +16,16 @@ paths:
     /key_management/create_master_key:
         post:
             tags:
-                - fishykeys
-            summary: create_master_key fishykeys
+                - key_management
+            summary: create_master_key key_management
             description: Create a new master key and split it into shares
-            operationId: fishykeys#create_master_key
+            operationId: key_management#create_master_key
             parameters:
                 - name: create_master_key_request_body
                   in: body
                   required: true
                   schema:
-                    $ref: '#/definitions/FishykeysCreateMasterKeyRequestBody'
+                    $ref: '#/definitions/KeyManagementCreateMasterKeyRequestBody'
                     required:
                         - total_shares
                         - min_shares
@@ -33,7 +33,7 @@ paths:
                 "201":
                     description: Created response.
                     schema:
-                        $ref: '#/definitions/FishykeysCreateMasterKeyResponseBody'
+                        $ref: '#/definitions/KeyManagementCreateMasterKeyResponseBody'
                 "400":
                     description: Bad Request response.
                     schema:
@@ -51,23 +51,23 @@ paths:
     /key_management/share:
         post:
             tags:
-                - fishykeys
-            summary: add_share fishykeys
+                - key_management
+            summary: add_share key_management
             description: Add a share to unlock the master key
-            operationId: fishykeys#add_share
+            operationId: key_management#add_share
             parameters:
                 - name: add_share_request_body
                   in: body
                   required: true
                   schema:
-                    $ref: '#/definitions/FishykeysAddShareRequestBody'
+                    $ref: '#/definitions/KeyManagementAddShareRequestBody'
                     required:
                         - share
             responses:
                 "201":
                     description: Created response.
                     schema:
-                        $ref: '#/definitions/FishykeysAddShareResponseBody'
+                        $ref: '#/definitions/KeyManagementAddShareResponseBody'
                         required:
                             - index
                             - unlocked
@@ -91,16 +91,16 @@ paths:
                 - http
         delete:
             tags:
-                - fishykeys
-            summary: delete_share fishykeys
+                - key_management
+            summary: delete_share key_management
             description: Delete a share from the key management system
-            operationId: fishykeys#delete_share
+            operationId: key_management#delete_share
             parameters:
                 - name: delete_share_request_body
                   in: body
                   required: true
                   schema:
-                    $ref: '#/definitions/FishykeysDeleteShareRequestBody'
+                    $ref: '#/definitions/KeyManagementDeleteShareRequestBody'
                     required:
                         - index
             responses:
@@ -127,15 +127,15 @@ paths:
     /key_management/status:
         get:
             tags:
-                - fishykeys
-            summary: get_key_status fishykeys
+                - key_management
+            summary: get_key_status key_management
             description: Get the current status of the master key
-            operationId: fishykeys#get_key_status
+            operationId: key_management#get_key_status
             responses:
                 "200":
                     description: OK response.
                     schema:
-                        $ref: '#/definitions/FishykeysGetKeyStatusResponseBody'
+                        $ref: '#/definitions/KeyManagementGetKeyStatusResponseBody'
                         required:
                             - is_locked
                             - current_shares
@@ -151,9 +151,120 @@ paths:
                         type: string
             schemes:
                 - http
+    /users:
+        get:
+            tags:
+                - users
+            summary: list users
+            description: List all users
+            operationId: users#list
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        type: array
+                        items:
+                            $ref: '#/definitions/User'
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
+            schemes:
+                - http
+        post:
+            tags:
+                - users
+            summary: create users
+            description: Create a new user
+            operationId: users#create
+            parameters:
+                - name: CreateRequestBody
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/UsersCreateRequestBody'
+                    required:
+                        - username
+                        - password
+            responses:
+                "201":
+                    description: Created response.
+                    schema:
+                        $ref: '#/definitions/UsersCreateResponseBody'
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        type: string
+                "409":
+                    description: Conflict response.
+                    schema:
+                        type: string
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
+            schemes:
+                - http
+    /users/{username}:
+        delete:
+            tags:
+                - users
+            summary: delete users
+            description: Delete a user by username
+            operationId: users#delete
+            parameters:
+                - name: username
+                  in: path
+                  description: Username of the user to delete
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: OK response.
+                "404":
+                    description: Not Found response.
+                    schema:
+                        type: string
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
+            schemes:
+                - http
+    /users/auth:
+        post:
+            tags:
+                - users
+            summary: auth users
+            description: Authenticate a user with username and password
+            operationId: users#auth
+            parameters:
+                - name: AuthRequestBody
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/UsersAuthRequestBody'
+                    required:
+                        - username
+                        - password
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        $ref: '#/definitions/UsersAuthResponseBody'
+                "401":
+                    description: Unauthorized response.
+                    schema:
+                        type: string
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
+            schemes:
+                - http
 definitions:
-    FishykeysAddShareRequestBody:
-        title: FishykeysAddShareRequestBody
+    KeyManagementAddShareRequestBody:
+        title: KeyManagementAddShareRequestBody
         type: object
         properties:
             share:
@@ -164,27 +275,27 @@ definitions:
             share: EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0
         required:
             - share
-    FishykeysAddShareResponseBody:
-        title: FishykeysAddShareResponseBody
+    KeyManagementAddShareResponseBody:
+        title: KeyManagementAddShareResponseBody
         type: object
         properties:
             index:
                 type: integer
                 description: The index of the share added
-                example: 1009166832579766622
+                example: 7698091821871401703
                 format: int64
             unlocked:
                 type: boolean
                 description: Whether the master key has been unlocked
-                example: true
+                example: false
         example:
-            index: 6662091457102477057
-            unlocked: true
+            index: 7280264691809939389
+            unlocked: false
         required:
             - index
             - unlocked
-    FishykeysCreateMasterKeyRequestBody:
-        title: FishykeysCreateMasterKeyRequestBody
+    KeyManagementCreateMasterKeyRequestBody:
+        title: KeyManagementCreateMasterKeyRequestBody
         type: object
         properties:
             min_shares:
@@ -203,28 +314,27 @@ definitions:
         required:
             - total_shares
             - min_shares
-    FishykeysCreateMasterKeyResponseBody:
-        title: FishykeysCreateMasterKeyResponseBody
+    KeyManagementCreateMasterKeyResponseBody:
+        title: KeyManagementCreateMasterKeyResponseBody
         type: object
         properties:
             shares:
                 type: array
                 items:
                     type: string
-                    example: Est voluptatem pariatur voluptatem.
+                    example: Laboriosam sunt nostrum assumenda.
                 description: The generated key shares
                 example:
-                    - Ratione qui itaque amet ipsum error.
-                    - Et assumenda.
-                    - Commodi repudiandae sit est consequuntur animi.
+                    - Nesciunt architecto sint facere quos doloribus.
+                    - Veniam qui.
+                    - Corrupti minus.
         example:
             shares:
-                - Ratione dolorum perspiciatis consectetur.
-                - Quia libero vel quod dignissimos libero.
-                - Nobis praesentium non numquam maxime rem quisquam.
-                - Sunt eos in ut.
-    FishykeysDeleteShareRequestBody:
-        title: FishykeysDeleteShareRequestBody
+                - Reiciendis dolore animi deleniti.
+                - Nisi occaecati est inventore.
+                - Qui excepturi.
+    KeyManagementDeleteShareRequestBody:
+        title: KeyManagementDeleteShareRequestBody
         type: object
         properties:
             index:
@@ -236,14 +346,14 @@ definitions:
             index: 1
         required:
             - index
-    FishykeysGetKeyStatusResponseBody:
-        title: FishykeysGetKeyStatusResponseBody
+    KeyManagementGetKeyStatusResponseBody:
+        title: KeyManagementGetKeyStatusResponseBody
         type: object
         properties:
             current_shares:
                 type: integer
                 description: Number of shares currently held
-                example: 6518574107503557211
+                example: 6301691789677483758
                 format: int64
             is_locked:
                 type: boolean
@@ -252,20 +362,105 @@ definitions:
             min_shares:
                 type: integer
                 description: Minimum number of shares required
-                example: 5594704514197726645
+                example: 3058226914185531902
                 format: int64
             total_shares:
                 type: integer
                 description: Total number of shares
-                example: 4934522018738475179
+                example: 6465654726740394934
                 format: int64
         example:
-            current_shares: 1686211336919984919
+            current_shares: 4063444925102994977
             is_locked: true
-            min_shares: 3002255462360240987
-            total_shares: 9117224753253597825
+            min_shares: 6650704053550084319
+            total_shares: 4864005717453730110
         required:
             - is_locked
             - current_shares
             - min_shares
             - total_shares
+    User:
+        title: User
+        type: object
+        properties:
+            created_at:
+                type: string
+                description: User creation timestamp
+                example: Qui odio minima consequatur et.
+            updated_at:
+                type: string
+                description: User last update timestamp
+                example: Qui et.
+            username:
+                type: string
+                description: The username
+                example: Aut hic maiores officia eum.
+        example:
+            created_at: Sint asperiores repudiandae deleniti sit rerum eveniet.
+            updated_at: Tenetur maxime quasi veniam autem temporibus.
+            username: Qui nulla hic molestias esse in.
+        required:
+            - username
+            - created_at
+            - updated_at
+    UsersAuthRequestBody:
+        title: UsersAuthRequestBody
+        type: object
+        properties:
+            password:
+                type: string
+                description: Password
+                example: s3cr3t
+            username:
+                type: string
+                description: Username
+                example: alice
+        example:
+            password: s3cr3t
+            username: alice
+        required:
+            - username
+            - password
+    UsersAuthResponseBody:
+        title: UsersAuthResponseBody
+        type: object
+        properties:
+            token:
+                type: string
+                description: JWT or session token
+                example: Laborum ratione minima.
+            username:
+                type: string
+                description: The username of the authenticated user
+                example: Cum ipsum tenetur blanditiis est pariatur.
+        example:
+            token: Sint ipsa debitis voluptatum non ducimus natus.
+            username: Et quis vel reiciendis.
+    UsersCreateRequestBody:
+        title: UsersCreateRequestBody
+        type: object
+        properties:
+            password:
+                type: string
+                description: Password (hashed or plain depending on implementation)
+                example: s3cr3t
+            username:
+                type: string
+                description: Username of the new user
+                example: alice
+        example:
+            password: s3cr3t
+            username: alice
+        required:
+            - username
+            - password
+    UsersCreateResponseBody:
+        title: UsersCreateResponseBody
+        type: object
+        properties:
+            username:
+                type: string
+                description: The username of the created user
+                example: Error minus et maxime impedit necessitatibus sint.
+        example:
+            username: Perferendis est.

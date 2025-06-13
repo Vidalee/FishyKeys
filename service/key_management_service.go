@@ -9,7 +9,7 @@ import (
 
 	"github.com/Vidalee/FishyKeys/repository"
 
-	genkey "github.com/Vidalee/FishyKeys/gen/fishykeys"
+	genkey "github.com/Vidalee/FishyKeys/gen/key_management"
 	"github.com/Vidalee/FishyKeys/internal/crypto"
 )
 

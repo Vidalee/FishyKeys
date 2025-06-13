@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	genkey "github.com/Vidalee/FishyKeys/gen/fishykeys"
+	genkey "github.com/Vidalee/FishyKeys/gen/key_management"
 	"github.com/Vidalee/FishyKeys/internal/crypto"
 	"github.com/Vidalee/FishyKeys/internal/testutil"
 	"github.com/Vidalee/FishyKeys/repository"
@@ -22,21 +22,6 @@ func setupTestService() *KeyManagementService {
 	keyManager := crypto.GetKeyManager()
 	repo := repository.NewGlobalSettingsRepository(testDB)
 	return NewKeyManagementService(keyManager, repo)
-}
-
-func TestMain(m *testing.M) {
-	var err error
-	testDB, err = testutil.SetupTestDB()
-	if err != nil {
-		panic(fmt.Sprintf("failed to setup test db: %v", err))
-	}
-	defer func() {
-		if err := testutil.TeardownTestDB(); err != nil {
-			panic(fmt.Sprintf("failed to teardown test db: %v", err))
-		}
-	}()
-
-	m.Run()
 }
 
 func TestKeyManagementService_CreateMasterKey(t *testing.T) {

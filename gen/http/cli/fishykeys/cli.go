@@ -3,7 +3,7 @@
 // fishykeys HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/Vidalee/FishyKeys/backend/design
+// $ goa gen github.com/Vidalee/FishyKeys/design
 
 package cli
 
@@ -13,7 +13,8 @@ import (
 	"net/http"
 	"os"
 
-	fishykeysc "github.com/Vidalee/FishyKeys/gen/http/fishykeys/client"
+	keymanagementc "github.com/Vidalee/FishyKeys/gen/http/key_management/client"
+	usersc "github.com/Vidalee/FishyKeys/gen/http/users/client"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -22,15 +23,20 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `fishykeys (create-master-key|get-key-status|add-share|delete-share)
+	return `key-management (create-master-key|get-key-status|add-share|delete-share)
+users (create|list|delete|auth)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` fishykeys create-master-key --body '{
+	return os.Args[0] + ` key-management create-master-key --body '{
       "min_shares": 3,
       "total_shares": 5
+   }'` + "\n" +
+		os.Args[0] + ` users create --body '{
+      "password": "s3cr3t",
+      "username": "alice"
    }'` + "\n" +
 		""
 }
@@ -45,24 +51,43 @@ func ParseEndpoint(
 	restore bool,
 ) (goa.Endpoint, any, error) {
 	var (
-		fishykeysFlags = flag.NewFlagSet("fishykeys", flag.ContinueOnError)
+		keyManagementFlags = flag.NewFlagSet("key-management", flag.ContinueOnError)
 
-		fishykeysCreateMasterKeyFlags    = flag.NewFlagSet("create-master-key", flag.ExitOnError)
-		fishykeysCreateMasterKeyBodyFlag = fishykeysCreateMasterKeyFlags.String("body", "REQUIRED", "")
+		keyManagementCreateMasterKeyFlags    = flag.NewFlagSet("create-master-key", flag.ExitOnError)
+		keyManagementCreateMasterKeyBodyFlag = keyManagementCreateMasterKeyFlags.String("body", "REQUIRED", "")
 
-		fishykeysGetKeyStatusFlags = flag.NewFlagSet("get-key-status", flag.ExitOnError)
+		keyManagementGetKeyStatusFlags = flag.NewFlagSet("get-key-status", flag.ExitOnError)
 
-		fishykeysAddShareFlags    = flag.NewFlagSet("add-share", flag.ExitOnError)
-		fishykeysAddShareBodyFlag = fishykeysAddShareFlags.String("body", "REQUIRED", "")
+		keyManagementAddShareFlags    = flag.NewFlagSet("add-share", flag.ExitOnError)
+		keyManagementAddShareBodyFlag = keyManagementAddShareFlags.String("body", "REQUIRED", "")
 
-		fishykeysDeleteShareFlags    = flag.NewFlagSet("delete-share", flag.ExitOnError)
-		fishykeysDeleteShareBodyFlag = fishykeysDeleteShareFlags.String("body", "REQUIRED", "")
+		keyManagementDeleteShareFlags    = flag.NewFlagSet("delete-share", flag.ExitOnError)
+		keyManagementDeleteShareBodyFlag = keyManagementDeleteShareFlags.String("body", "REQUIRED", "")
+
+		usersFlags = flag.NewFlagSet("users", flag.ContinueOnError)
+
+		usersCreateFlags    = flag.NewFlagSet("create", flag.ExitOnError)
+		usersCreateBodyFlag = usersCreateFlags.String("body", "REQUIRED", "")
+
+		usersListFlags = flag.NewFlagSet("list", flag.ExitOnError)
+
+		usersDeleteFlags        = flag.NewFlagSet("delete", flag.ExitOnError)
+		usersDeleteUsernameFlag = usersDeleteFlags.String("username", "REQUIRED", "Username of the user to delete")
+
+		usersAuthFlags    = flag.NewFlagSet("auth", flag.ExitOnError)
+		usersAuthBodyFlag = usersAuthFlags.String("body", "REQUIRED", "")
 	)
-	fishykeysFlags.Usage = fishykeysUsage
-	fishykeysCreateMasterKeyFlags.Usage = fishykeysCreateMasterKeyUsage
-	fishykeysGetKeyStatusFlags.Usage = fishykeysGetKeyStatusUsage
-	fishykeysAddShareFlags.Usage = fishykeysAddShareUsage
-	fishykeysDeleteShareFlags.Usage = fishykeysDeleteShareUsage
+	keyManagementFlags.Usage = keyManagementUsage
+	keyManagementCreateMasterKeyFlags.Usage = keyManagementCreateMasterKeyUsage
+	keyManagementGetKeyStatusFlags.Usage = keyManagementGetKeyStatusUsage
+	keyManagementAddShareFlags.Usage = keyManagementAddShareUsage
+	keyManagementDeleteShareFlags.Usage = keyManagementDeleteShareUsage
+
+	usersFlags.Usage = usersUsage
+	usersCreateFlags.Usage = usersCreateUsage
+	usersListFlags.Usage = usersListUsage
+	usersDeleteFlags.Usage = usersDeleteUsage
+	usersAuthFlags.Usage = usersAuthUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -79,8 +104,10 @@ func ParseEndpoint(
 	{
 		svcn = flag.Arg(0)
 		switch svcn {
-		case "fishykeys":
-			svcf = fishykeysFlags
+		case "key-management":
+			svcf = keyManagementFlags
+		case "users":
+			svcf = usersFlags
 		default:
 			return nil, nil, fmt.Errorf("unknown service %q", svcn)
 		}
@@ -96,19 +123,35 @@ func ParseEndpoint(
 	{
 		epn = svcf.Arg(0)
 		switch svcn {
-		case "fishykeys":
+		case "key-management":
 			switch epn {
 			case "create-master-key":
-				epf = fishykeysCreateMasterKeyFlags
+				epf = keyManagementCreateMasterKeyFlags
 
 			case "get-key-status":
-				epf = fishykeysGetKeyStatusFlags
+				epf = keyManagementGetKeyStatusFlags
 
 			case "add-share":
-				epf = fishykeysAddShareFlags
+				epf = keyManagementAddShareFlags
 
 			case "delete-share":
-				epf = fishykeysDeleteShareFlags
+				epf = keyManagementDeleteShareFlags
+
+			}
+
+		case "users":
+			switch epn {
+			case "create":
+				epf = usersCreateFlags
+
+			case "list":
+				epf = usersListFlags
+
+			case "delete":
+				epf = usersDeleteFlags
+
+			case "auth":
+				epf = usersAuthFlags
 
 			}
 
@@ -132,20 +175,35 @@ func ParseEndpoint(
 	)
 	{
 		switch svcn {
-		case "fishykeys":
-			c := fishykeysc.NewClient(scheme, host, doer, enc, dec, restore)
+		case "key-management":
+			c := keymanagementc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
 			case "create-master-key":
 				endpoint = c.CreateMasterKey()
-				data, err = fishykeysc.BuildCreateMasterKeyPayload(*fishykeysCreateMasterKeyBodyFlag)
+				data, err = keymanagementc.BuildCreateMasterKeyPayload(*keyManagementCreateMasterKeyBodyFlag)
 			case "get-key-status":
 				endpoint = c.GetKeyStatus()
 			case "add-share":
 				endpoint = c.AddShare()
-				data, err = fishykeysc.BuildAddSharePayload(*fishykeysAddShareBodyFlag)
+				data, err = keymanagementc.BuildAddSharePayload(*keyManagementAddShareBodyFlag)
 			case "delete-share":
 				endpoint = c.DeleteShare()
-				data, err = fishykeysc.BuildDeleteSharePayload(*fishykeysDeleteShareBodyFlag)
+				data, err = keymanagementc.BuildDeleteSharePayload(*keyManagementDeleteShareBodyFlag)
+			}
+		case "users":
+			c := usersc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "create":
+				endpoint = c.Create()
+				data, err = usersc.BuildCreatePayload(*usersCreateBodyFlag)
+			case "list":
+				endpoint = c.List()
+			case "delete":
+				endpoint = c.Delete()
+				data, err = usersc.BuildDeletePayload(*usersDeleteUsernameFlag)
+			case "auth":
+				endpoint = c.Auth()
+				data, err = usersc.BuildAuthPayload(*usersAuthBodyFlag)
 			}
 		}
 	}
@@ -156,12 +214,12 @@ func ParseEndpoint(
 	return endpoint, data, nil
 }
 
-// fishykeysUsage displays the usage of the fishykeys command and its
+// keyManagementUsage displays the usage of the key-management command and its
 // subcommands.
-func fishykeysUsage() {
+func keyManagementUsage() {
 	fmt.Fprintf(os.Stderr, `The FishyKeys server handles master key operations
 Usage:
-    %[1]s [globalflags] fishykeys COMMAND [flags]
+    %[1]s [globalflags] key-management COMMAND [flags]
 
 COMMAND:
     create-master-key: Create a new master key and split it into shares
@@ -170,55 +228,120 @@ COMMAND:
     delete-share: Delete a share from the key management system
 
 Additional help:
-    %[1]s fishykeys COMMAND --help
+    %[1]s key-management COMMAND --help
 `, os.Args[0])
 }
-func fishykeysCreateMasterKeyUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] fishykeys create-master-key -body JSON
+func keyManagementCreateMasterKeyUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] key-management create-master-key -body JSON
 
 Create a new master key and split it into shares
     -body JSON: 
 
 Example:
-    %[1]s fishykeys create-master-key --body '{
+    %[1]s key-management create-master-key --body '{
       "min_shares": 3,
       "total_shares": 5
    }'
 `, os.Args[0])
 }
 
-func fishykeysGetKeyStatusUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] fishykeys get-key-status
+func keyManagementGetKeyStatusUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] key-management get-key-status
 
 Get the current status of the master key
 
 Example:
-    %[1]s fishykeys get-key-status
+    %[1]s key-management get-key-status
 `, os.Args[0])
 }
 
-func fishykeysAddShareUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] fishykeys add-share -body JSON
+func keyManagementAddShareUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] key-management add-share -body JSON
 
 Add a share to unlock the master key
     -body JSON: 
 
 Example:
-    %[1]s fishykeys add-share --body '{
+    %[1]s key-management add-share --body '{
       "share": "EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0"
    }'
 `, os.Args[0])
 }
 
-func fishykeysDeleteShareUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] fishykeys delete-share -body JSON
+func keyManagementDeleteShareUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] key-management delete-share -body JSON
 
 Delete a share from the key management system
     -body JSON: 
 
 Example:
-    %[1]s fishykeys delete-share --body '{
+    %[1]s key-management delete-share --body '{
       "index": 1
+   }'
+`, os.Args[0])
+}
+
+// usersUsage displays the usage of the users command and its subcommands.
+func usersUsage() {
+	fmt.Fprintf(os.Stderr, `User service manages user accounts and authentication
+Usage:
+    %[1]s [globalflags] users COMMAND [flags]
+
+COMMAND:
+    create: Create a new user
+    list: List all users
+    delete: Delete a user by username
+    auth: Authenticate a user with username and password
+
+Additional help:
+    %[1]s users COMMAND --help
+`, os.Args[0])
+}
+func usersCreateUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] users create -body JSON
+
+Create a new user
+    -body JSON: 
+
+Example:
+    %[1]s users create --body '{
+      "password": "s3cr3t",
+      "username": "alice"
+   }'
+`, os.Args[0])
+}
+
+func usersListUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] users list
+
+List all users
+
+Example:
+    %[1]s users list
+`, os.Args[0])
+}
+
+func usersDeleteUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] users delete -username STRING
+
+Delete a user by username
+    -username STRING: Username of the user to delete
+
+Example:
+    %[1]s users delete --username "alice"
+`, os.Args[0])
+}
+
+func usersAuthUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] users auth -body JSON
+
+Authenticate a user with username and password
+    -body JSON: 
+
+Example:
+    %[1]s users auth --body '{
+      "password": "s3cr3t",
+      "username": "alice"
    }'
 `, os.Args[0])
 }

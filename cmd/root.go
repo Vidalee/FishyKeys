@@ -42,7 +42,6 @@ var rootCmd = &cobra.Command{
 		}
 		defer db.Pool().Close()
 
-		// Run database migrations
 		if err := migration.RunMigrations(db.Pool()); err != nil {
 			log.Fatalf("failed to run migrations: %v", err)
 		}

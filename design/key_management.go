@@ -4,7 +4,7 @@ import (
 	. "goa.design/goa/v3/dsl"
 )
 
-var _ = Service("fishykeys", func() {
+var _ = Service("key_management", func() {
 	Description("The FishyKeys server handles master key operations")
 
 	Method("create_master_key", func() {

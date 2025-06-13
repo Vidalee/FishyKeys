@@ -1,5 +1,5 @@
 gen:
-	goa gen github.com/Vidalee/FishyKeys/backend/design
+	goa gen github.com/Vidalee/FishyKeys/design
 
 test:
 	go test ./...
