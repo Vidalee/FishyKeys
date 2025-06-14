@@ -19,6 +19,10 @@ type CreateMasterKeyRequestBody struct {
 	TotalShares int `form:"total_shares" json:"total_shares" xml:"total_shares"`
 	// Minimum number of shares required to reconstruct the key
 	MinShares int `form:"min_shares" json:"min_shares" xml:"min_shares"`
+	// Admin username for key management
+	AdminUsername string `form:"admin_username" json:"admin_username" xml:"admin_username"`
+	// Admin password for key management
+	AdminPassword string `form:"admin_password" json:"admin_password" xml:"admin_password"`
 }
 
 // AddShareRequestBody is the type of the "key_management" service "add_share"
@@ -40,6 +44,8 @@ type DeleteShareRequestBody struct {
 type CreateMasterKeyResponseBody struct {
 	// The generated key shares
 	Shares []string `form:"shares,omitempty" json:"shares,omitempty" xml:"shares,omitempty"`
+	// The admin user's username
+	AdminUsername *string `form:"admin_username,omitempty" json:"admin_username,omitempty" xml:"admin_username,omitempty"`
 }
 
 // GetKeyStatusResponseBody is the type of the "key_management" service
@@ -64,12 +70,33 @@ type AddShareResponseBody struct {
 	Unlocked *bool `form:"unlocked,omitempty" json:"unlocked,omitempty" xml:"unlocked,omitempty"`
 }
 
+// CreateMasterKeyInvalidParametersResponseBody is the type of the
+// "key_management" service "create_master_key" endpoint HTTP response body for
+// the "invalid_parameters" error.
+type CreateMasterKeyInvalidParametersResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
 // NewCreateMasterKeyRequestBody builds the HTTP request body from the payload
 // of the "create_master_key" endpoint of the "key_management" service.
 func NewCreateMasterKeyRequestBody(p *keymanagement.CreateMasterKeyPayload) *CreateMasterKeyRequestBody {
 	body := &CreateMasterKeyRequestBody{
-		TotalShares: p.TotalShares,
-		MinShares:   p.MinShares,
+		TotalShares:   p.TotalShares,
+		MinShares:     p.MinShares,
+		AdminUsername: p.AdminUsername,
+		AdminPassword: p.AdminPassword,
 	}
 	return body
 }
@@ -95,7 +122,9 @@ func NewDeleteShareRequestBody(p *keymanagement.DeleteSharePayload) *DeleteShare
 // NewCreateMasterKeyResultCreated builds a "key_management" service
 // "create_master_key" endpoint result from a HTTP "Created" response.
 func NewCreateMasterKeyResultCreated(body *CreateMasterKeyResponseBody) *keymanagement.CreateMasterKeyResult {
-	v := &keymanagement.CreateMasterKeyResult{}
+	v := &keymanagement.CreateMasterKeyResult{
+		AdminUsername: body.AdminUsername,
+	}
 	if body.Shares != nil {
 		v.Shares = make([]string, len(body.Shares))
 		for i, val := range body.Shares {
@@ -106,18 +135,25 @@ func NewCreateMasterKeyResultCreated(body *CreateMasterKeyResponseBody) *keymana
 	return v
 }
 
-// NewCreateMasterKeyInternalError builds a key_management service
-// create_master_key endpoint internal_error error.
-func NewCreateMasterKeyInternalError(body string) keymanagement.InternalError {
-	v := keymanagement.InternalError(body)
+// NewCreateMasterKeyInvalidParameters builds a key_management service
+// create_master_key endpoint invalid_parameters error.
+func NewCreateMasterKeyInvalidParameters(body *CreateMasterKeyInvalidParametersResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
 
-// NewCreateMasterKeyInvalidParameters builds a key_management service
-// create_master_key endpoint invalid_parameters error.
-func NewCreateMasterKeyInvalidParameters(body string) keymanagement.InvalidParameters {
-	v := keymanagement.InvalidParameters(body)
+// NewCreateMasterKeyInternalError builds a key_management service
+// create_master_key endpoint internal_error error.
+func NewCreateMasterKeyInternalError(body string) keymanagement.InternalError {
+	v := keymanagement.InternalError(body)
 
 	return v
 }
@@ -284,6 +320,30 @@ func ValidateAddShareResponseBody(body *AddShareResponseBody) (err error) {
 	}
 	if body.Unlocked == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("unlocked", "body"))
+	}
+	return
+}
+
+// ValidateCreateMasterKeyInvalidParametersResponseBody runs the validations
+// defined on create_master_key_invalid_parameters_response_body
+func ValidateCreateMasterKeyInvalidParametersResponseBody(body *CreateMasterKeyInvalidParametersResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
 	}
 	return
 }

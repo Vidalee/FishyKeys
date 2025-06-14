@@ -50,9 +50,9 @@ type AuthUserResponseBody struct {
 	Token *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
 }
 
-// CreateUserInvalidInputResponseBody is the type of the "users" service
-// "create user" endpoint HTTP response body for the "invalid_input" error.
-type CreateUserInvalidInputResponseBody struct {
+// CreateUserInvalidParametersResponseBody is the type of the "users" service
+// "create user" endpoint HTTP response body for the "invalid_parameters" error.
+type CreateUserInvalidParametersResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -108,9 +108,9 @@ func NewCreateUserResultCreated(body *CreateUserResponseBody) *users.CreateUserR
 	return v
 }
 
-// NewCreateUserInvalidInput builds a users service create user endpoint
-// invalid_input error.
-func NewCreateUserInvalidInput(body *CreateUserInvalidInputResponseBody) *goa.ServiceError {
+// NewCreateUserInvalidParameters builds a users service create user endpoint
+// invalid_parameters error.
+func NewCreateUserInvalidParameters(body *CreateUserInvalidParametersResponseBody) *goa.ServiceError {
 	v := &goa.ServiceError{
 		Name:      *body.Name,
 		ID:        *body.ID,
@@ -201,9 +201,9 @@ func NewAuthUserUnauthorized(body string) users.Unauthorized {
 	return v
 }
 
-// ValidateCreateUserInvalidInputResponseBody runs the validations defined on
-// create user_invalid_input_response_body
-func ValidateCreateUserInvalidInputResponseBody(body *CreateUserInvalidInputResponseBody) (err error) {
+// ValidateCreateUserInvalidParametersResponseBody runs the validations defined
+// on create user_invalid_parameters_response_body
+func ValidateCreateUserInvalidParametersResponseBody(body *CreateUserInvalidParametersResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}

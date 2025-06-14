@@ -54,8 +54,8 @@ func EncodeCreateMasterKeyRequest(encoder func(*http.Request) goahttp.Encoder) f
 // the key_management create_master_key endpoint. restoreBody controls whether
 // the response body should be restored after having been read.
 // DecodeCreateMasterKeyResponse may return the following errors:
+//   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
 //   - "internal_error" (type keymanagement.InternalError): http.StatusInternalServerError
-//   - "invalid_parameters" (type keymanagement.InvalidParameters): http.StatusBadRequest
 //   - "key_already_exists" (type keymanagement.KeyAlreadyExists): http.StatusConflict
 //   - error: internal error
 func DecodeCreateMasterKeyResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
@@ -84,6 +84,20 @@ func DecodeCreateMasterKeyResponse(decoder func(*http.Response) goahttp.Decoder,
 			}
 			res := NewCreateMasterKeyResultCreated(&body)
 			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body CreateMasterKeyInvalidParametersResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("key_management", "create_master_key", err)
+			}
+			err = ValidateCreateMasterKeyInvalidParametersResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("key_management", "create_master_key", err)
+			}
+			return nil, NewCreateMasterKeyInvalidParameters(&body)
 		case http.StatusInternalServerError:
 			var (
 				body string
@@ -94,16 +108,6 @@ func DecodeCreateMasterKeyResponse(decoder func(*http.Response) goahttp.Decoder,
 				return nil, goahttp.ErrDecodingError("key_management", "create_master_key", err)
 			}
 			return nil, NewCreateMasterKeyInternalError(body)
-		case http.StatusBadRequest:
-			var (
-				body string
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("key_management", "create_master_key", err)
-			}
-			return nil, NewCreateMasterKeyInvalidParameters(body)
 		case http.StatusConflict:
 			var (
 				body string

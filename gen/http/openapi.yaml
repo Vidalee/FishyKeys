@@ -29,6 +29,8 @@ paths:
                     required:
                         - total_shares
                         - min_shares
+                        - admin_username
+                        - admin_password
             responses:
                 "201":
                     description: Created response.
@@ -37,7 +39,7 @@ paths:
                 "400":
                     description: Bad Request response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/KeyManagementCreateMasterKeyInvalidParametersResponseBody'
                 "409":
                     description: Conflict response.
                     schema:
@@ -194,7 +196,7 @@ paths:
                 "400":
                     description: Bad Request response.
                     schema:
-                        $ref: '#/definitions/UsersCreateUserInvalidInputResponseBody'
+                        $ref: '#/definitions/UsersCreateUserInvalidParametersResponseBody'
                 "409":
                     description: Conflict response.
                     schema:
@@ -282,22 +284,73 @@ definitions:
             index:
                 type: integer
                 description: The index of the share added
-                example: 7698091821871401703
+                example: 5172716312330372806
                 format: int64
             unlocked:
                 type: boolean
                 description: Whether the master key has been unlocked
                 example: false
         example:
-            index: 7280264691809939389
-            unlocked: false
+            index: 3630086288301701828
+            unlocked: true
         required:
             - index
             - unlocked
+    KeyManagementCreateMasterKeyInvalidParametersResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: Invalid parameters provided (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
     KeyManagementCreateMasterKeyRequestBody:
         title: KeyManagementCreateMasterKeyRequestBody
         type: object
         properties:
+            admin_password:
+                type: string
+                description: Admin password for key management
+                example: admin_password123!
+            admin_username:
+                type: string
+                description: Admin username for key management
+                example: admin
             min_shares:
                 type: integer
                 description: Minimum number of shares required to reconstruct the key
@@ -309,15 +362,23 @@ definitions:
                 example: 5
                 format: int64
         example:
+            admin_password: admin_password123!
+            admin_username: admin
             min_shares: 3
             total_shares: 5
         required:
             - total_shares
             - min_shares
+            - admin_username
+            - admin_password
     KeyManagementCreateMasterKeyResponseBody:
         title: KeyManagementCreateMasterKeyResponseBody
         type: object
         properties:
+            admin_username:
+                type: string
+                description: The admin user's username
+                example: admin
             shares:
                 type: array
                 items:
@@ -329,6 +390,7 @@ definitions:
                     - Veniam qui.
                     - Corrupti minus.
         example:
+            admin_username: admin
             shares:
                 - Reiciendis dolore animi deleniti.
                 - Nisi occaecati est inventore.
@@ -353,7 +415,7 @@ definitions:
             current_shares:
                 type: integer
                 description: Number of shares currently held
-                example: 6301691789677483758
+                example: 4864005717453730110
                 format: int64
             is_locked:
                 type: boolean
@@ -362,18 +424,18 @@ definitions:
             min_shares:
                 type: integer
                 description: Minimum number of shares required
-                example: 3058226914185531902
+                example: 7698091821871401703
                 format: int64
             total_shares:
                 type: integer
                 description: Total number of shares
-                example: 6465654726740394934
+                example: 7645663036194808677
                 format: int64
         example:
-            current_shares: 4063444925102994977
-            is_locked: true
-            min_shares: 6650704053550084319
-            total_shares: 4864005717453730110
+            current_shares: 5550376517080984471
+            is_locked: false
+            min_shares: 3638475778790626784
+            total_shares: 6836499522799983954
         required:
             - is_locked
             - current_shares
@@ -386,19 +448,19 @@ definitions:
             created_at:
                 type: string
                 description: User creation timestamp
-                example: Qui et.
+                example: In assumenda sint.
             updated_at:
                 type: string
                 description: User last update timestamp
-                example: Qui nulla hic molestias esse in.
+                example: Repudiandae deleniti sit.
             username:
                 type: string
                 description: The username
-                example: Qui odio minima consequatur et.
+                example: Hic molestias.
         example:
-            created_at: Tenetur maxime quasi veniam autem temporibus.
-            updated_at: Cum ipsum tenetur blanditiis est pariatur.
-            username: Sint asperiores repudiandae deleniti sit rerum eveniet.
+            created_at: Quasi veniam autem temporibus sed cum ipsum.
+            updated_at: Blanditiis est pariatur dolorem laborum.
+            username: Eveniet porro tenetur.
         required:
             - username
             - created_at
@@ -428,22 +490,22 @@ definitions:
             token:
                 type: string
                 description: JWT or session token
-                example: Et quis vel reiciendis.
+                example: Quis vel reiciendis distinctio sint.
             username:
                 type: string
                 description: The username of the authenticated user
-                example: Laborum ratione minima.
+                example: Minima maxime.
         example:
-            token: Voluptatem consequatur sint asperiores natus aliquam.
-            username: Sint ipsa debitis voluptatum non ducimus natus.
-    UsersCreateUserInvalidInputResponseBody:
+            token: Consequatur sint asperiores natus.
+            username: Debitis voluptatum non ducimus natus nisi.
+    UsersCreateUserInvalidParametersResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
         properties:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -459,7 +521,7 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: true
+                example: false
             timeout:
                 type: boolean
                 description: Is the error a timeout?
@@ -470,7 +532,7 @@ definitions:
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
+            temporary: true
             timeout: true
         required:
             - name
@@ -504,6 +566,6 @@ definitions:
             username:
                 type: string
                 description: The username of the created user
-                example: Error minus et maxime impedit necessitatibus sint.
+                example: Sint accusamus perferendis est nulla aut hic.
         example:
-            username: Perferendis est.
+            username: Officia eum et qui odio minima consequatur.

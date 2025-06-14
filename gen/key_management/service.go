@@ -9,6 +9,8 @@ package keymanagement
 
 import (
 	"context"
+
+	goa "goa.design/goa/v3/pkg"
 )
 
 // The FishyKeys server handles master key operations
@@ -62,6 +64,10 @@ type CreateMasterKeyPayload struct {
 	TotalShares int
 	// Minimum number of shares required to reconstruct the key
 	MinShares int
+	// Admin username for key management
+	AdminUsername string
+	// Admin password for key management
+	AdminPassword string
 }
 
 // CreateMasterKeyResult is the result type of the key_management service
@@ -69,6 +75,8 @@ type CreateMasterKeyPayload struct {
 type CreateMasterKeyResult struct {
 	// The generated key shares
 	Shares []string
+	// The admin user's username
+	AdminUsername *string
 }
 
 // DeleteSharePayload is the payload type of the key_management service
@@ -269,4 +277,9 @@ func (e WrongShares) ErrorName() string {
 // GoaErrorName returns "wrong_shares".
 func (e WrongShares) GoaErrorName() string {
 	return "wrong_shares"
+}
+
+// MakeInvalidParameters builds a goa.ServiceError from an error.
+func MakeInvalidParameters(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "invalid_parameters", false, false, false)
 }

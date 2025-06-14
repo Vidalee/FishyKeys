@@ -22,12 +22,14 @@ func BuildCreateMasterKeyPayload(keyManagementCreateMasterKeyBody string) (*keym
 	{
 		err = json.Unmarshal([]byte(keyManagementCreateMasterKeyBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"min_shares\": 3,\n      \"total_shares\": 5\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"admin_password\": \"admin_password123!\",\n      \"admin_username\": \"admin\",\n      \"min_shares\": 3,\n      \"total_shares\": 5\n   }'")
 		}
 	}
 	v := &keymanagement.CreateMasterKeyPayload{
-		TotalShares: body.TotalShares,
-		MinShares:   body.MinShares,
+		TotalShares:   body.TotalShares,
+		MinShares:     body.MinShares,
+		AdminUsername: body.AdminUsername,
+		AdminPassword: body.AdminPassword,
 	}
 
 	return v, nil

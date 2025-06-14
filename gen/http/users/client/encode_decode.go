@@ -54,7 +54,7 @@ func EncodeCreateUserRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 // users create user endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeCreateUserResponse may return the following errors:
-//   - "invalid_input" (type *goa.ServiceError): http.StatusBadRequest
+//   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
 //   - "internal_error" (type users.InternalError): http.StatusInternalServerError
 //   - "username_taken" (type users.UsernameTaken): http.StatusConflict
 //   - error: internal error
@@ -86,18 +86,18 @@ func DecodeCreateUserResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			return res, nil
 		case http.StatusBadRequest:
 			var (
-				body CreateUserInvalidInputResponseBody
+				body CreateUserInvalidParametersResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("users", "create user", err)
 			}
-			err = ValidateCreateUserInvalidInputResponseBody(&body)
+			err = ValidateCreateUserInvalidParametersResponseBody(&body)
 			if err != nil {
 				return nil, goahttp.ErrValidationError("users", "create user", err)
 			}
-			return nil, NewCreateUserInvalidInput(&body)
+			return nil, NewCreateUserInvalidParameters(&body)
 		case http.StatusInternalServerError:
 			var (
 				body string

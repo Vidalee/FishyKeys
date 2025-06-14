@@ -19,6 +19,10 @@ type CreateMasterKeyRequestBody struct {
 	TotalShares *int `form:"total_shares,omitempty" json:"total_shares,omitempty" xml:"total_shares,omitempty"`
 	// Minimum number of shares required to reconstruct the key
 	MinShares *int `form:"min_shares,omitempty" json:"min_shares,omitempty" xml:"min_shares,omitempty"`
+	// Admin username for key management
+	AdminUsername *string `form:"admin_username,omitempty" json:"admin_username,omitempty" xml:"admin_username,omitempty"`
+	// Admin password for key management
+	AdminPassword *string `form:"admin_password,omitempty" json:"admin_password,omitempty" xml:"admin_password,omitempty"`
 }
 
 // AddShareRequestBody is the type of the "key_management" service "add_share"
@@ -40,6 +44,8 @@ type DeleteShareRequestBody struct {
 type CreateMasterKeyResponseBody struct {
 	// The generated key shares
 	Shares []string `form:"shares,omitempty" json:"shares,omitempty" xml:"shares,omitempty"`
+	// The admin user's username
+	AdminUsername *string `form:"admin_username,omitempty" json:"admin_username,omitempty" xml:"admin_username,omitempty"`
 }
 
 // GetKeyStatusResponseBody is the type of the "key_management" service
@@ -64,10 +70,31 @@ type AddShareResponseBody struct {
 	Unlocked bool `form:"unlocked" json:"unlocked" xml:"unlocked"`
 }
 
+// CreateMasterKeyInvalidParametersResponseBody is the type of the
+// "key_management" service "create_master_key" endpoint HTTP response body for
+// the "invalid_parameters" error.
+type CreateMasterKeyInvalidParametersResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // NewCreateMasterKeyResponseBody builds the HTTP response body from the result
 // of the "create_master_key" endpoint of the "key_management" service.
 func NewCreateMasterKeyResponseBody(res *keymanagement.CreateMasterKeyResult) *CreateMasterKeyResponseBody {
-	body := &CreateMasterKeyResponseBody{}
+	body := &CreateMasterKeyResponseBody{
+		AdminUsername: res.AdminUsername,
+	}
 	if res.Shares != nil {
 		body.Shares = make([]string, len(res.Shares))
 		for i, val := range res.Shares {
@@ -99,12 +126,29 @@ func NewAddShareResponseBody(res *keymanagement.AddShareResult) *AddShareRespons
 	return body
 }
 
+// NewCreateMasterKeyInvalidParametersResponseBody builds the HTTP response
+// body from the result of the "create_master_key" endpoint of the
+// "key_management" service.
+func NewCreateMasterKeyInvalidParametersResponseBody(res *goa.ServiceError) *CreateMasterKeyInvalidParametersResponseBody {
+	body := &CreateMasterKeyInvalidParametersResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewCreateMasterKeyPayload builds a key_management service create_master_key
 // endpoint payload.
 func NewCreateMasterKeyPayload(body *CreateMasterKeyRequestBody) *keymanagement.CreateMasterKeyPayload {
 	v := &keymanagement.CreateMasterKeyPayload{
-		TotalShares: *body.TotalShares,
-		MinShares:   *body.MinShares,
+		TotalShares:   *body.TotalShares,
+		MinShares:     *body.MinShares,
+		AdminUsername: *body.AdminUsername,
+		AdminPassword: *body.AdminPassword,
 	}
 
 	return v
@@ -138,6 +182,12 @@ func ValidateCreateMasterKeyRequestBody(body *CreateMasterKeyRequestBody) (err e
 	}
 	if body.MinShares == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("min_shares", "body"))
+	}
+	if body.AdminUsername == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("admin_username", "body"))
+	}
+	if body.AdminPassword == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("admin_password", "body"))
 	}
 	return
 }

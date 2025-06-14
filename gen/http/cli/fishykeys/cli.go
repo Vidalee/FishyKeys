@@ -31,6 +31,8 @@ users (create-user|list-users|delete-user|auth-user)
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` key-management create-master-key --body '{
+      "admin_password": "admin_password123!",
+      "admin_username": "admin",
       "min_shares": 3,
       "total_shares": 5
    }'` + "\n" +
@@ -239,6 +241,8 @@ Create a new master key and split it into shares
 
 Example:
     %[1]s key-management create-master-key --body '{
+      "admin_password": "admin_password123!",
+      "admin_username": "admin",
       "min_shares": 3,
       "total_shares": 5
    }'

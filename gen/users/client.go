@@ -34,7 +34,7 @@ func NewClient(createUser, listUsers, deleteUser, authUser goa.Endpoint) *Client
 // CreateUser calls the "create user" endpoint of the "users" service.
 // CreateUser may return the following errors:
 //   - "username_taken" (type UsernameTaken)
-//   - "invalid_input" (type *goa.ServiceError): Invalid input
+//   - "invalid_parameters" (type *goa.ServiceError): Invalid input
 //   - "internal_error" (type InternalError)
 //   - error: internal error
 func (c *Client) CreateUser(ctx context.Context, p *CreateUserPayload) (res *CreateUserResult, err error) {
@@ -62,7 +62,7 @@ func (c *Client) ListUsers(ctx context.Context) (res []*User, err error) {
 // DeleteUser calls the "delete user" endpoint of the "users" service.
 // DeleteUser may return the following errors:
 //   - "user_not_found" (type UserNotFound)
-//   - "invalid_input" (type *goa.ServiceError): Invalid input
+//   - "invalid_parameters" (type *goa.ServiceError): Invalid input
 //   - "internal_error" (type InternalError)
 //   - error: internal error
 func (c *Client) DeleteUser(ctx context.Context, p *DeleteUserPayload) (err error) {

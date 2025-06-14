@@ -50,9 +50,9 @@ type AuthUserResponseBody struct {
 	Token *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
 }
 
-// CreateUserInvalidInputResponseBody is the type of the "users" service
-// "create user" endpoint HTTP response body for the "invalid_input" error.
-type CreateUserInvalidInputResponseBody struct {
+// CreateUserInvalidParametersResponseBody is the type of the "users" service
+// "create user" endpoint HTTP response body for the "invalid_parameters" error.
+type CreateUserInvalidParametersResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -107,10 +107,10 @@ func NewAuthUserResponseBody(res *users.AuthUserResult) *AuthUserResponseBody {
 	return body
 }
 
-// NewCreateUserInvalidInputResponseBody builds the HTTP response body from the
-// result of the "create user" endpoint of the "users" service.
-func NewCreateUserInvalidInputResponseBody(res *goa.ServiceError) *CreateUserInvalidInputResponseBody {
-	body := &CreateUserInvalidInputResponseBody{
+// NewCreateUserInvalidParametersResponseBody builds the HTTP response body
+// from the result of the "create user" endpoint of the "users" service.
+func NewCreateUserInvalidParametersResponseBody(res *goa.ServiceError) *CreateUserInvalidParametersResponseBody {
+	body := &CreateUserInvalidParametersResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,

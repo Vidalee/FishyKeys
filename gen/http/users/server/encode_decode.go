@@ -69,7 +69,7 @@ func EncodeCreateUserError(encoder func(context.Context, http.ResponseWriter) go
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
-		case "invalid_input":
+		case "invalid_parameters":
 			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
@@ -77,7 +77,7 @@ func EncodeCreateUserError(encoder func(context.Context, http.ResponseWriter) go
 			if formatter != nil {
 				body = formatter(ctx, res)
 			} else {
-				body = NewCreateUserInvalidInputResponseBody(res)
+				body = NewCreateUserInvalidParametersResponseBody(res)
 			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusBadRequest)

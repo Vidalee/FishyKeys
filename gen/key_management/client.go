@@ -34,7 +34,7 @@ func NewClient(createMasterKey, getKeyStatus, addShare, deleteShare goa.Endpoint
 // CreateMasterKey calls the "create_master_key" endpoint of the
 // "key_management" service.
 // CreateMasterKey may return the following errors:
-//   - "invalid_parameters" (type InvalidParameters)
+//   - "invalid_parameters" (type *goa.ServiceError): Invalid parameters provided
 //   - "internal_error" (type InternalError)
 //   - "key_already_exists" (type KeyAlreadyExists)
 //   - error: internal error

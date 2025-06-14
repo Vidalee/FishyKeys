@@ -69,6 +69,19 @@ func EncodeCreateMasterKeyError(encoder func(context.Context, http.ResponseWrite
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
+		case "invalid_parameters":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewCreateMasterKeyInvalidParametersResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
 		case "internal_error":
 			var res keymanagement.InternalError
 			errors.As(v, &res)
@@ -76,14 +89,6 @@ func EncodeCreateMasterKeyError(encoder func(context.Context, http.ResponseWrite
 			body := res
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
-		case "invalid_parameters":
-			var res keymanagement.InvalidParameters
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			body := res
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		case "key_already_exists":
 			var res keymanagement.KeyAlreadyExists

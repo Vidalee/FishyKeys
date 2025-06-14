@@ -168,7 +168,7 @@ func (e UsernameTaken) GoaErrorName() string {
 	return "username_taken"
 }
 
-// MakeInvalidInput builds a goa.ServiceError from an error.
-func MakeInvalidInput(err error) *goa.ServiceError {
-	return goa.NewServiceError(err, "invalid_input", false, false, false)
+// MakeInvalidParameters builds a goa.ServiceError from an error.
+func MakeInvalidParameters(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "invalid_parameters", false, false, false)
 }
