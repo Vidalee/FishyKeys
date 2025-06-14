@@ -30,7 +30,7 @@ func (s *UsersService) CreateUser(ctx context.Context, payload *genusers.CreateU
 
 	_, err := s.usersRepository.GetUserByUsername(ctx, payload.Username)
 	if err == nil {
-		return nil, genusers.UsernameTaken("username already exists")
+		return nil, genusers.MakeUsernameTaken(fmt.Errorf("username already exists"))
 	} else if !errors.Is(err, repository.ErrUserNotFound) {
 		return nil, genusers.InternalError("could not check user existence")
 	}

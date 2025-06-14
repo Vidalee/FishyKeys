@@ -33,7 +33,7 @@ func NewClient(createUser, listUsers, deleteUser, authUser goa.Endpoint) *Client
 
 // CreateUser calls the "create user" endpoint of the "users" service.
 // CreateUser may return the following errors:
-//   - "username_taken" (type UsernameTaken)
+//   - "username_taken" (type *goa.ServiceError): Username already exists
 //   - "invalid_parameters" (type *goa.ServiceError): Invalid input
 //   - "internal_error" (type InternalError)
 //   - error: internal error

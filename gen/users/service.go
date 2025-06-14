@@ -97,9 +97,6 @@ type Unauthorized string
 // User does not exist
 type UserNotFound string
 
-// Username already exists
-type UsernameTaken string
-
 // Error returns an error description.
 func (e InternalError) Error() string {
 	return "Internal server error"
@@ -151,21 +148,9 @@ func (e UserNotFound) GoaErrorName() string {
 	return "user_not_found"
 }
 
-// Error returns an error description.
-func (e UsernameTaken) Error() string {
-	return "Username already exists"
-}
-
-// ErrorName returns "username_taken".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e UsernameTaken) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "username_taken".
-func (e UsernameTaken) GoaErrorName() string {
-	return "username_taken"
+// MakeUsernameTaken builds a goa.ServiceError from an error.
+func MakeUsernameTaken(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "username_taken", false, false, false)
 }
 
 // MakeInvalidParameters builds a goa.ServiceError from an error.

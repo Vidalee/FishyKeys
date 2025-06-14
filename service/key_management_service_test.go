@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"testing"
 
@@ -295,7 +294,6 @@ func TestKeyManagementService_AddShare(t *testing.T) {
 			}
 
 			result, err := service.AddShare(ctx, payload)
-			fmt.Println("Adding share:", createResult, err)
 			if i < 2 {
 				assert.NoError(t, err)
 				assert.NotNil(t, result)

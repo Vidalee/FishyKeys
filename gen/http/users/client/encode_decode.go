@@ -54,9 +54,9 @@ func EncodeCreateUserRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 // users create user endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeCreateUserResponse may return the following errors:
+//   - "username_taken" (type *goa.ServiceError): http.StatusConflict
 //   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
 //   - "internal_error" (type users.InternalError): http.StatusInternalServerError
-//   - "username_taken" (type users.UsernameTaken): http.StatusConflict
 //   - error: internal error
 func DecodeCreateUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -84,6 +84,20 @@ func DecodeCreateUserResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			}
 			res := NewCreateUserResultCreated(&body)
 			return res, nil
+		case http.StatusConflict:
+			var (
+				body CreateUserUsernameTakenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("users", "create user", err)
+			}
+			err = ValidateCreateUserUsernameTakenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "create user", err)
+			}
+			return nil, NewCreateUserUsernameTaken(&body)
 		case http.StatusBadRequest:
 			var (
 				body CreateUserInvalidParametersResponseBody
@@ -108,16 +122,6 @@ func DecodeCreateUserResponse(decoder func(*http.Response) goahttp.Decoder, rest
 				return nil, goahttp.ErrDecodingError("users", "create user", err)
 			}
 			return nil, NewCreateUserInternalError(body)
-		case http.StatusConflict:
-			var (
-				body string
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "create user", err)
-			}
-			return nil, NewCreateUserUsernameTaken(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("users", "create user", resp.StatusCode, string(body))

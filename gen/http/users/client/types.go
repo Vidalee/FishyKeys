@@ -50,6 +50,24 @@ type AuthUserResponseBody struct {
 	Token *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
 }
 
+// CreateUserUsernameTakenResponseBody is the type of the "users" service
+// "create user" endpoint HTTP response body for the "username_taken" error.
+type CreateUserUsernameTakenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
 // CreateUserInvalidParametersResponseBody is the type of the "users" service
 // "create user" endpoint HTTP response body for the "invalid_parameters" error.
 type CreateUserInvalidParametersResponseBody struct {
@@ -108,6 +126,21 @@ func NewCreateUserResultCreated(body *CreateUserResponseBody) *users.CreateUserR
 	return v
 }
 
+// NewCreateUserUsernameTaken builds a users service create user endpoint
+// username_taken error.
+func NewCreateUserUsernameTaken(body *CreateUserUsernameTakenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
 // NewCreateUserInvalidParameters builds a users service create user endpoint
 // invalid_parameters error.
 func NewCreateUserInvalidParameters(body *CreateUserInvalidParametersResponseBody) *goa.ServiceError {
@@ -127,14 +160,6 @@ func NewCreateUserInvalidParameters(body *CreateUserInvalidParametersResponseBod
 // internal_error error.
 func NewCreateUserInternalError(body string) users.InternalError {
 	v := users.InternalError(body)
-
-	return v
-}
-
-// NewCreateUserUsernameTaken builds a users service create user endpoint
-// username_taken error.
-func NewCreateUserUsernameTaken(body string) users.UsernameTaken {
-	v := users.UsernameTaken(body)
 
 	return v
 }
@@ -199,6 +224,30 @@ func NewAuthUserUnauthorized(body string) users.Unauthorized {
 	v := users.Unauthorized(body)
 
 	return v
+}
+
+// ValidateCreateUserUsernameTakenResponseBody runs the validations defined on
+// create user_username_taken_response_body
+func ValidateCreateUserUsernameTakenResponseBody(body *CreateUserUsernameTakenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
 }
 
 // ValidateCreateUserInvalidParametersResponseBody runs the validations defined

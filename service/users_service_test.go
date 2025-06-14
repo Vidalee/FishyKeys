@@ -32,6 +32,7 @@ func TestUsersService_CreateUser(t *testing.T) {
 		password          string
 		expectedError     bool
 		expectedErrorText string
+		doDuplicate       bool
 	}{
 		{
 			name:              "empty username",
@@ -53,6 +54,14 @@ func TestUsersService_CreateUser(t *testing.T) {
 			password:      "long_password",
 			expectedError: false,
 		},
+		{
+			name:              "duplicate username",
+			username:          "username",
+			password:          "another_password",
+			expectedError:     true,
+			expectedErrorText: "username already exists",
+			doDuplicate:       true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -66,6 +75,9 @@ func TestUsersService_CreateUser(t *testing.T) {
 			}
 
 			result, err := service.CreateUser(ctx, payload)
+			if tt.doDuplicate {
+				result, err = service.CreateUser(ctx, payload)
+			}
 
 			if tt.expectedError {
 				assert.Error(t, err)

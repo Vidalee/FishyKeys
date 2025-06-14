@@ -49,16 +49,16 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Dolorem omnis sed et qui et quis.
-                            example: Magni veniam occaecati.
+                                example: Voluptatem ad amet sint est.
+                            example: Ab qui harum distinctio.
                 "500":
                     description: 'internal_error: Internal Server Error response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Eligendi aut quae vel occaecati.
-                            example: Excepturi dolorum sed consequatur eos doloribus sit.
+                                example: Qui sint sapiente architecto.
+                            example: Atque est autem sit sit in rem.
     /key_management/share:
         delete:
             tags:
@@ -83,32 +83,32 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Corrupti aut.
-                            example: Aut quis.
+                                example: Natus dignissimos.
+                            example: Commodi rerum quo excepturi.
                 "404":
                     description: 'no_key_set: Not Found response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Natus dignissimos.
-                            example: Commodi rerum quo excepturi.
+                                example: Fugiat ut.
+                            example: Asperiores architecto similique quia illo eos quasi.
                 "409":
                     description: 'key_already_unlocked: Conflict response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Quos officiis.
-                            example: Maiores at et ut occaecati harum maiores.
+                                example: Inventore nostrum minima et.
+                            example: Doloremque possimus.
                 "500":
                     description: 'internal_error: Internal Server Error response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Voluptatem qui et.
-                            example: Ducimus eum qui est.
+                                example: Consequatur illum totam officiis.
+                            example: Dolorem fuga cupiditate alias quis voluptatibus dignissimos.
         post:
             tags:
                 - key_management
@@ -139,32 +139,32 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Corporis officia natus eius maxime doloribus explicabo.
-                            example: Asperiores architecto similique quia illo eos quasi.
+                                example: Est temporibus nam.
+                            example: Quidem voluptatibus ducimus.
                 "404":
                     description: 'no_key_set: Not Found response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Consequatur illum totam officiis.
-                            example: Dolorem fuga cupiditate alias quis voluptatibus dignissimos.
+                                example: Omnis quia et repellat natus quidem impedit.
+                            example: Perspiciatis repellendus facilis est.
                 "409":
                     description: 'key_already_unlocked: Conflict response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Omnis quia et repellat natus quidem impedit.
-                            example: Doloremque possimus.
+                                example: Vel non nam magnam beatae ipsa.
+                            example: Rerum ab et aliquam.
                 "500":
                     description: 'internal_error: Internal Server Error response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Non voluptatem qui.
-                            example: Quidem voluptatibus ducimus.
+                                example: Natus rerum optio est laborum.
+                            example: Rerum autem rerum omnis reiciendis.
     /key_management/status:
         get:
             tags:
@@ -190,16 +190,16 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Dolore est temporibus nam laboriosam natus rerum.
-                            example: Rerum autem rerum omnis reiciendis.
+                                example: Et qui et quis eaque eius.
+                            example: Cumque amet et.
                 "500":
                     description: 'internal_error: Internal Server Error response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Est laborum ut vel non nam magnam.
-                            example: Quo eveniet deleniti praesentium ex eum.
+                                example: Dignissimos vel.
+                            example: Excepturi dolorum sed consequatur eos doloribus sit.
     /users:
         get:
             tags:
@@ -217,27 +217,30 @@ paths:
                                 items:
                                     $ref: '#/components/schemas/User'
                                 example:
-                                    - created_at: Saepe nesciunt aut.
-                                      updated_at: Id fuga in numquam voluptatem.
-                                      username: Eos ducimus repudiandae et distinctio.
-                                    - created_at: Saepe nesciunt aut.
-                                      updated_at: Id fuga in numquam voluptatem.
-                                      username: Eos ducimus repudiandae et distinctio.
+                                    - created_at: Necessitatibus dicta optio.
+                                      updated_at: Eos ducimus repudiandae et distinctio.
+                                      username: Culpa voluptatem impedit tempore et quod.
+                                    - created_at: Necessitatibus dicta optio.
+                                      updated_at: Eos ducimus repudiandae et distinctio.
+                                      username: Culpa voluptatem impedit tempore et quod.
+                                    - created_at: Necessitatibus dicta optio.
+                                      updated_at: Eos ducimus repudiandae et distinctio.
+                                      username: Culpa voluptatem impedit tempore et quod.
                             example:
-                                - created_at: Saepe nesciunt aut.
-                                  updated_at: Id fuga in numquam voluptatem.
-                                  username: Eos ducimus repudiandae et distinctio.
-                                - created_at: Saepe nesciunt aut.
-                                  updated_at: Id fuga in numquam voluptatem.
-                                  username: Eos ducimus repudiandae et distinctio.
+                                - created_at: Necessitatibus dicta optio.
+                                  updated_at: Eos ducimus repudiandae et distinctio.
+                                  username: Culpa voluptatem impedit tempore et quod.
+                                - created_at: Necessitatibus dicta optio.
+                                  updated_at: Eos ducimus repudiandae et distinctio.
+                                  username: Culpa voluptatem impedit tempore et quod.
                 "500":
                     description: 'internal_error: Internal Server Error response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Est et corrupti culpa minus velit.
-                            example: Quas ut.
+                                example: Voluptatem maiores qui velit eum.
+                            example: At et ut occaecati harum maiores delectus.
         post:
             tags:
                 - users
@@ -269,21 +272,19 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Error'
                 "409":
-                    description: 'username_taken: Conflict response.'
+                    description: 'username_taken: Username already exists'
                     content:
-                        application/json:
+                        application/vnd.goa.error:
                             schema:
-                                type: string
-                                example: Ut officia earum totam esse.
-                            example: Est et expedita doloremque architecto commodi rerum.
+                                $ref: '#/components/schemas/Error'
                 "500":
                     description: 'internal_error: Internal Server Error response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Velit praesentium sint.
-                            example: Nam nobis libero repudiandae.
+                                example: Corrupti aut.
+                            example: Ducimus eum qui est.
     /users/{username}:
         delete:
             tags:
@@ -310,16 +311,16 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Est sit dignissimos.
-                            example: Ex hic placeat maxime.
+                                example: Deserunt omnis aliquam.
+                            example: Quis in est et expedita doloremque architecto.
                 "500":
                     description: 'internal_error: Internal Server Error response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Sint voluptas aspernatur.
-                            example: Eligendi quae adipisci occaecati.
+                                example: Ut officia earum totam esse.
+                            example: Rerum quidem nam nobis libero.
     /users/auth:
         post:
             tags:
@@ -344,24 +345,24 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/AuthUserResponseBody'
                             example:
-                                token: Occaecati nesciunt eos commodi.
-                                username: Sequi accusantium fugit sed.
+                                token: Eos sapiente.
+                                username: Dolores aperiam excepturi quisquam.
                 "401":
                     description: 'unauthorized: Unauthorized response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Ab qui harum distinctio.
-                            example: Quam modi.
+                                example: Asperiores dolorem sed incidunt id.
+                            example: Aperiam atque quas ut quidem ex hic.
                 "500":
                     description: 'internal_error: Internal Server Error response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Cumque amet et.
-                            example: Ipsum sapiente et quia.
+                                example: Sed dolor itaque.
+                            example: Maxime odit eligendi quae adipisci.
 components:
     schemas:
         AddShareRequestBody:
@@ -381,14 +382,14 @@ components:
                 index:
                     type: integer
                     description: The index of the share added
-                    example: 931669034124869970
+                    example: 6424931001824332862
                     format: int64
                 unlocked:
                     type: boolean
                     description: Whether the master key has been unlocked
-                    example: true
+                    example: false
             example:
-                index: 3872896210058284524
+                index: 945154162230229594
                 unlocked: true
             required:
                 - index
@@ -399,14 +400,14 @@ components:
                 token:
                     type: string
                     description: JWT or session token
-                    example: Dolorem sed incidunt id dolore sed.
+                    example: Voluptas est et corrupti culpa minus.
                 username:
                     type: string
                     description: The username of the authenticated user
-                    example: Cupiditate sint molestiae adipisci architecto.
+                    example: Velit praesentium sint.
             example:
-                token: Sit sit in rem.
-                username: Itaque magnam atque est.
+                token: Voluptas aspernatur quia cupiditate sint molestiae adipisci.
+                username: Eos est sit dignissimos ex.
         CreateMasterKeyRequestBody:
             type: object
             properties:
@@ -449,17 +450,17 @@ components:
                     type: array
                     items:
                         type: string
-                        example: Iste et animi explicabo sed.
+                        example: Aperiam nemo et rerum quidem expedita.
                     description: The generated key shares
                     example:
-                        - Commodi repudiandae et molestias quasi.
-                        - Cupiditate eos et nisi eos beatae.
-                        - Eligendi consequatur voluptas.
+                        - Quia et similique nihil iste et.
+                        - Explicabo sed sed accusantium.
+                        - Repudiandae et.
             example:
                 admin_username: admin
                 shares:
-                    - Eos ut.
-                    - Sunt ut qui sint sapiente.
+                    - Eveniet cupiditate eos et nisi eos beatae.
+                    - Eligendi consequatur voluptas.
         CreateUserRequestBody:
             type: object
             properties:
@@ -483,9 +484,9 @@ components:
                 username:
                     type: string
                     description: The username of the created user
-                    example: Nam voluptatem maiores qui velit.
+                    example: Voluptatem qui et.
             example:
-                username: Excepturi deserunt omnis aliquam.
+                username: Quos officiis.
         DeleteShareRequestBody:
             type: object
             properties:
@@ -520,14 +521,14 @@ components:
                 temporary:
                     type: boolean
                     description: Is the error temporary?
-                    example: false
+                    example: true
                 timeout:
                     type: boolean
                     description: Is the error a timeout?
-                    example: false
+                    example: true
             description: Invalid parameters provided
             example:
-                fault: false
+                fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
@@ -546,7 +547,7 @@ components:
                 current_shares:
                     type: integer
                     description: Number of shares currently held
-                    example: 5901166280847989925
+                    example: 3204362017974806603
                     format: int64
                 is_locked:
                     type: boolean
@@ -555,18 +556,18 @@ components:
                 min_shares:
                     type: integer
                     description: Minimum number of shares required
-                    example: 2148045937798897608
+                    example: 7390922679859328998
                     format: int64
                 total_shares:
                     type: integer
                     description: Total number of shares
-                    example: 2087716876176659606
+                    example: 7362036207563285969
                     format: int64
             example:
-                current_shares: 6424931001824332862
+                current_shares: 1961684668140663594
                 is_locked: false
-                min_shares: 7957248520782200033
-                total_shares: 945154162230229594
+                min_shares: 3468115806578446057
+                total_shares: 7109564824357408988
             required:
                 - is_locked
                 - current_shares
@@ -578,19 +579,19 @@ components:
                 created_at:
                     type: string
                     description: User creation timestamp
-                    example: Autem ut necessitatibus dolor earum aut.
+                    example: Voluptatem consequatur sint asperiores natus aliquam.
                 updated_at:
                     type: string
                     description: User last update timestamp
-                    example: Esse dolores aut quia ea.
+                    example: Illo impedit debitis quia.
                 username:
                     type: string
                     description: The username
-                    example: Laborum illo impedit debitis quia.
+                    example: Sint ipsa debitis voluptatum non ducimus natus.
             example:
-                created_at: Aperiam nemo et rerum quidem expedita.
-                updated_at: Qui quia et similique.
-                username: Eum necessitatibus perspiciatis.
+                created_at: Esse dolores aut quia ea.
+                updated_at: Eum necessitatibus perspiciatis.
+                username: Autem ut necessitatibus dolor earum aut.
             required:
                 - username
                 - created_at

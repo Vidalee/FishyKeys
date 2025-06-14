@@ -28,7 +28,7 @@ var _ = Service("users", func() {
 		Result(func() {
 			Attribute("username", String, "The username of the created user")
 		})
-		Error("username_taken", String, "Username already exists")
+		Error("username_taken", ErrorResult, "Username already exists")
 		Error("invalid_parameters", ErrorResult, "Invalid input")
 		Error("internal_error", String, "Internal server error")
 		HTTP(func() {

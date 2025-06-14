@@ -69,6 +69,19 @@ func EncodeCreateUserError(encoder func(context.Context, http.ResponseWriter) go
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
+		case "username_taken":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewCreateUserUsernameTakenResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusConflict)
+			return enc.Encode(body)
 		case "invalid_parameters":
 			var res *goa.ServiceError
 			errors.As(v, &res)
@@ -89,14 +102,6 @@ func EncodeCreateUserError(encoder func(context.Context, http.ResponseWriter) go
 			body := res
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
-		case "username_taken":
-			var res users.UsernameTaken
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			body := res
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusConflict)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
