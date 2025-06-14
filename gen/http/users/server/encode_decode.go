@@ -180,6 +180,19 @@ func EncodeDeleteUserError(encoder func(context.Context, http.ResponseWriter) go
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
+		case "user_not_found":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewDeleteUserUserNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
 		case "internal_error":
 			var res users.InternalError
 			errors.As(v, &res)
@@ -187,14 +200,6 @@ func EncodeDeleteUserError(encoder func(context.Context, http.ResponseWriter) go
 			body := res
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
-		case "user_not_found":
-			var res users.UserNotFound
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			body := res
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusNotFound)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)

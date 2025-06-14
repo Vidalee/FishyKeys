@@ -86,6 +86,24 @@ type CreateUserInvalidParametersResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// DeleteUserUserNotFoundResponseBody is the type of the "users" service
+// "delete user" endpoint HTTP response body for the "user_not_found" error.
+type DeleteUserUserNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // AuthUserUnauthorizedResponseBody is the type of the "users" service "auth
 // user" endpoint HTTP response body for the "unauthorized" error.
 type AuthUserUnauthorizedResponseBody struct {
@@ -179,6 +197,20 @@ func NewCreateUserUsernameTakenResponseBody(res *goa.ServiceError) *CreateUserUs
 // from the result of the "create user" endpoint of the "users" service.
 func NewCreateUserInvalidParametersResponseBody(res *goa.ServiceError) *CreateUserInvalidParametersResponseBody {
 	body := &CreateUserInvalidParametersResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteUserUserNotFoundResponseBody builds the HTTP response body from the
+// result of the "delete user" endpoint of the "users" service.
+func NewDeleteUserUserNotFoundResponseBody(res *goa.ServiceError) *DeleteUserUserNotFoundResponseBody {
+	body := &DeleteUserUserNotFoundResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,

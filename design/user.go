@@ -59,7 +59,7 @@ var _ = Service("users", func() {
 			})
 			Required("username")
 		})
-		Error("user_not_found", String, "User does not exist")
+		Error("user_not_found", ErrorResult, "User not found")
 		Error("invalid_parameters", ErrorResult, "Invalid input")
 		Error("internal_error", String, "Internal server error")
 		HTTP(func() {

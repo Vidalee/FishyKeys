@@ -61,7 +61,7 @@ func (c *Client) ListUsers(ctx context.Context) (res []*User, err error) {
 
 // DeleteUser calls the "delete user" endpoint of the "users" service.
 // DeleteUser may return the following errors:
-//   - "user_not_found" (type UserNotFound)
+//   - "user_not_found" (type *goa.ServiceError): User not found
 //   - "invalid_parameters" (type *goa.ServiceError): Invalid input
 //   - "internal_error" (type InternalError)
 //   - error: internal error

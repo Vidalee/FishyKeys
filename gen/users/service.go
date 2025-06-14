@@ -91,9 +91,6 @@ type User struct {
 // Internal server error
 type InternalError string
 
-// User does not exist
-type UserNotFound string
-
 // Error returns an error description.
 func (e InternalError) Error() string {
 	return "Internal server error"
@@ -111,23 +108,6 @@ func (e InternalError) GoaErrorName() string {
 	return "internal_error"
 }
 
-// Error returns an error description.
-func (e UserNotFound) Error() string {
-	return "User does not exist"
-}
-
-// ErrorName returns "user_not_found".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e UserNotFound) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "user_not_found".
-func (e UserNotFound) GoaErrorName() string {
-	return "user_not_found"
-}
-
 // MakeUsernameTaken builds a goa.ServiceError from an error.
 func MakeUsernameTaken(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "username_taken", false, false, false)
@@ -136,6 +116,11 @@ func MakeUsernameTaken(err error) *goa.ServiceError {
 // MakeInvalidParameters builds a goa.ServiceError from an error.
 func MakeInvalidParameters(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "invalid_parameters", false, false, false)
+}
+
+// MakeUserNotFound builds a goa.ServiceError from an error.
+func MakeUserNotFound(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "user_not_found", false, false, false)
 }
 
 // MakeUnauthorized builds a goa.ServiceError from an error.

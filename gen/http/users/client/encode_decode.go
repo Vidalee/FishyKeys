@@ -232,8 +232,8 @@ func (c *Client) BuildDeleteUserRequest(ctx context.Context, v any) (*http.Reque
 // users delete user endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeDeleteUserResponse may return the following errors:
+//   - "user_not_found" (type *goa.ServiceError): http.StatusNotFound
 //   - "internal_error" (type users.InternalError): http.StatusInternalServerError
-//   - "user_not_found" (type users.UserNotFound): http.StatusNotFound
 //   - error: internal error
 func DecodeDeleteUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -252,6 +252,20 @@ func DecodeDeleteUserResponse(decoder func(*http.Response) goahttp.Decoder, rest
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
+		case http.StatusNotFound:
+			var (
+				body DeleteUserUserNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("users", "delete user", err)
+			}
+			err = ValidateDeleteUserUserNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "delete user", err)
+			}
+			return nil, NewDeleteUserUserNotFound(&body)
 		case http.StatusInternalServerError:
 			var (
 				body string
@@ -262,16 +276,6 @@ func DecodeDeleteUserResponse(decoder func(*http.Response) goahttp.Decoder, rest
 				return nil, goahttp.ErrDecodingError("users", "delete user", err)
 			}
 			return nil, NewDeleteUserInternalError(body)
-		case http.StatusNotFound:
-			var (
-				body string
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "delete user", err)
-			}
-			return nil, NewDeleteUserUserNotFound(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("users", "delete user", resp.StatusCode, string(body))

@@ -221,3 +221,70 @@ func TestUsersService_ListUsers(t *testing.T) {
 		assert.Equal(t, testUsers[i].Username, user.Username, "usernames should match")
 	}
 }
+
+func TestUsersService_DeleteUser(t *testing.T) {
+	service := setupUsersTestService(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		name              string
+		username          string
+		createUser        bool
+		expectedError     bool
+		expectedErrorText string
+	}{
+		{
+			name:              "empty username",
+			username:          "",
+			createUser:        false,
+			expectedError:     true,
+			expectedErrorText: "username must be provided",
+		},
+		{
+			name:              "nonexistent user",
+			username:          "username",
+			createUser:        false,
+			expectedError:     true,
+			expectedErrorText: "user not found",
+		},
+		{
+			name:          "existing user",
+			username:      "username",
+			createUser:    true,
+			expectedError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := testutil.ClearTable(ctx, "users")
+			require.NoError(t, err)
+
+			if tt.createUser {
+				createPayload := &genusers.CreateUserPayload{
+					Username: tt.username,
+					Password: "password",
+				}
+				_, err := service.CreateUser(ctx, createPayload)
+				require.NoError(t, err, "failed to create user for auth test")
+			}
+
+			payload := &genusers.DeleteUserPayload{
+				Username: tt.username,
+			}
+
+			err = service.DeleteUser(ctx, payload)
+
+			if tt.expectedError {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedErrorText, err.Error())
+			} else {
+				assert.NoError(t, err)
+
+				_, err := service.usersRepository.GetUserByUsername(ctx, tt.username)
+				assert.Error(t, err)
+				assert.Equal(t, repository.ErrUserNotFound, err, "expected user to be deleted")
+			}
+		})
+	}
+}
