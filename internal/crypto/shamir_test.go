@@ -27,12 +27,12 @@ func TestEndToEndSecretSharing(t *testing.T) {
 
 	plaintext := []byte("This is a top secret message.")
 
-	ciphertext, err := Encrypt(secret, plaintext)
+	ciphertext, err := EncryptWithKey(secret, plaintext)
 	if err != nil {
 		t.Fatalf("Encrypt failed: %v", err)
 	}
 
-	decrypted, err := Decrypt(secret, ciphertext)
+	decrypted, err := DecryptWithKey(secret, ciphertext)
 	if err != nil {
 		t.Fatalf("Decrypt failed: %v", err)
 	}
@@ -47,12 +47,12 @@ func TestEndToEndWithWrongKey(t *testing.T) {
 	wrongKey := make([]byte, 32)
 	plaintext := []byte("Sensitive data")
 
-	ciphertext, err := Encrypt(secret, plaintext)
+	ciphertext, err := EncryptWithKey(secret, plaintext)
 	if err != nil {
 		t.Fatalf("Encrypt failed: %v", err)
 	}
 
-	_, err = Decrypt(wrongKey, ciphertext)
+	_, err = DecryptWithKey(wrongKey, ciphertext)
 	if err == nil {
 		t.Fatal("Expected decryption error with wrong key, got nil")
 	}

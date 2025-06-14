@@ -36,21 +36,9 @@ var (
 	once     sync.Once
 )
 
-// GetKeyManager returns the singleton instance of the key manager
-func GetKeyManager() *KeyManager {
-	once.Do(func() {
-		instance = &KeyManager{
-			state: StateUninitialized,
-		}
-	})
-	return instance
-}
-
-// ResetKeyManager resets the singleton instance of the key manager
-// Mostly used to facilitate testing
-func ResetKeyManager() {
-	once = sync.Once{} // Reset the singleton instance
-	instance = &KeyManager{
+// GetDefaultKeyManager returns a new instance of KeyManager with uninitialized state
+func GetDefaultKeyManager() *KeyManager {
+	return &KeyManager{
 		state: StateUninitialized,
 	}
 }

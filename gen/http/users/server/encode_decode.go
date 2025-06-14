@@ -18,24 +18,24 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// EncodeCreateResponse returns an encoder for responses returned by the users
-// create endpoint.
-func EncodeCreateResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+// EncodeCreateUserResponse returns an encoder for responses returned by the
+// users create user endpoint.
+func EncodeCreateUserResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
 	return func(ctx context.Context, w http.ResponseWriter, v any) error {
-		res, _ := v.(*users.CreateResult)
+		res, _ := v.(*users.CreateUserResult)
 		enc := encoder(ctx, w)
-		body := NewCreateResponseBody(res)
+		body := NewCreateUserResponseBody(res)
 		w.WriteHeader(http.StatusCreated)
 		return enc.Encode(body)
 	}
 }
 
-// DecodeCreateRequest returns a decoder for requests sent to the users create
-// endpoint.
-func DecodeCreateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
+// DecodeCreateUserRequest returns a decoder for requests sent to the users
+// create user endpoint.
+func DecodeCreateUserRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
 	return func(r *http.Request) (any, error) {
 		var (
-			body CreateRequestBody
+			body CreateUserRequestBody
 			err  error
 		)
 		err = decoder(r).Decode(&body)
@@ -49,19 +49,19 @@ func DecodeCreateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 			}
 			return nil, goa.DecodePayloadError(err.Error())
 		}
-		err = ValidateCreateRequestBody(&body)
+		err = ValidateCreateUserRequestBody(&body)
 		if err != nil {
 			return nil, err
 		}
-		payload := NewCreatePayload(&body)
+		payload := NewCreateUserPayload(&body)
 
 		return payload, nil
 	}
 }
 
-// EncodeCreateError returns an encoder for errors returned by the create users
-// endpoint.
-func EncodeCreateError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodeCreateUserError returns an encoder for errors returned by the create
+// user users endpoint.
+func EncodeCreateUserError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		var en goa.GoaErrorNamer
@@ -69,6 +69,19 @@ func EncodeCreateError(encoder func(context.Context, http.ResponseWriter) goahtt
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
+		case "invalid_input":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewCreateUserInvalidInputResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
 		case "internal_error":
 			var res users.InternalError
 			errors.As(v, &res)
@@ -76,14 +89,6 @@ func EncodeCreateError(encoder func(context.Context, http.ResponseWriter) goahtt
 			body := res
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
-		case "invalid_input":
-			var res users.InvalidInput
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			body := res
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		case "username_taken":
 			var res users.UsernameTaken
@@ -99,21 +104,21 @@ func EncodeCreateError(encoder func(context.Context, http.ResponseWriter) goahtt
 	}
 }
 
-// EncodeListResponse returns an encoder for responses returned by the users
-// list endpoint.
-func EncodeListResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+// EncodeListUsersResponse returns an encoder for responses returned by the
+// users list users endpoint.
+func EncodeListUsersResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
 	return func(ctx context.Context, w http.ResponseWriter, v any) error {
 		res, _ := v.([]*users.User)
 		enc := encoder(ctx, w)
-		body := NewListResponseBody(res)
+		body := NewListUsersResponseBody(res)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
 }
 
-// EncodeListError returns an encoder for errors returned by the list users
-// endpoint.
-func EncodeListError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodeListUsersError returns an encoder for errors returned by the list
+// users users endpoint.
+func EncodeListUsersError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		var en goa.GoaErrorNamer
@@ -135,18 +140,18 @@ func EncodeListError(encoder func(context.Context, http.ResponseWriter) goahttp.
 	}
 }
 
-// EncodeDeleteResponse returns an encoder for responses returned by the users
-// delete endpoint.
-func EncodeDeleteResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+// EncodeDeleteUserResponse returns an encoder for responses returned by the
+// users delete user endpoint.
+func EncodeDeleteUserResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
 	return func(ctx context.Context, w http.ResponseWriter, v any) error {
 		w.WriteHeader(http.StatusOK)
 		return nil
 	}
 }
 
-// DecodeDeleteRequest returns a decoder for requests sent to the users delete
-// endpoint.
-func DecodeDeleteRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
+// DecodeDeleteUserRequest returns a decoder for requests sent to the users
+// delete user endpoint.
+func DecodeDeleteUserRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
 	return func(r *http.Request) (any, error) {
 		var (
 			username string
@@ -154,15 +159,15 @@ func DecodeDeleteRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 			params = mux.Vars(r)
 		)
 		username = params["username"]
-		payload := NewDeletePayload(username)
+		payload := NewDeleteUserPayload(username)
 
 		return payload, nil
 	}
 }
 
-// EncodeDeleteError returns an encoder for errors returned by the delete users
-// endpoint.
-func EncodeDeleteError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodeDeleteUserError returns an encoder for errors returned by the delete
+// user users endpoint.
+func EncodeDeleteUserError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		var en goa.GoaErrorNamer
@@ -192,24 +197,24 @@ func EncodeDeleteError(encoder func(context.Context, http.ResponseWriter) goahtt
 	}
 }
 
-// EncodeAuthResponse returns an encoder for responses returned by the users
-// auth endpoint.
-func EncodeAuthResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+// EncodeAuthUserResponse returns an encoder for responses returned by the
+// users auth user endpoint.
+func EncodeAuthUserResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
 	return func(ctx context.Context, w http.ResponseWriter, v any) error {
-		res, _ := v.(*users.AuthResult)
+		res, _ := v.(*users.AuthUserResult)
 		enc := encoder(ctx, w)
-		body := NewAuthResponseBody(res)
+		body := NewAuthUserResponseBody(res)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
 }
 
-// DecodeAuthRequest returns a decoder for requests sent to the users auth
-// endpoint.
-func DecodeAuthRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
+// DecodeAuthUserRequest returns a decoder for requests sent to the users auth
+// user endpoint.
+func DecodeAuthUserRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
 	return func(r *http.Request) (any, error) {
 		var (
-			body AuthRequestBody
+			body AuthUserRequestBody
 			err  error
 		)
 		err = decoder(r).Decode(&body)
@@ -223,19 +228,19 @@ func DecodeAuthRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.De
 			}
 			return nil, goa.DecodePayloadError(err.Error())
 		}
-		err = ValidateAuthRequestBody(&body)
+		err = ValidateAuthUserRequestBody(&body)
 		if err != nil {
 			return nil, err
 		}
-		payload := NewAuthPayload(&body)
+		payload := NewAuthUserPayload(&body)
 
 		return payload, nil
 	}
 }
 
-// EncodeAuthError returns an encoder for errors returned by the auth users
-// endpoint.
-func EncodeAuthError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+// EncodeAuthUserError returns an encoder for errors returned by the auth user
+// users endpoint.
+func EncodeAuthUserError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		var en goa.GoaErrorNamer

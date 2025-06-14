@@ -4,6 +4,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"encoding/base64"
 	"errors"
 	"io"
 
@@ -33,29 +34,49 @@ func CombineShares(shares [][]byte) ([]byte, error) {
 	return shamir.Combine(shares)
 }
 
-// Encrypt encrypts data with AES-GCM using the provided key
-func Encrypt(key, plaintext []byte) ([]byte, error) {
+// EncryptWithKey encrypts data with AES-GCM using the provided key
+func EncryptWithKey(key, plaintext []byte) (string, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	aesGCM, err := cipher.NewGCM(block)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	nonce := make([]byte, aesGCM.NonceSize())
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		return nil, err
+		return "", err
 	}
 
 	ciphertext := aesGCM.Seal(nonce, nonce, plaintext, nil)
-	return ciphertext, nil
+
+	cipherTextEncoded := base64.StdEncoding.EncodeToString(ciphertext)
+	return cipherTextEncoded, nil
 }
 
-// Decrypt decrypts AES-GCM encrypted data with the provided key
-func Decrypt(key, ciphertext []byte) ([]byte, error) {
+// Encrypt encrypts data with AES-GCM using the unlocked KeyManager
+func Encrypt(keyManager *KeyManager, plaintext []byte) (string, error) {
+	if keyManager == nil {
+		return "", errors.New("key manager is nil")
+	}
+
+	key, err := keyManager.GetMasterKey()
+	if err != nil {
+		return "", err
+	}
+
+	return EncryptWithKey(key, plaintext)
+}
+
+// DecryptWithKey decrypts AES-GCM encrypted data with the provided key
+func DecryptWithKey(key []byte, encodedCiphertext string) ([]byte, error) {
+	ciphertext, err := base64.StdEncoding.DecodeString(encodedCiphertext)
+	if err != nil {
+		return nil, err
+	}
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -73,4 +94,18 @@ func Decrypt(key, ciphertext []byte) ([]byte, error) {
 
 	nonce, ciphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
 	return aesGCM.Open(nil, nonce, ciphertext, nil)
+}
+
+// Decrypt decrypts AES-GCM encrypted data with the unlocked KeyManager
+func Decrypt(keyManager *KeyManager, encodedCiphertext string) ([]byte, error) {
+	if keyManager == nil {
+		return nil, errors.New("key manager is nil")
+	}
+
+	key, err := keyManager.GetMasterKey()
+	if err != nil {
+		return nil, err
+	}
+
+	return DecryptWithKey(key, encodedCiphertext)
 }

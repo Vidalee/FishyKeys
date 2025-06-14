@@ -155,9 +155,9 @@ paths:
         get:
             tags:
                 - users
-            summary: list users
+            summary: list users users
             description: List all users
-            operationId: users#list
+            operationId: users#list users
             responses:
                 "200":
                     description: OK response.
@@ -174,15 +174,15 @@ paths:
         post:
             tags:
                 - users
-            summary: create users
+            summary: create user users
             description: Create a new user
-            operationId: users#create
+            operationId: users#create user
             parameters:
-                - name: CreateRequestBody
+                - name: Create UserRequestBody
                   in: body
                   required: true
                   schema:
-                    $ref: '#/definitions/UsersCreateRequestBody'
+                    $ref: '#/definitions/UsersCreateUserRequestBody'
                     required:
                         - username
                         - password
@@ -190,11 +190,11 @@ paths:
                 "201":
                     description: Created response.
                     schema:
-                        $ref: '#/definitions/UsersCreateResponseBody'
+                        $ref: '#/definitions/UsersCreateUserResponseBody'
                 "400":
                     description: Bad Request response.
                     schema:
-                        type: string
+                        $ref: '#/definitions/UsersCreateUserInvalidInputResponseBody'
                 "409":
                     description: Conflict response.
                     schema:
@@ -209,9 +209,9 @@ paths:
         delete:
             tags:
                 - users
-            summary: delete users
+            summary: delete user users
             description: Delete a user by username
-            operationId: users#delete
+            operationId: users#delete user
             parameters:
                 - name: username
                   in: path
@@ -235,15 +235,15 @@ paths:
         post:
             tags:
                 - users
-            summary: auth users
+            summary: auth user users
             description: Authenticate a user with username and password
-            operationId: users#auth
+            operationId: users#auth user
             parameters:
-                - name: AuthRequestBody
+                - name: Auth UserRequestBody
                   in: body
                   required: true
                   schema:
-                    $ref: '#/definitions/UsersAuthRequestBody'
+                    $ref: '#/definitions/UsersAuthUserRequestBody'
                     required:
                         - username
                         - password
@@ -251,7 +251,7 @@ paths:
                 "200":
                     description: OK response.
                     schema:
-                        $ref: '#/definitions/UsersAuthResponseBody'
+                        $ref: '#/definitions/UsersAuthUserResponseBody'
                 "401":
                     description: Unauthorized response.
                     schema:
@@ -386,25 +386,25 @@ definitions:
             created_at:
                 type: string
                 description: User creation timestamp
-                example: Qui odio minima consequatur et.
+                example: Qui et.
             updated_at:
                 type: string
                 description: User last update timestamp
-                example: Qui et.
+                example: Qui nulla hic molestias esse in.
             username:
                 type: string
                 description: The username
-                example: Aut hic maiores officia eum.
+                example: Qui odio minima consequatur et.
         example:
-            created_at: Sint asperiores repudiandae deleniti sit rerum eveniet.
-            updated_at: Tenetur maxime quasi veniam autem temporibus.
-            username: Qui nulla hic molestias esse in.
+            created_at: Tenetur maxime quasi veniam autem temporibus.
+            updated_at: Cum ipsum tenetur blanditiis est pariatur.
+            username: Sint asperiores repudiandae deleniti sit rerum eveniet.
         required:
             - username
             - created_at
             - updated_at
-    UsersAuthRequestBody:
-        title: UsersAuthRequestBody
+    UsersAuthUserRequestBody:
+        title: UsersAuthUserRequestBody
         type: object
         properties:
             password:
@@ -421,23 +421,66 @@ definitions:
         required:
             - username
             - password
-    UsersAuthResponseBody:
-        title: UsersAuthResponseBody
+    UsersAuthUserResponseBody:
+        title: UsersAuthUserResponseBody
         type: object
         properties:
             token:
                 type: string
                 description: JWT or session token
-                example: Laborum ratione minima.
+                example: Et quis vel reiciendis.
             username:
                 type: string
                 description: The username of the authenticated user
-                example: Cum ipsum tenetur blanditiis est pariatur.
+                example: Laborum ratione minima.
         example:
-            token: Sint ipsa debitis voluptatum non ducimus natus.
-            username: Et quis vel reiciendis.
-    UsersCreateRequestBody:
-        title: UsersCreateRequestBody
+            token: Voluptatem consequatur sint asperiores natus aliquam.
+            username: Sint ipsa debitis voluptatum non ducimus natus.
+    UsersCreateUserInvalidInputResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: Invalid input (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    UsersCreateUserRequestBody:
+        title: UsersCreateUserRequestBody
         type: object
         properties:
             password:
@@ -454,8 +497,8 @@ definitions:
         required:
             - username
             - password
-    UsersCreateResponseBody:
-        title: UsersCreateResponseBody
+    UsersCreateUserResponseBody:
+        title: UsersCreateUserResponseBody
         type: object
         properties:
             username:

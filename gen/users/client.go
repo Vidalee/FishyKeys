@@ -15,70 +15,71 @@ import (
 
 // Client is the "users" service client.
 type Client struct {
-	CreateEndpoint goa.Endpoint
-	ListEndpoint   goa.Endpoint
-	DeleteEndpoint goa.Endpoint
-	AuthEndpoint   goa.Endpoint
+	CreateUserEndpoint goa.Endpoint
+	ListUsersEndpoint  goa.Endpoint
+	DeleteUserEndpoint goa.Endpoint
+	AuthUserEndpoint   goa.Endpoint
 }
 
 // NewClient initializes a "users" service client given the endpoints.
-func NewClient(create, list, delete_, auth goa.Endpoint) *Client {
+func NewClient(createUser, listUsers, deleteUser, authUser goa.Endpoint) *Client {
 	return &Client{
-		CreateEndpoint: create,
-		ListEndpoint:   list,
-		DeleteEndpoint: delete_,
-		AuthEndpoint:   auth,
+		CreateUserEndpoint: createUser,
+		ListUsersEndpoint:  listUsers,
+		DeleteUserEndpoint: deleteUser,
+		AuthUserEndpoint:   authUser,
 	}
 }
 
-// Create calls the "create" endpoint of the "users" service.
-// Create may return the following errors:
+// CreateUser calls the "create user" endpoint of the "users" service.
+// CreateUser may return the following errors:
 //   - "username_taken" (type UsernameTaken)
-//   - "invalid_input" (type InvalidInput)
+//   - "invalid_input" (type *goa.ServiceError): Invalid input
 //   - "internal_error" (type InternalError)
 //   - error: internal error
-func (c *Client) Create(ctx context.Context, p *CreatePayload) (res *CreateResult, err error) {
+func (c *Client) CreateUser(ctx context.Context, p *CreateUserPayload) (res *CreateUserResult, err error) {
 	var ires any
-	ires, err = c.CreateEndpoint(ctx, p)
+	ires, err = c.CreateUserEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.(*CreateResult), nil
+	return ires.(*CreateUserResult), nil
 }
 
-// List calls the "list" endpoint of the "users" service.
-// List may return the following errors:
+// ListUsers calls the "list users" endpoint of the "users" service.
+// ListUsers may return the following errors:
 //   - "internal_error" (type InternalError)
 //   - error: internal error
-func (c *Client) List(ctx context.Context) (res []*User, err error) {
+func (c *Client) ListUsers(ctx context.Context) (res []*User, err error) {
 	var ires any
-	ires, err = c.ListEndpoint(ctx, nil)
+	ires, err = c.ListUsersEndpoint(ctx, nil)
 	if err != nil {
 		return
 	}
 	return ires.([]*User), nil
 }
 
-// Delete calls the "delete" endpoint of the "users" service.
-// Delete may return the following errors:
+// DeleteUser calls the "delete user" endpoint of the "users" service.
+// DeleteUser may return the following errors:
 //   - "user_not_found" (type UserNotFound)
+//   - "invalid_input" (type *goa.ServiceError): Invalid input
 //   - "internal_error" (type InternalError)
 //   - error: internal error
-func (c *Client) Delete(ctx context.Context, p *DeletePayload) (err error) {
-	_, err = c.DeleteEndpoint(ctx, p)
+func (c *Client) DeleteUser(ctx context.Context, p *DeleteUserPayload) (err error) {
+	_, err = c.DeleteUserEndpoint(ctx, p)
 	return
 }
 
-// Auth calls the "auth" endpoint of the "users" service.
-// Auth may return the following errors:
+// AuthUser calls the "auth user" endpoint of the "users" service.
+// AuthUser may return the following errors:
 //   - "unauthorized" (type Unauthorized)
 //   - "internal_error" (type InternalError)
 //   - error: internal error
-func (c *Client) Auth(ctx context.Context, p *AuthPayload) (res *AuthResult, err error) {
+func (c *Client) AuthUser(ctx context.Context, p *AuthUserPayload) (res *AuthUserResult, err error) {
 	var ires any
-	ires, err = c.AuthEndpoint(ctx, p)
+	ires, err = c.AuthUserEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.(*AuthResult), nil
+	return ires.(*AuthUserResult), nil
 }

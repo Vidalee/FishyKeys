@@ -17,17 +17,21 @@ import (
 
 // Client lists the users service endpoint HTTP clients.
 type Client struct {
-	// Create Doer is the HTTP client used to make requests to the create endpoint.
-	CreateDoer goahttp.Doer
+	// CreateUser Doer is the HTTP client used to make requests to the create user
+	// endpoint.
+	CreateUserDoer goahttp.Doer
 
-	// List Doer is the HTTP client used to make requests to the list endpoint.
-	ListDoer goahttp.Doer
+	// ListUsers Doer is the HTTP client used to make requests to the list users
+	// endpoint.
+	ListUsersDoer goahttp.Doer
 
-	// Delete Doer is the HTTP client used to make requests to the delete endpoint.
-	DeleteDoer goahttp.Doer
+	// DeleteUser Doer is the HTTP client used to make requests to the delete user
+	// endpoint.
+	DeleteUserDoer goahttp.Doer
 
-	// Auth Doer is the HTTP client used to make requests to the auth endpoint.
-	AuthDoer goahttp.Doer
+	// AuthUser Doer is the HTTP client used to make requests to the auth user
+	// endpoint.
+	AuthUserDoer goahttp.Doer
 
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
@@ -52,10 +56,10 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		CreateDoer:          doer,
-		ListDoer:            doer,
-		DeleteDoer:          doer,
-		AuthDoer:            doer,
+		CreateUserDoer:      doer,
+		ListUsersDoer:       doer,
+		DeleteUserDoer:      doer,
+		AuthUserDoer:        doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -65,15 +69,15 @@ func NewClient(
 	}
 }
 
-// Create returns an endpoint that makes HTTP requests to the users service
-// create server.
-func (c *Client) Create() goa.Endpoint {
+// CreateUser returns an endpoint that makes HTTP requests to the users service
+// create user server.
+func (c *Client) CreateUser() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeCreateRequest(c.encoder)
-		decodeResponse = DecodeCreateResponse(c.decoder, c.RestoreResponseBody)
+		encodeRequest  = EncodeCreateUserRequest(c.encoder)
+		decodeResponse = DecodeCreateUserResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {
-		req, err := c.BuildCreateRequest(ctx, v)
+		req, err := c.BuildCreateUserRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
@@ -81,61 +85,61 @@ func (c *Client) Create() goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.CreateDoer.Do(req)
+		resp, err := c.CreateUserDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("users", "create", err)
+			return nil, goahttp.ErrRequestError("users", "create user", err)
 		}
 		return decodeResponse(resp)
 	}
 }
 
-// List returns an endpoint that makes HTTP requests to the users service list
-// server.
-func (c *Client) List() goa.Endpoint {
+// ListUsers returns an endpoint that makes HTTP requests to the users service
+// list users server.
+func (c *Client) ListUsers() goa.Endpoint {
 	var (
-		decodeResponse = DecodeListResponse(c.decoder, c.RestoreResponseBody)
+		decodeResponse = DecodeListUsersResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {
-		req, err := c.BuildListRequest(ctx, v)
+		req, err := c.BuildListUsersRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.ListDoer.Do(req)
+		resp, err := c.ListUsersDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("users", "list", err)
+			return nil, goahttp.ErrRequestError("users", "list users", err)
 		}
 		return decodeResponse(resp)
 	}
 }
 
-// Delete returns an endpoint that makes HTTP requests to the users service
-// delete server.
-func (c *Client) Delete() goa.Endpoint {
+// DeleteUser returns an endpoint that makes HTTP requests to the users service
+// delete user server.
+func (c *Client) DeleteUser() goa.Endpoint {
 	var (
-		decodeResponse = DecodeDeleteResponse(c.decoder, c.RestoreResponseBody)
+		decodeResponse = DecodeDeleteUserResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {
-		req, err := c.BuildDeleteRequest(ctx, v)
+		req, err := c.BuildDeleteUserRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.DeleteDoer.Do(req)
+		resp, err := c.DeleteUserDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("users", "delete", err)
+			return nil, goahttp.ErrRequestError("users", "delete user", err)
 		}
 		return decodeResponse(resp)
 	}
 }
 
-// Auth returns an endpoint that makes HTTP requests to the users service auth
-// server.
-func (c *Client) Auth() goa.Endpoint {
+// AuthUser returns an endpoint that makes HTTP requests to the users service
+// auth user server.
+func (c *Client) AuthUser() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeAuthRequest(c.encoder)
-		decodeResponse = DecodeAuthResponse(c.decoder, c.RestoreResponseBody)
+		encodeRequest  = EncodeAuthUserRequest(c.encoder)
+		decodeResponse = DecodeAuthUserResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {
-		req, err := c.BuildAuthRequest(ctx, v)
+		req, err := c.BuildAuthUserRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
@@ -143,9 +147,9 @@ func (c *Client) Auth() goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.AuthDoer.Do(req)
+		resp, err := c.AuthUserDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("users", "auth", err)
+			return nil, goahttp.ErrRequestError("users", "auth user", err)
 		}
 		return decodeResponse(resp)
 	}

@@ -70,7 +70,7 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 	if err != nil {
 		return nil, genkey.InternalError("error generating master key: " + err.Error())
 	}
-	checksum, err := crypto.Encrypt(masterKey, []byte(checksumExpectedValue))
+	checksum, err := crypto.EncryptWithKey(masterKey, []byte(checksumExpectedValue))
 	if err != nil {
 		return nil, genkey.InternalError("error encrypting master key checksum: " + err.Error())
 	}
@@ -87,7 +87,7 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 	err = s.settingsRepository.StoreSettings(ctx, map[string]string{
 		columnTotalShares:       strconv.Itoa(payload.TotalShares),
 		columnMinShares:         strconv.Itoa(payload.MinShares),
-		columnMasterKeyChecksum: base64.StdEncoding.EncodeToString(checksum),
+		columnMasterKeyChecksum: checksum,
 	})
 	if err != nil {
 		return nil, genkey.InternalError("error storing key settings: " + err.Error())
@@ -154,17 +154,7 @@ func (s *KeyManagementService) AddShare(ctx context.Context, payload *genkey.Add
 			return nil, genkey.InternalError("error retrieving master key checksum: " + err.Error())
 		}
 
-		decodedChecksum, err := base64.StdEncoding.DecodeString(checksum)
-		if err != nil {
-			s.keyManager.RollbackToLocked()
-			return nil, genkey.InternalError("error retrieving master key checksum: " + err.Error())
-		}
-		masterKey, err := s.keyManager.GetMasterKey()
-		if err != nil {
-			s.keyManager.RollbackToLocked()
-			return nil, genkey.InternalError("error retrieving master key: " + err.Error())
-		}
-		decryptedChecksum, err := crypto.Decrypt(masterKey, decodedChecksum)
+		decryptedChecksum, err := crypto.Decrypt(s.keyManager, checksum)
 		if err != nil {
 			s.keyManager.RollbackToLocked()
 			return nil, genkey.WrongShares("error decrypting master key checksum: " + err.Error())

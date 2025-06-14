@@ -11,22 +11,22 @@ import (
 	"fmt"
 )
 
-// CreateUsersPath returns the URL path to the users service create HTTP endpoint.
-func CreateUsersPath() string {
+// CreateUserUsersPath returns the URL path to the users service create user HTTP endpoint.
+func CreateUserUsersPath() string {
 	return "/users"
 }
 
-// ListUsersPath returns the URL path to the users service list HTTP endpoint.
-func ListUsersPath() string {
+// ListUsersUsersPath returns the URL path to the users service list users HTTP endpoint.
+func ListUsersUsersPath() string {
 	return "/users"
 }
 
-// DeleteUsersPath returns the URL path to the users service delete HTTP endpoint.
-func DeleteUsersPath(username string) string {
+// DeleteUserUsersPath returns the URL path to the users service delete user HTTP endpoint.
+func DeleteUserUsersPath(username string) string {
 	return fmt.Sprintf("/users/%v", username)
 }
 
-// AuthUsersPath returns the URL path to the users service auth HTTP endpoint.
-func AuthUsersPath() string {
+// AuthUserUsersPath returns the URL path to the users service auth user HTTP endpoint.
+func AuthUserUsersPath() string {
 	return "/users/auth"
 }

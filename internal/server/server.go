@@ -15,12 +15,12 @@ import (
 )
 
 func NewServer(pool *pgxpool.Pool) http.Handler {
-	keyManager := crypto.GetKeyManager()
+	keyManager := crypto.GetDefaultKeyManager()
 	keyRepo := repository.NewGlobalSettingsRepository(pool)
 	keyService := service.NewKeyManagementService(keyManager, keyRepo)
 
 	usersRepo := repository.NewUsersRepository(pool)
-	userService := service.NewUserService(usersRepo)
+	userService := service.NewUsersService(usersRepo)
 
 	keyManagementEndpoints := keymanagement.NewEndpoints(keyService)
 	usersEndpoints := users.NewEndpoints(userService)

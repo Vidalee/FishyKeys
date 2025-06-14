@@ -19,12 +19,12 @@ import (
 
 // Server lists the users service endpoint HTTP handlers.
 type Server struct {
-	Mounts []*MountPoint
-	Create http.Handler
-	List   http.Handler
-	Delete http.Handler
-	Auth   http.Handler
-	CORS   http.Handler
+	Mounts     []*MountPoint
+	CreateUser http.Handler
+	ListUsers  http.Handler
+	DeleteUser http.Handler
+	AuthUser   http.Handler
+	CORS       http.Handler
 }
 
 // MountPoint holds information about the mounted endpoints.
@@ -54,19 +54,19 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"Create", "POST", "/users"},
-			{"List", "GET", "/users"},
-			{"Delete", "DELETE", "/users/{username}"},
-			{"Auth", "POST", "/users/auth"},
+			{"CreateUser", "POST", "/users"},
+			{"ListUsers", "GET", "/users"},
+			{"DeleteUser", "DELETE", "/users/{username}"},
+			{"AuthUser", "POST", "/users/auth"},
 			{"CORS", "OPTIONS", "/users"},
 			{"CORS", "OPTIONS", "/users/{username}"},
 			{"CORS", "OPTIONS", "/users/auth"},
 		},
-		Create: NewCreateHandler(e.Create, mux, decoder, encoder, errhandler, formatter),
-		List:   NewListHandler(e.List, mux, decoder, encoder, errhandler, formatter),
-		Delete: NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
-		Auth:   NewAuthHandler(e.Auth, mux, decoder, encoder, errhandler, formatter),
-		CORS:   NewCORSHandler(),
+		CreateUser: NewCreateUserHandler(e.CreateUser, mux, decoder, encoder, errhandler, formatter),
+		ListUsers:  NewListUsersHandler(e.ListUsers, mux, decoder, encoder, errhandler, formatter),
+		DeleteUser: NewDeleteUserHandler(e.DeleteUser, mux, decoder, encoder, errhandler, formatter),
+		AuthUser:   NewAuthUserHandler(e.AuthUser, mux, decoder, encoder, errhandler, formatter),
+		CORS:       NewCORSHandler(),
 	}
 }
 
@@ -75,10 +75,10 @@ func (s *Server) Service() string { return "users" }
 
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
-	s.Create = m(s.Create)
-	s.List = m(s.List)
-	s.Delete = m(s.Delete)
-	s.Auth = m(s.Auth)
+	s.CreateUser = m(s.CreateUser)
+	s.ListUsers = m(s.ListUsers)
+	s.DeleteUser = m(s.DeleteUser)
+	s.AuthUser = m(s.AuthUser)
 	s.CORS = m(s.CORS)
 }
 
@@ -87,10 +87,10 @@ func (s *Server) MethodNames() []string { return users.MethodNames[:] }
 
 // Mount configures the mux to serve the users endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
-	MountCreateHandler(mux, h.Create)
-	MountListHandler(mux, h.List)
-	MountDeleteHandler(mux, h.Delete)
-	MountAuthHandler(mux, h.Auth)
+	MountCreateUserHandler(mux, h.CreateUser)
+	MountListUsersHandler(mux, h.ListUsers)
+	MountDeleteUserHandler(mux, h.DeleteUser)
+	MountAuthUserHandler(mux, h.AuthUser)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -99,9 +99,9 @@ func (s *Server) Mount(mux goahttp.Muxer) {
 	Mount(mux, s)
 }
 
-// MountCreateHandler configures the mux to serve the "users" service "create"
-// endpoint.
-func MountCreateHandler(mux goahttp.Muxer, h http.Handler) {
+// MountCreateUserHandler configures the mux to serve the "users" service
+// "create user" endpoint.
+func MountCreateUserHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := HandleUsersOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
@@ -111,9 +111,9 @@ func MountCreateHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("POST", "/users", f)
 }
 
-// NewCreateHandler creates a HTTP handler which loads the HTTP request and
-// calls the "users" service "create" endpoint.
-func NewCreateHandler(
+// NewCreateUserHandler creates a HTTP handler which loads the HTTP request and
+// calls the "users" service "create user" endpoint.
+func NewCreateUserHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -122,13 +122,13 @@ func NewCreateHandler(
 	formatter func(ctx context.Context, err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeCreateRequest(mux, decoder)
-		encodeResponse = EncodeCreateResponse(encoder)
-		encodeError    = EncodeCreateError(encoder, formatter)
+		decodeRequest  = DecodeCreateUserRequest(mux, decoder)
+		encodeResponse = EncodeCreateUserResponse(encoder)
+		encodeError    = EncodeCreateUserError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "create")
+		ctx = context.WithValue(ctx, goa.MethodKey, "create user")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "users")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -150,9 +150,9 @@ func NewCreateHandler(
 	})
 }
 
-// MountListHandler configures the mux to serve the "users" service "list"
-// endpoint.
-func MountListHandler(mux goahttp.Muxer, h http.Handler) {
+// MountListUsersHandler configures the mux to serve the "users" service "list
+// users" endpoint.
+func MountListUsersHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := HandleUsersOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
@@ -162,9 +162,9 @@ func MountListHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("GET", "/users", f)
 }
 
-// NewListHandler creates a HTTP handler which loads the HTTP request and calls
-// the "users" service "list" endpoint.
-func NewListHandler(
+// NewListUsersHandler creates a HTTP handler which loads the HTTP request and
+// calls the "users" service "list users" endpoint.
+func NewListUsersHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -173,12 +173,12 @@ func NewListHandler(
 	formatter func(ctx context.Context, err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		encodeResponse = EncodeListResponse(encoder)
-		encodeError    = EncodeListError(encoder, formatter)
+		encodeResponse = EncodeListUsersResponse(encoder)
+		encodeError    = EncodeListUsersError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "list")
+		ctx = context.WithValue(ctx, goa.MethodKey, "list users")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "users")
 		var err error
 		res, err := endpoint(ctx, nil)
@@ -194,9 +194,9 @@ func NewListHandler(
 	})
 }
 
-// MountDeleteHandler configures the mux to serve the "users" service "delete"
-// endpoint.
-func MountDeleteHandler(mux goahttp.Muxer, h http.Handler) {
+// MountDeleteUserHandler configures the mux to serve the "users" service
+// "delete user" endpoint.
+func MountDeleteUserHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := HandleUsersOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
@@ -206,9 +206,9 @@ func MountDeleteHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("DELETE", "/users/{username}", f)
 }
 
-// NewDeleteHandler creates a HTTP handler which loads the HTTP request and
-// calls the "users" service "delete" endpoint.
-func NewDeleteHandler(
+// NewDeleteUserHandler creates a HTTP handler which loads the HTTP request and
+// calls the "users" service "delete user" endpoint.
+func NewDeleteUserHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -217,13 +217,13 @@ func NewDeleteHandler(
 	formatter func(ctx context.Context, err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeDeleteRequest(mux, decoder)
-		encodeResponse = EncodeDeleteResponse(encoder)
-		encodeError    = EncodeDeleteError(encoder, formatter)
+		decodeRequest  = DecodeDeleteUserRequest(mux, decoder)
+		encodeResponse = EncodeDeleteUserResponse(encoder)
+		encodeError    = EncodeDeleteUserError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "delete")
+		ctx = context.WithValue(ctx, goa.MethodKey, "delete user")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "users")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -245,9 +245,9 @@ func NewDeleteHandler(
 	})
 }
 
-// MountAuthHandler configures the mux to serve the "users" service "auth"
-// endpoint.
-func MountAuthHandler(mux goahttp.Muxer, h http.Handler) {
+// MountAuthUserHandler configures the mux to serve the "users" service "auth
+// user" endpoint.
+func MountAuthUserHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := HandleUsersOrigin(h).(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
@@ -257,9 +257,9 @@ func MountAuthHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("POST", "/users/auth", f)
 }
 
-// NewAuthHandler creates a HTTP handler which loads the HTTP request and calls
-// the "users" service "auth" endpoint.
-func NewAuthHandler(
+// NewAuthUserHandler creates a HTTP handler which loads the HTTP request and
+// calls the "users" service "auth user" endpoint.
+func NewAuthUserHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -268,13 +268,13 @@ func NewAuthHandler(
 	formatter func(ctx context.Context, err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeAuthRequest(mux, decoder)
-		encodeResponse = EncodeAuthResponse(encoder)
-		encodeError    = EncodeAuthError(encoder, formatter)
+		decodeRequest  = DecodeAuthUserRequest(mux, decoder)
+		encodeResponse = EncodeAuthUserResponse(encoder)
+		encodeError    = EncodeAuthUserError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "auth")
+		ctx = context.WithValue(ctx, goa.MethodKey, "auth user")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "users")
 		payload, err := decodeRequest(r)
 		if err != nil {

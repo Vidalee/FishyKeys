@@ -24,7 +24,7 @@ import (
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
 	return `key-management (create-master-key|get-key-status|add-share|delete-share)
-users (create|list|delete|auth)
+users (create-user|list-users|delete-user|auth-user)
 `
 }
 
@@ -34,7 +34,7 @@ func UsageExamples() string {
       "min_shares": 3,
       "total_shares": 5
    }'` + "\n" +
-		os.Args[0] + ` users create --body '{
+		os.Args[0] + ` users create-user --body '{
       "password": "s3cr3t",
       "username": "alice"
    }'` + "\n" +
@@ -66,16 +66,16 @@ func ParseEndpoint(
 
 		usersFlags = flag.NewFlagSet("users", flag.ContinueOnError)
 
-		usersCreateFlags    = flag.NewFlagSet("create", flag.ExitOnError)
-		usersCreateBodyFlag = usersCreateFlags.String("body", "REQUIRED", "")
+		usersCreateUserFlags    = flag.NewFlagSet("create-user", flag.ExitOnError)
+		usersCreateUserBodyFlag = usersCreateUserFlags.String("body", "REQUIRED", "")
 
-		usersListFlags = flag.NewFlagSet("list", flag.ExitOnError)
+		usersListUsersFlags = flag.NewFlagSet("list-users", flag.ExitOnError)
 
-		usersDeleteFlags        = flag.NewFlagSet("delete", flag.ExitOnError)
-		usersDeleteUsernameFlag = usersDeleteFlags.String("username", "REQUIRED", "Username of the user to delete")
+		usersDeleteUserFlags        = flag.NewFlagSet("delete-user", flag.ExitOnError)
+		usersDeleteUserUsernameFlag = usersDeleteUserFlags.String("username", "REQUIRED", "Username of the user to delete")
 
-		usersAuthFlags    = flag.NewFlagSet("auth", flag.ExitOnError)
-		usersAuthBodyFlag = usersAuthFlags.String("body", "REQUIRED", "")
+		usersAuthUserFlags    = flag.NewFlagSet("auth-user", flag.ExitOnError)
+		usersAuthUserBodyFlag = usersAuthUserFlags.String("body", "REQUIRED", "")
 	)
 	keyManagementFlags.Usage = keyManagementUsage
 	keyManagementCreateMasterKeyFlags.Usage = keyManagementCreateMasterKeyUsage
@@ -84,10 +84,10 @@ func ParseEndpoint(
 	keyManagementDeleteShareFlags.Usage = keyManagementDeleteShareUsage
 
 	usersFlags.Usage = usersUsage
-	usersCreateFlags.Usage = usersCreateUsage
-	usersListFlags.Usage = usersListUsage
-	usersDeleteFlags.Usage = usersDeleteUsage
-	usersAuthFlags.Usage = usersAuthUsage
+	usersCreateUserFlags.Usage = usersCreateUserUsage
+	usersListUsersFlags.Usage = usersListUsersUsage
+	usersDeleteUserFlags.Usage = usersDeleteUserUsage
+	usersAuthUserFlags.Usage = usersAuthUserUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -141,17 +141,17 @@ func ParseEndpoint(
 
 		case "users":
 			switch epn {
-			case "create":
-				epf = usersCreateFlags
+			case "create-user":
+				epf = usersCreateUserFlags
 
-			case "list":
-				epf = usersListFlags
+			case "list-users":
+				epf = usersListUsersFlags
 
-			case "delete":
-				epf = usersDeleteFlags
+			case "delete-user":
+				epf = usersDeleteUserFlags
 
-			case "auth":
-				epf = usersAuthFlags
+			case "auth-user":
+				epf = usersAuthUserFlags
 
 			}
 
@@ -193,17 +193,17 @@ func ParseEndpoint(
 		case "users":
 			c := usersc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
-			case "create":
-				endpoint = c.Create()
-				data, err = usersc.BuildCreatePayload(*usersCreateBodyFlag)
-			case "list":
-				endpoint = c.List()
-			case "delete":
-				endpoint = c.Delete()
-				data, err = usersc.BuildDeletePayload(*usersDeleteUsernameFlag)
-			case "auth":
-				endpoint = c.Auth()
-				data, err = usersc.BuildAuthPayload(*usersAuthBodyFlag)
+			case "create-user":
+				endpoint = c.CreateUser()
+				data, err = usersc.BuildCreateUserPayload(*usersCreateUserBodyFlag)
+			case "list-users":
+				endpoint = c.ListUsers()
+			case "delete-user":
+				endpoint = c.DeleteUser()
+				data, err = usersc.BuildDeleteUserPayload(*usersDeleteUserUsernameFlag)
+			case "auth-user":
+				endpoint = c.AuthUser()
+				data, err = usersc.BuildAuthUserPayload(*usersAuthUserBodyFlag)
 			}
 		}
 	}
@@ -288,58 +288,58 @@ Usage:
     %[1]s [globalflags] users COMMAND [flags]
 
 COMMAND:
-    create: Create a new user
-    list: List all users
-    delete: Delete a user by username
-    auth: Authenticate a user with username and password
+    create-user: Create a new user
+    list-users: List all users
+    delete-user: Delete a user by username
+    auth-user: Authenticate a user with username and password
 
 Additional help:
     %[1]s users COMMAND --help
 `, os.Args[0])
 }
-func usersCreateUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] users create -body JSON
+func usersCreateUserUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] users create-user -body JSON
 
 Create a new user
     -body JSON: 
 
 Example:
-    %[1]s users create --body '{
+    %[1]s users create-user --body '{
       "password": "s3cr3t",
       "username": "alice"
    }'
 `, os.Args[0])
 }
 
-func usersListUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] users list
+func usersListUsersUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] users list-users
 
 List all users
 
 Example:
-    %[1]s users list
+    %[1]s users list-users
 `, os.Args[0])
 }
 
-func usersDeleteUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] users delete -username STRING
+func usersDeleteUserUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] users delete-user -username STRING
 
 Delete a user by username
     -username STRING: Username of the user to delete
 
 Example:
-    %[1]s users delete --username "alice"
+    %[1]s users delete-user --username "alice"
 `, os.Args[0])
 }
 
-func usersAuthUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] users auth -body JSON
+func usersAuthUserUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] users auth-user -body JSON
 
 Authenticate a user with username and password
     -body JSON: 
 
 Example:
-    %[1]s users auth --body '{
+    %[1]s users auth-user --body '{
       "password": "s3cr3t",
       "username": "alice"
    }'

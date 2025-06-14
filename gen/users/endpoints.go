@@ -15,61 +15,61 @@ import (
 
 // Endpoints wraps the "users" service endpoints.
 type Endpoints struct {
-	Create goa.Endpoint
-	List   goa.Endpoint
-	Delete goa.Endpoint
-	Auth   goa.Endpoint
+	CreateUser goa.Endpoint
+	ListUsers  goa.Endpoint
+	DeleteUser goa.Endpoint
+	AuthUser   goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "users" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
-		Create: NewCreateEndpoint(s),
-		List:   NewListEndpoint(s),
-		Delete: NewDeleteEndpoint(s),
-		Auth:   NewAuthEndpoint(s),
+		CreateUser: NewCreateUserEndpoint(s),
+		ListUsers:  NewListUsersEndpoint(s),
+		DeleteUser: NewDeleteUserEndpoint(s),
+		AuthUser:   NewAuthUserEndpoint(s),
 	}
 }
 
 // Use applies the given middleware to all the "users" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
-	e.Create = m(e.Create)
-	e.List = m(e.List)
-	e.Delete = m(e.Delete)
-	e.Auth = m(e.Auth)
+	e.CreateUser = m(e.CreateUser)
+	e.ListUsers = m(e.ListUsers)
+	e.DeleteUser = m(e.DeleteUser)
+	e.AuthUser = m(e.AuthUser)
 }
 
-// NewCreateEndpoint returns an endpoint function that calls the method
-// "create" of service "users".
-func NewCreateEndpoint(s Service) goa.Endpoint {
+// NewCreateUserEndpoint returns an endpoint function that calls the method
+// "create user" of service "users".
+func NewCreateUserEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
-		p := req.(*CreatePayload)
-		return s.Create(ctx, p)
+		p := req.(*CreateUserPayload)
+		return s.CreateUser(ctx, p)
 	}
 }
 
-// NewListEndpoint returns an endpoint function that calls the method "list" of
-// service "users".
-func NewListEndpoint(s Service) goa.Endpoint {
+// NewListUsersEndpoint returns an endpoint function that calls the method
+// "list users" of service "users".
+func NewListUsersEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
-		return s.List(ctx)
+		return s.ListUsers(ctx)
 	}
 }
 
-// NewDeleteEndpoint returns an endpoint function that calls the method
-// "delete" of service "users".
-func NewDeleteEndpoint(s Service) goa.Endpoint {
+// NewDeleteUserEndpoint returns an endpoint function that calls the method
+// "delete user" of service "users".
+func NewDeleteUserEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
-		p := req.(*DeletePayload)
-		return nil, s.Delete(ctx, p)
+		p := req.(*DeleteUserPayload)
+		return nil, s.DeleteUser(ctx, p)
 	}
 }
 
-// NewAuthEndpoint returns an endpoint function that calls the method "auth" of
-// service "users".
-func NewAuthEndpoint(s Service) goa.Endpoint {
+// NewAuthUserEndpoint returns an endpoint function that calls the method "auth
+// user" of service "users".
+func NewAuthUserEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
-		p := req.(*AuthPayload)
-		return s.Auth(ctx, p)
+		p := req.(*AuthUserPayload)
+		return s.AuthUser(ctx, p)
 	}
 }

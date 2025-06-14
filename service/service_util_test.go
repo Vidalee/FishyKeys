@@ -3,8 +3,11 @@ package service
 import (
 	"fmt"
 	"github.com/Vidalee/FishyKeys/internal/testutil"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"testing"
 )
+
+var testDB *pgxpool.Pool
 
 func TestMain(m *testing.M) {
 	var err error

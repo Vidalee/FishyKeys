@@ -14,18 +14,18 @@ import (
 	users "github.com/Vidalee/FishyKeys/gen/users"
 )
 
-// BuildCreatePayload builds the payload for the users create endpoint from CLI
-// flags.
-func BuildCreatePayload(usersCreateBody string) (*users.CreatePayload, error) {
+// BuildCreateUserPayload builds the payload for the users create user endpoint
+// from CLI flags.
+func BuildCreateUserPayload(usersCreateUserBody string) (*users.CreateUserPayload, error) {
 	var err error
-	var body CreateRequestBody
+	var body CreateUserRequestBody
 	{
-		err = json.Unmarshal([]byte(usersCreateBody), &body)
+		err = json.Unmarshal([]byte(usersCreateUserBody), &body)
 		if err != nil {
 			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"password\": \"s3cr3t\",\n      \"username\": \"alice\"\n   }'")
 		}
 	}
-	v := &users.CreatePayload{
+	v := &users.CreateUserPayload{
 		Username: body.Username,
 		Password: body.Password,
 	}
@@ -33,31 +33,31 @@ func BuildCreatePayload(usersCreateBody string) (*users.CreatePayload, error) {
 	return v, nil
 }
 
-// BuildDeletePayload builds the payload for the users delete endpoint from CLI
-// flags.
-func BuildDeletePayload(usersDeleteUsername string) (*users.DeletePayload, error) {
+// BuildDeleteUserPayload builds the payload for the users delete user endpoint
+// from CLI flags.
+func BuildDeleteUserPayload(usersDeleteUserUsername string) (*users.DeleteUserPayload, error) {
 	var username string
 	{
-		username = usersDeleteUsername
+		username = usersDeleteUserUsername
 	}
-	v := &users.DeletePayload{}
+	v := &users.DeleteUserPayload{}
 	v.Username = username
 
 	return v, nil
 }
 
-// BuildAuthPayload builds the payload for the users auth endpoint from CLI
-// flags.
-func BuildAuthPayload(usersAuthBody string) (*users.AuthPayload, error) {
+// BuildAuthUserPayload builds the payload for the users auth user endpoint
+// from CLI flags.
+func BuildAuthUserPayload(usersAuthUserBody string) (*users.AuthUserPayload, error) {
 	var err error
-	var body AuthRequestBody
+	var body AuthUserRequestBody
 	{
-		err = json.Unmarshal([]byte(usersAuthBody), &body)
+		err = json.Unmarshal([]byte(usersAuthUserBody), &body)
 		if err != nil {
 			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"password\": \"s3cr3t\",\n      \"username\": \"alice\"\n   }'")
 		}
 	}
-	v := &users.AuthPayload{
+	v := &users.AuthUserPayload{
 		Username: body.Username,
 		Password: body.Password,
 	}

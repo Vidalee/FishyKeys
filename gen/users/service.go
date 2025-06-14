@@ -9,18 +9,20 @@ package users
 
 import (
 	"context"
+
+	goa "goa.design/goa/v3/pkg"
 )
 
 // User service manages user accounts and authentication
 type Service interface {
 	// Create a new user
-	Create(context.Context, *CreatePayload) (res *CreateResult, err error)
+	CreateUser(context.Context, *CreateUserPayload) (res *CreateUserResult, err error)
 	// List all users
-	List(context.Context) (res []*User, err error)
+	ListUsers(context.Context) (res []*User, err error)
 	// Delete a user by username
-	Delete(context.Context, *DeletePayload) (err error)
+	DeleteUser(context.Context, *DeleteUserPayload) (err error)
 	// Authenticate a user with username and password
-	Auth(context.Context, *AuthPayload) (res *AuthResult, err error)
+	AuthUser(context.Context, *AuthUserPayload) (res *AuthUserResult, err error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -37,40 +39,42 @@ const ServiceName = "users"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [4]string{"create", "list", "delete", "auth"}
+var MethodNames = [4]string{"create user", "list users", "delete user", "auth user"}
 
-// AuthPayload is the payload type of the users service auth method.
-type AuthPayload struct {
+// AuthUserPayload is the payload type of the users service auth user method.
+type AuthUserPayload struct {
 	// Username
 	Username string
 	// Password
 	Password string
 }
 
-// AuthResult is the result type of the users service auth method.
-type AuthResult struct {
+// AuthUserResult is the result type of the users service auth user method.
+type AuthUserResult struct {
 	// The username of the authenticated user
 	Username *string
 	// JWT or session token
 	Token *string
 }
 
-// CreatePayload is the payload type of the users service create method.
-type CreatePayload struct {
+// CreateUserPayload is the payload type of the users service create user
+// method.
+type CreateUserPayload struct {
 	// Username of the new user
 	Username string
 	// Password (hashed or plain depending on implementation)
 	Password string
 }
 
-// CreateResult is the result type of the users service create method.
-type CreateResult struct {
+// CreateUserResult is the result type of the users service create user method.
+type CreateUserResult struct {
 	// The username of the created user
 	Username *string
 }
 
-// DeletePayload is the payload type of the users service delete method.
-type DeletePayload struct {
+// DeleteUserPayload is the payload type of the users service delete user
+// method.
+type DeleteUserPayload struct {
 	// Username of the user to delete
 	Username string
 }
@@ -86,9 +90,6 @@ type User struct {
 
 // Internal server error
 type InternalError string
-
-// Invalid input
-type InvalidInput string
 
 // Invalid username or password
 type Unauthorized string
@@ -114,23 +115,6 @@ func (e InternalError) ErrorName() string {
 // GoaErrorName returns "internal_error".
 func (e InternalError) GoaErrorName() string {
 	return "internal_error"
-}
-
-// Error returns an error description.
-func (e InvalidInput) Error() string {
-	return "Invalid input"
-}
-
-// ErrorName returns "invalid_input".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e InvalidInput) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "invalid_input".
-func (e InvalidInput) GoaErrorName() string {
-	return "invalid_input"
 }
 
 // Error returns an error description.
@@ -182,4 +166,9 @@ func (e UsernameTaken) ErrorName() string {
 // GoaErrorName returns "username_taken".
 func (e UsernameTaken) GoaErrorName() string {
 	return "username_taken"
+}
+
+// MakeInvalidInput builds a goa.ServiceError from an error.
+func MakeInvalidInput(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "invalid_input", false, false, false)
 }

@@ -12,42 +12,60 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// CreateRequestBody is the type of the "users" service "create" endpoint HTTP
-// request body.
-type CreateRequestBody struct {
+// CreateUserRequestBody is the type of the "users" service "create user"
+// endpoint HTTP request body.
+type CreateUserRequestBody struct {
 	// Username of the new user
 	Username string `form:"username" json:"username" xml:"username"`
 	// Password (hashed or plain depending on implementation)
 	Password string `form:"password" json:"password" xml:"password"`
 }
 
-// AuthRequestBody is the type of the "users" service "auth" endpoint HTTP
-// request body.
-type AuthRequestBody struct {
+// AuthUserRequestBody is the type of the "users" service "auth user" endpoint
+// HTTP request body.
+type AuthUserRequestBody struct {
 	// Username
 	Username string `form:"username" json:"username" xml:"username"`
 	// Password
 	Password string `form:"password" json:"password" xml:"password"`
 }
 
-// CreateResponseBody is the type of the "users" service "create" endpoint HTTP
-// response body.
-type CreateResponseBody struct {
+// CreateUserResponseBody is the type of the "users" service "create user"
+// endpoint HTTP response body.
+type CreateUserResponseBody struct {
 	// The username of the created user
 	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 }
 
-// ListResponseBody is the type of the "users" service "list" endpoint HTTP
-// response body.
-type ListResponseBody []*UserResponse
+// ListUsersResponseBody is the type of the "users" service "list users"
+// endpoint HTTP response body.
+type ListUsersResponseBody []*UserResponse
 
-// AuthResponseBody is the type of the "users" service "auth" endpoint HTTP
-// response body.
-type AuthResponseBody struct {
+// AuthUserResponseBody is the type of the "users" service "auth user" endpoint
+// HTTP response body.
+type AuthUserResponseBody struct {
 	// The username of the authenticated user
 	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 	// JWT or session token
 	Token *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
+}
+
+// CreateUserInvalidInputResponseBody is the type of the "users" service
+// "create user" endpoint HTTP response body for the "invalid_input" error.
+type CreateUserInvalidInputResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
 // UserResponse is used to define fields on response body types.
@@ -60,63 +78,70 @@ type UserResponse struct {
 	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 }
 
-// NewCreateRequestBody builds the HTTP request body from the payload of the
-// "create" endpoint of the "users" service.
-func NewCreateRequestBody(p *users.CreatePayload) *CreateRequestBody {
-	body := &CreateRequestBody{
+// NewCreateUserRequestBody builds the HTTP request body from the payload of
+// the "create user" endpoint of the "users" service.
+func NewCreateUserRequestBody(p *users.CreateUserPayload) *CreateUserRequestBody {
+	body := &CreateUserRequestBody{
 		Username: p.Username,
 		Password: p.Password,
 	}
 	return body
 }
 
-// NewAuthRequestBody builds the HTTP request body from the payload of the
-// "auth" endpoint of the "users" service.
-func NewAuthRequestBody(p *users.AuthPayload) *AuthRequestBody {
-	body := &AuthRequestBody{
+// NewAuthUserRequestBody builds the HTTP request body from the payload of the
+// "auth user" endpoint of the "users" service.
+func NewAuthUserRequestBody(p *users.AuthUserPayload) *AuthUserRequestBody {
+	body := &AuthUserRequestBody{
 		Username: p.Username,
 		Password: p.Password,
 	}
 	return body
 }
 
-// NewCreateResultCreated builds a "users" service "create" endpoint result
-// from a HTTP "Created" response.
-func NewCreateResultCreated(body *CreateResponseBody) *users.CreateResult {
-	v := &users.CreateResult{
+// NewCreateUserResultCreated builds a "users" service "create user" endpoint
+// result from a HTTP "Created" response.
+func NewCreateUserResultCreated(body *CreateUserResponseBody) *users.CreateUserResult {
+	v := &users.CreateUserResult{
 		Username: body.Username,
 	}
 
 	return v
 }
 
-// NewCreateInternalError builds a users service create endpoint internal_error
-// error.
-func NewCreateInternalError(body string) users.InternalError {
+// NewCreateUserInvalidInput builds a users service create user endpoint
+// invalid_input error.
+func NewCreateUserInvalidInput(body *CreateUserInvalidInputResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewCreateUserInternalError builds a users service create user endpoint
+// internal_error error.
+func NewCreateUserInternalError(body string) users.InternalError {
 	v := users.InternalError(body)
 
 	return v
 }
 
-// NewCreateInvalidInput builds a users service create endpoint invalid_input
-// error.
-func NewCreateInvalidInput(body string) users.InvalidInput {
-	v := users.InvalidInput(body)
-
-	return v
-}
-
-// NewCreateUsernameTaken builds a users service create endpoint username_taken
-// error.
-func NewCreateUsernameTaken(body string) users.UsernameTaken {
+// NewCreateUserUsernameTaken builds a users service create user endpoint
+// username_taken error.
+func NewCreateUserUsernameTaken(body string) users.UsernameTaken {
 	v := users.UsernameTaken(body)
 
 	return v
 }
 
-// NewListUserOK builds a "users" service "list" endpoint result from a HTTP
-// "OK" response.
-func NewListUserOK(body []*UserResponse) []*users.User {
+// NewListUsersUserOK builds a "users" service "list users" endpoint result
+// from a HTTP "OK" response.
+func NewListUsersUserOK(body []*UserResponse) []*users.User {
 	v := make([]*users.User, len(body))
 	for i, val := range body {
 		v[i] = unmarshalUserResponseToUsersUser(val)
@@ -125,34 +150,34 @@ func NewListUserOK(body []*UserResponse) []*users.User {
 	return v
 }
 
-// NewListInternalError builds a users service list endpoint internal_error
-// error.
-func NewListInternalError(body string) users.InternalError {
+// NewListUsersInternalError builds a users service list users endpoint
+// internal_error error.
+func NewListUsersInternalError(body string) users.InternalError {
 	v := users.InternalError(body)
 
 	return v
 }
 
-// NewDeleteInternalError builds a users service delete endpoint internal_error
-// error.
-func NewDeleteInternalError(body string) users.InternalError {
+// NewDeleteUserInternalError builds a users service delete user endpoint
+// internal_error error.
+func NewDeleteUserInternalError(body string) users.InternalError {
 	v := users.InternalError(body)
 
 	return v
 }
 
-// NewDeleteUserNotFound builds a users service delete endpoint user_not_found
-// error.
-func NewDeleteUserNotFound(body string) users.UserNotFound {
+// NewDeleteUserUserNotFound builds a users service delete user endpoint
+// user_not_found error.
+func NewDeleteUserUserNotFound(body string) users.UserNotFound {
 	v := users.UserNotFound(body)
 
 	return v
 }
 
-// NewAuthResultOK builds a "users" service "auth" endpoint result from a HTTP
-// "OK" response.
-func NewAuthResultOK(body *AuthResponseBody) *users.AuthResult {
-	v := &users.AuthResult{
+// NewAuthUserResultOK builds a "users" service "auth user" endpoint result
+// from a HTTP "OK" response.
+func NewAuthUserResultOK(body *AuthUserResponseBody) *users.AuthUserResult {
+	v := &users.AuthUserResult{
 		Username: body.Username,
 		Token:    body.Token,
 	}
@@ -160,19 +185,44 @@ func NewAuthResultOK(body *AuthResponseBody) *users.AuthResult {
 	return v
 }
 
-// NewAuthInternalError builds a users service auth endpoint internal_error
-// error.
-func NewAuthInternalError(body string) users.InternalError {
+// NewAuthUserInternalError builds a users service auth user endpoint
+// internal_error error.
+func NewAuthUserInternalError(body string) users.InternalError {
 	v := users.InternalError(body)
 
 	return v
 }
 
-// NewAuthUnauthorized builds a users service auth endpoint unauthorized error.
-func NewAuthUnauthorized(body string) users.Unauthorized {
+// NewAuthUserUnauthorized builds a users service auth user endpoint
+// unauthorized error.
+func NewAuthUserUnauthorized(body string) users.Unauthorized {
 	v := users.Unauthorized(body)
 
 	return v
+}
+
+// ValidateCreateUserInvalidInputResponseBody runs the validations defined on
+// create user_invalid_input_response_body
+func ValidateCreateUserInvalidInputResponseBody(body *CreateUserInvalidInputResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
 }
 
 // ValidateUserResponse runs the validations defined on UserResponse

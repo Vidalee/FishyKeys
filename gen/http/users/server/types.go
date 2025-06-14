@@ -12,42 +12,60 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// CreateRequestBody is the type of the "users" service "create" endpoint HTTP
-// request body.
-type CreateRequestBody struct {
+// CreateUserRequestBody is the type of the "users" service "create user"
+// endpoint HTTP request body.
+type CreateUserRequestBody struct {
 	// Username of the new user
 	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 	// Password (hashed or plain depending on implementation)
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
 }
 
-// AuthRequestBody is the type of the "users" service "auth" endpoint HTTP
-// request body.
-type AuthRequestBody struct {
+// AuthUserRequestBody is the type of the "users" service "auth user" endpoint
+// HTTP request body.
+type AuthUserRequestBody struct {
 	// Username
 	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 	// Password
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
 }
 
-// CreateResponseBody is the type of the "users" service "create" endpoint HTTP
-// response body.
-type CreateResponseBody struct {
+// CreateUserResponseBody is the type of the "users" service "create user"
+// endpoint HTTP response body.
+type CreateUserResponseBody struct {
 	// The username of the created user
 	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 }
 
-// ListResponseBody is the type of the "users" service "list" endpoint HTTP
-// response body.
-type ListResponseBody []*UserResponse
+// ListUsersResponseBody is the type of the "users" service "list users"
+// endpoint HTTP response body.
+type ListUsersResponseBody []*UserResponse
 
-// AuthResponseBody is the type of the "users" service "auth" endpoint HTTP
-// response body.
-type AuthResponseBody struct {
+// AuthUserResponseBody is the type of the "users" service "auth user" endpoint
+// HTTP response body.
+type AuthUserResponseBody struct {
 	// The username of the authenticated user
 	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 	// JWT or session token
 	Token *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
+}
+
+// CreateUserInvalidInputResponseBody is the type of the "users" service
+// "create user" endpoint HTTP response body for the "invalid_input" error.
+type CreateUserInvalidInputResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
 // UserResponse is used to define fields on response body types.
@@ -60,18 +78,18 @@ type UserResponse struct {
 	UpdatedAt string `form:"updated_at" json:"updated_at" xml:"updated_at"`
 }
 
-// NewCreateResponseBody builds the HTTP response body from the result of the
-// "create" endpoint of the "users" service.
-func NewCreateResponseBody(res *users.CreateResult) *CreateResponseBody {
-	body := &CreateResponseBody{
+// NewCreateUserResponseBody builds the HTTP response body from the result of
+// the "create user" endpoint of the "users" service.
+func NewCreateUserResponseBody(res *users.CreateUserResult) *CreateUserResponseBody {
+	body := &CreateUserResponseBody{
 		Username: res.Username,
 	}
 	return body
 }
 
-// NewListResponseBody builds the HTTP response body from the result of the
-// "list" endpoint of the "users" service.
-func NewListResponseBody(res []*users.User) ListResponseBody {
+// NewListUsersResponseBody builds the HTTP response body from the result of
+// the "list users" endpoint of the "users" service.
+func NewListUsersResponseBody(res []*users.User) ListUsersResponseBody {
 	body := make([]*UserResponse, len(res))
 	for i, val := range res {
 		body[i] = marshalUsersUserToUserResponse(val)
@@ -79,19 +97,33 @@ func NewListResponseBody(res []*users.User) ListResponseBody {
 	return body
 }
 
-// NewAuthResponseBody builds the HTTP response body from the result of the
-// "auth" endpoint of the "users" service.
-func NewAuthResponseBody(res *users.AuthResult) *AuthResponseBody {
-	body := &AuthResponseBody{
+// NewAuthUserResponseBody builds the HTTP response body from the result of the
+// "auth user" endpoint of the "users" service.
+func NewAuthUserResponseBody(res *users.AuthUserResult) *AuthUserResponseBody {
+	body := &AuthUserResponseBody{
 		Username: res.Username,
 		Token:    res.Token,
 	}
 	return body
 }
 
-// NewCreatePayload builds a users service create endpoint payload.
-func NewCreatePayload(body *CreateRequestBody) *users.CreatePayload {
-	v := &users.CreatePayload{
+// NewCreateUserInvalidInputResponseBody builds the HTTP response body from the
+// result of the "create user" endpoint of the "users" service.
+func NewCreateUserInvalidInputResponseBody(res *goa.ServiceError) *CreateUserInvalidInputResponseBody {
+	body := &CreateUserInvalidInputResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCreateUserPayload builds a users service create user endpoint payload.
+func NewCreateUserPayload(body *CreateUserRequestBody) *users.CreateUserPayload {
+	v := &users.CreateUserPayload{
 		Username: *body.Username,
 		Password: *body.Password,
 	}
@@ -99,17 +131,17 @@ func NewCreatePayload(body *CreateRequestBody) *users.CreatePayload {
 	return v
 }
 
-// NewDeletePayload builds a users service delete endpoint payload.
-func NewDeletePayload(username string) *users.DeletePayload {
-	v := &users.DeletePayload{}
+// NewDeleteUserPayload builds a users service delete user endpoint payload.
+func NewDeleteUserPayload(username string) *users.DeleteUserPayload {
+	v := &users.DeleteUserPayload{}
 	v.Username = username
 
 	return v
 }
 
-// NewAuthPayload builds a users service auth endpoint payload.
-func NewAuthPayload(body *AuthRequestBody) *users.AuthPayload {
-	v := &users.AuthPayload{
+// NewAuthUserPayload builds a users service auth user endpoint payload.
+func NewAuthUserPayload(body *AuthUserRequestBody) *users.AuthUserPayload {
+	v := &users.AuthUserPayload{
 		Username: *body.Username,
 		Password: *body.Password,
 	}
@@ -117,8 +149,9 @@ func NewAuthPayload(body *AuthRequestBody) *users.AuthPayload {
 	return v
 }
 
-// ValidateCreateRequestBody runs the validations defined on CreateRequestBody
-func ValidateCreateRequestBody(body *CreateRequestBody) (err error) {
+// ValidateCreateUserRequestBody runs the validations defined on Create
+// UserRequestBody
+func ValidateCreateUserRequestBody(body *CreateUserRequestBody) (err error) {
 	if body.Username == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("username", "body"))
 	}
@@ -128,8 +161,9 @@ func ValidateCreateRequestBody(body *CreateRequestBody) (err error) {
 	return
 }
 
-// ValidateAuthRequestBody runs the validations defined on AuthRequestBody
-func ValidateAuthRequestBody(body *AuthRequestBody) (err error) {
+// ValidateAuthUserRequestBody runs the validations defined on Auth
+// UserRequestBody
+func ValidateAuthUserRequestBody(body *AuthUserRequestBody) (err error) {
 	if body.Username == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("username", "body"))
 	}

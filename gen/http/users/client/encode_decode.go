@@ -19,13 +19,13 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// BuildCreateRequest instantiates a HTTP request object with method and path
-// set to call the "users" service "create" endpoint
-func (c *Client) BuildCreateRequest(ctx context.Context, v any) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: CreateUsersPath()}
+// BuildCreateUserRequest instantiates a HTTP request object with method and
+// path set to call the "users" service "create user" endpoint
+func (c *Client) BuildCreateUserRequest(ctx context.Context, v any) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: CreateUserUsersPath()}
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("users", "create", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("users", "create user", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -34,31 +34,31 @@ func (c *Client) BuildCreateRequest(ctx context.Context, v any) (*http.Request, 
 	return req, nil
 }
 
-// EncodeCreateRequest returns an encoder for requests sent to the users create
-// server.
-func EncodeCreateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+// EncodeCreateUserRequest returns an encoder for requests sent to the users
+// create user server.
+func EncodeCreateUserRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
 	return func(req *http.Request, v any) error {
-		p, ok := v.(*users.CreatePayload)
+		p, ok := v.(*users.CreateUserPayload)
 		if !ok {
-			return goahttp.ErrInvalidType("users", "create", "*users.CreatePayload", v)
+			return goahttp.ErrInvalidType("users", "create user", "*users.CreateUserPayload", v)
 		}
-		body := NewCreateRequestBody(p)
+		body := NewCreateUserRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {
-			return goahttp.ErrEncodingError("users", "create", err)
+			return goahttp.ErrEncodingError("users", "create user", err)
 		}
 		return nil
 	}
 }
 
-// DecodeCreateResponse returns a decoder for responses returned by the users
-// create endpoint. restoreBody controls whether the response body should be
-// restored after having been read.
-// DecodeCreateResponse may return the following errors:
+// DecodeCreateUserResponse returns a decoder for responses returned by the
+// users create user endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeCreateUserResponse may return the following errors:
+//   - "invalid_input" (type *goa.ServiceError): http.StatusBadRequest
 //   - "internal_error" (type users.InternalError): http.StatusInternalServerError
-//   - "invalid_input" (type users.InvalidInput): http.StatusBadRequest
 //   - "username_taken" (type users.UsernameTaken): http.StatusConflict
 //   - error: internal error
-func DecodeCreateResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+func DecodeCreateUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
 			b, err := io.ReadAll(resp.Body)
@@ -75,15 +75,29 @@ func DecodeCreateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 		switch resp.StatusCode {
 		case http.StatusCreated:
 			var (
-				body CreateResponseBody
+				body CreateUserResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "create", err)
+				return nil, goahttp.ErrDecodingError("users", "create user", err)
 			}
-			res := NewCreateResultCreated(&body)
+			res := NewCreateUserResultCreated(&body)
 			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body CreateUserInvalidInputResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("users", "create user", err)
+			}
+			err = ValidateCreateUserInvalidInputResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "create user", err)
+			}
+			return nil, NewCreateUserInvalidInput(&body)
 		case http.StatusInternalServerError:
 			var (
 				body string
@@ -91,19 +105,9 @@ func DecodeCreateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "create", err)
+				return nil, goahttp.ErrDecodingError("users", "create user", err)
 			}
-			return nil, NewCreateInternalError(body)
-		case http.StatusBadRequest:
-			var (
-				body string
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "create", err)
-			}
-			return nil, NewCreateInvalidInput(body)
+			return nil, NewCreateUserInternalError(body)
 		case http.StatusConflict:
 			var (
 				body string
@@ -111,23 +115,23 @@ func DecodeCreateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "create", err)
+				return nil, goahttp.ErrDecodingError("users", "create user", err)
 			}
-			return nil, NewCreateUsernameTaken(body)
+			return nil, NewCreateUserUsernameTaken(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("users", "create", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("users", "create user", resp.StatusCode, string(body))
 		}
 	}
 }
 
-// BuildListRequest instantiates a HTTP request object with method and path set
-// to call the "users" service "list" endpoint
-func (c *Client) BuildListRequest(ctx context.Context, v any) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ListUsersPath()}
+// BuildListUsersRequest instantiates a HTTP request object with method and
+// path set to call the "users" service "list users" endpoint
+func (c *Client) BuildListUsersRequest(ctx context.Context, v any) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ListUsersUsersPath()}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("users", "list", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("users", "list users", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -136,13 +140,13 @@ func (c *Client) BuildListRequest(ctx context.Context, v any) (*http.Request, er
 	return req, nil
 }
 
-// DecodeListResponse returns a decoder for responses returned by the users
-// list endpoint. restoreBody controls whether the response body should be
-// restored after having been read.
-// DecodeListResponse may return the following errors:
+// DecodeListUsersResponse returns a decoder for responses returned by the
+// users list users endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeListUsersResponse may return the following errors:
 //   - "internal_error" (type users.InternalError): http.StatusInternalServerError
 //   - error: internal error
-func DecodeListResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+func DecodeListUsersResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
 			b, err := io.ReadAll(resp.Body)
@@ -159,12 +163,12 @@ func DecodeListResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				body ListResponseBody
+				body ListUsersResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "list", err)
+				return nil, goahttp.ErrDecodingError("users", "list users", err)
 			}
 			for _, e := range body {
 				if e != nil {
@@ -174,9 +178,9 @@ func DecodeListResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 				}
 			}
 			if err != nil {
-				return nil, goahttp.ErrValidationError("users", "list", err)
+				return nil, goahttp.ErrValidationError("users", "list users", err)
 			}
-			res := NewListUserOK(body)
+			res := NewListUsersUserOK(body)
 			return res, nil
 		case http.StatusInternalServerError:
 			var (
@@ -185,33 +189,33 @@ func DecodeListResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "list", err)
+				return nil, goahttp.ErrDecodingError("users", "list users", err)
 			}
-			return nil, NewListInternalError(body)
+			return nil, NewListUsersInternalError(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("users", "list", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("users", "list users", resp.StatusCode, string(body))
 		}
 	}
 }
 
-// BuildDeleteRequest instantiates a HTTP request object with method and path
-// set to call the "users" service "delete" endpoint
-func (c *Client) BuildDeleteRequest(ctx context.Context, v any) (*http.Request, error) {
+// BuildDeleteUserRequest instantiates a HTTP request object with method and
+// path set to call the "users" service "delete user" endpoint
+func (c *Client) BuildDeleteUserRequest(ctx context.Context, v any) (*http.Request, error) {
 	var (
 		username string
 	)
 	{
-		p, ok := v.(*users.DeletePayload)
+		p, ok := v.(*users.DeleteUserPayload)
 		if !ok {
-			return nil, goahttp.ErrInvalidType("users", "delete", "*users.DeletePayload", v)
+			return nil, goahttp.ErrInvalidType("users", "delete user", "*users.DeleteUserPayload", v)
 		}
 		username = p.Username
 	}
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteUsersPath(username)}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteUserUsersPath(username)}
 	req, err := http.NewRequest("DELETE", u.String(), nil)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("users", "delete", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("users", "delete user", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -220,14 +224,14 @@ func (c *Client) BuildDeleteRequest(ctx context.Context, v any) (*http.Request, 
 	return req, nil
 }
 
-// DecodeDeleteResponse returns a decoder for responses returned by the users
-// delete endpoint. restoreBody controls whether the response body should be
-// restored after having been read.
-// DecodeDeleteResponse may return the following errors:
+// DecodeDeleteUserResponse returns a decoder for responses returned by the
+// users delete user endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeDeleteUserResponse may return the following errors:
 //   - "internal_error" (type users.InternalError): http.StatusInternalServerError
 //   - "user_not_found" (type users.UserNotFound): http.StatusNotFound
 //   - error: internal error
-func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+func DecodeDeleteUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
 			b, err := io.ReadAll(resp.Body)
@@ -251,9 +255,9 @@ func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "delete", err)
+				return nil, goahttp.ErrDecodingError("users", "delete user", err)
 			}
-			return nil, NewDeleteInternalError(body)
+			return nil, NewDeleteUserInternalError(body)
 		case http.StatusNotFound:
 			var (
 				body string
@@ -261,23 +265,23 @@ func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "delete", err)
+				return nil, goahttp.ErrDecodingError("users", "delete user", err)
 			}
-			return nil, NewDeleteUserNotFound(body)
+			return nil, NewDeleteUserUserNotFound(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("users", "delete", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("users", "delete user", resp.StatusCode, string(body))
 		}
 	}
 }
 
-// BuildAuthRequest instantiates a HTTP request object with method and path set
-// to call the "users" service "auth" endpoint
-func (c *Client) BuildAuthRequest(ctx context.Context, v any) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AuthUsersPath()}
+// BuildAuthUserRequest instantiates a HTTP request object with method and path
+// set to call the "users" service "auth user" endpoint
+func (c *Client) BuildAuthUserRequest(ctx context.Context, v any) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AuthUserUsersPath()}
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("users", "auth", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("users", "auth user", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -286,30 +290,30 @@ func (c *Client) BuildAuthRequest(ctx context.Context, v any) (*http.Request, er
 	return req, nil
 }
 
-// EncodeAuthRequest returns an encoder for requests sent to the users auth
-// server.
-func EncodeAuthRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+// EncodeAuthUserRequest returns an encoder for requests sent to the users auth
+// user server.
+func EncodeAuthUserRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
 	return func(req *http.Request, v any) error {
-		p, ok := v.(*users.AuthPayload)
+		p, ok := v.(*users.AuthUserPayload)
 		if !ok {
-			return goahttp.ErrInvalidType("users", "auth", "*users.AuthPayload", v)
+			return goahttp.ErrInvalidType("users", "auth user", "*users.AuthUserPayload", v)
 		}
-		body := NewAuthRequestBody(p)
+		body := NewAuthUserRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {
-			return goahttp.ErrEncodingError("users", "auth", err)
+			return goahttp.ErrEncodingError("users", "auth user", err)
 		}
 		return nil
 	}
 }
 
-// DecodeAuthResponse returns a decoder for responses returned by the users
-// auth endpoint. restoreBody controls whether the response body should be
+// DecodeAuthUserResponse returns a decoder for responses returned by the users
+// auth user endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
-// DecodeAuthResponse may return the following errors:
+// DecodeAuthUserResponse may return the following errors:
 //   - "internal_error" (type users.InternalError): http.StatusInternalServerError
 //   - "unauthorized" (type users.Unauthorized): http.StatusUnauthorized
 //   - error: internal error
-func DecodeAuthResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+func DecodeAuthUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
 			b, err := io.ReadAll(resp.Body)
@@ -326,14 +330,14 @@ func DecodeAuthResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				body AuthResponseBody
+				body AuthUserResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "auth", err)
+				return nil, goahttp.ErrDecodingError("users", "auth user", err)
 			}
-			res := NewAuthResultOK(&body)
+			res := NewAuthUserResultOK(&body)
 			return res, nil
 		case http.StatusInternalServerError:
 			var (
@@ -342,9 +346,9 @@ func DecodeAuthResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "auth", err)
+				return nil, goahttp.ErrDecodingError("users", "auth user", err)
 			}
-			return nil, NewAuthInternalError(body)
+			return nil, NewAuthUserInternalError(body)
 		case http.StatusUnauthorized:
 			var (
 				body string
@@ -352,12 +356,12 @@ func DecodeAuthResponse(decoder func(*http.Response) goahttp.Decoder, restoreBod
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "auth", err)
+				return nil, goahttp.ErrDecodingError("users", "auth user", err)
 			}
-			return nil, NewAuthUnauthorized(body)
+			return nil, NewAuthUserUnauthorized(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("users", "auth", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("users", "auth user", resp.StatusCode, string(body))
 		}
 	}
 }
