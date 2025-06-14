@@ -16,8 +16,9 @@ import (
 
 func setupKeyTestService() *KeyManagementService {
 	keyManager := crypto.GetDefaultKeyManager()
-	repo := repository.NewGlobalSettingsRepository(testDB)
-	return NewKeyManagementService(keyManager, repo)
+	settingsRepository := repository.NewGlobalSettingsRepository(testDB)
+	usersRepository := repository.NewUsersRepository(testDB)
+	return NewKeyManagementService(keyManager, settingsRepository, usersRepository)
 }
 
 func TestKeyManagementService_CreateMasterKey(t *testing.T) {
@@ -29,30 +30,56 @@ func TestKeyManagementService_CreateMasterKey(t *testing.T) {
 		totalShares   int
 		minShares     int
 		expectedError bool
+		adminUsername string
+		adminPassword string
 	}{
 		{
 			name:          "valid parameters",
 			totalShares:   5,
 			minShares:     3,
 			expectedError: false,
+			adminUsername: "admin",
+			adminPassword: "admin_password",
 		},
 		{
 			name:          "invalid min shares",
 			totalShares:   5,
 			minShares:     0,
 			expectedError: true,
+			adminUsername: "admin",
+			adminPassword: "admin_password",
 		},
 		{
 			name:          "invalid total shares",
 			totalShares:   0,
 			minShares:     3,
 			expectedError: true,
+			adminUsername: "admin",
+			adminPassword: "admin_password",
 		},
 		{
 			name:          "min shares greater than total",
 			totalShares:   3,
 			minShares:     5,
 			expectedError: true,
+			adminUsername: "admin",
+			adminPassword: "admin_password",
+		},
+		{
+			name:          "empty admin username",
+			totalShares:   3,
+			minShares:     5,
+			expectedError: true,
+			adminUsername: "",
+			adminPassword: "admin_password",
+		},
+		{
+			name:          "admin password too short",
+			totalShares:   3,
+			minShares:     5,
+			expectedError: true,
+			adminUsername: "admin_username",
+			adminPassword: "admin_password",
 		},
 	}
 
@@ -62,8 +89,10 @@ func TestKeyManagementService_CreateMasterKey(t *testing.T) {
 			require.NoError(t, err)
 
 			payload := &genkey.CreateMasterKeyPayload{
-				TotalShares: tt.totalShares,
-				MinShares:   tt.minShares,
+				TotalShares:   tt.totalShares,
+				MinShares:     tt.minShares,
+				AdminUsername: tt.adminUsername,
+				AdminPassword: tt.adminPassword,
 			}
 
 			result, err := service.CreateMasterKey(ctx, payload)
@@ -71,6 +100,11 @@ func TestKeyManagementService_CreateMasterKey(t *testing.T) {
 			if tt.expectedError {
 				assert.Error(t, err)
 				assert.Nil(t, result)
+
+				settings, err := service.settingsRepository.GetSettings(ctx, columnTotalShares, columnMinShares, columnMasterKeyChecksum)
+				assert.Error(t, err)
+				assert.Nil(t, settings)
+				assert.Equal(t, "setting not found", err.Error())
 			} else {
 				assert.NoError(t, err)
 				assert.NotNil(t, result)
@@ -90,6 +124,16 @@ func TestKeyManagementService_CreateMasterKey(t *testing.T) {
 
 				// Verify checksum exists and is not empty
 				assert.NotEmpty(t, settings[columnMasterKeyChecksum])
+
+				// Verify admin user
+				user, err := service.usersRepository.GetUserByUsername(ctx, tt.adminUsername)
+				require.NoError(t, err)
+
+				assert.Equal(t, tt.adminUsername, user.Username)
+
+				decryptedPassword, err := crypto.Decrypt(service.keyManager, user.Password)
+				require.NoError(t, err)
+				assert.Equal(t, tt.adminPassword, string(decryptedPassword))
 			}
 		})
 	}

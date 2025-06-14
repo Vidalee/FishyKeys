@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"fmt"
+	genusers "github.com/Vidalee/FishyKeys/gen/users"
 	"log"
 	"strconv"
 
@@ -27,10 +29,15 @@ const (
 type KeyManagementService struct {
 	keyManager         *crypto.KeyManager
 	settingsRepository repository.GlobalSettingsRepository
+	usersRepository    repository.UsersRepository
 }
 
-func NewKeyManagementService(keyManager *crypto.KeyManager, repo repository.GlobalSettingsRepository) *KeyManagementService {
-	keySettings, err := repo.GetSettings(context.Background(), columnMasterKeyChecksum, columnTotalShares, columnMinShares)
+func NewKeyManagementService(
+	keyManager *crypto.KeyManager,
+	settingsRepository repository.GlobalSettingsRepository,
+	usersRepository repository.UsersRepository,
+) *KeyManagementService {
+	keySettings, err := settingsRepository.GetSettings(context.Background(), columnMasterKeyChecksum, columnTotalShares, columnMinShares)
 	if err != nil {
 		if !errors.Is(err, repository.ErrSettingNotFound) {
 			log.Fatalf("error retrieving key settings on service init: %v", err)
@@ -52,13 +59,22 @@ func NewKeyManagementService(keyManager *crypto.KeyManager, repo repository.Glob
 
 	return &KeyManagementService{
 		keyManager:         keyManager,
-		settingsRepository: repo,
+		settingsRepository: settingsRepository,
+		usersRepository:    usersRepository,
 	}
 }
 
 func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *genkey.CreateMasterKeyPayload) (*genkey.CreateMasterKeyResult, error) {
 	if payload.TotalShares <= 0 || payload.MinShares <= 0 || payload.MinShares > payload.TotalShares {
 		return nil, ErrInvalidParameters
+	}
+
+	if payload.AdminUsername == "" || payload.AdminPassword == "" {
+		return nil, genusers.MakeInvalidParameters(fmt.Errorf("username and password must be provided"))
+	}
+
+	if len(payload.AdminPassword) < 8 {
+		return nil, genusers.MakeInvalidParameters(fmt.Errorf("password must be at least 8 characters long"))
 	}
 
 	_, err := s.settingsRepository.GetSetting(ctx, columnMasterKeyChecksum)
@@ -98,8 +114,37 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		return nil, genkey.InternalError("error setting new master key: " + err.Error())
 	}
 
+	encryptedPassword, err := crypto.Encrypt(s.keyManager, []byte(payload.AdminPassword))
+	if err != nil {
+		s.keyManager.RollbackToUninitialized()
+
+		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalShares, columnMinShares, columnMasterKeyChecksum)
+		if delErr != nil {
+			return nil, genkey.InternalError(
+				"admin user password encryption failed: " + err.Error() +
+					"; rollback cleanup also failed: " + delErr.Error())
+		}
+
+		return nil, genusers.InternalError("could not encrypt password: " + err.Error())
+	}
+
+	err = s.usersRepository.CreateUser(ctx, payload.AdminUsername, encryptedPassword)
+	if err != nil {
+		s.keyManager.RollbackToUninitialized()
+
+		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalShares, columnMinShares, columnMasterKeyChecksum)
+		if delErr != nil {
+			return nil, genkey.InternalError(
+				"could not create admin user: " + err.Error() +
+					"; rollback cleanup also failed: " + delErr.Error())
+		}
+
+		return nil, genusers.InternalError("could not create admin user")
+	}
+
 	return &genkey.CreateMasterKeyResult{
-		Shares: encodedShares,
+		Shares:        encodedShares,
+		AdminUsername: &payload.AdminUsername,
 	}, nil
 }
 

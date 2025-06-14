@@ -21,11 +21,11 @@ func NewUsersService(keyManager *crypto.KeyManager, usersRepository repository.U
 
 func (s *UsersService) CreateUser(ctx context.Context, payload *genusers.CreateUserPayload) (*genusers.CreateUserResult, error) {
 	if payload.Username == "" || payload.Password == "" {
-		return nil, genusers.MakeInvalidInput(fmt.Errorf("username and password must be provided"))
+		return nil, genusers.MakeInvalidParameters(fmt.Errorf("username and password must be provided"))
 	}
 
 	if len(payload.Password) < 8 {
-		return nil, genusers.MakeInvalidInput(fmt.Errorf("password must be at least 8 characters long"))
+		return nil, genusers.MakeInvalidParameters(fmt.Errorf("password must be at least 8 characters long"))
 	}
 
 	_, err := s.usersRepository.GetUserByUsername(ctx, payload.Username)
@@ -89,7 +89,7 @@ func (s *UsersService) ListUsers(ctx context.Context) ([]*genusers.User, error) 
 
 func (s *UsersService) DeleteUser(ctx context.Context, payload *genusers.DeleteUserPayload) error {
 	if payload.Username == "" {
-		return genusers.MakeInvalidInput(fmt.Errorf("username must be provided"))
+		return genusers.MakeInvalidParameters(fmt.Errorf("username must be provided"))
 	}
 
 	err := s.usersRepository.DeleteUser(ctx, payload.Username)

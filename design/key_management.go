@@ -16,12 +16,21 @@ var _ = Service("key_management", func() {
 			Attribute("min_shares", Int, "Minimum number of shares required to reconstruct the key", func() {
 				Example(3)
 			})
-			Required("total_shares", "min_shares")
+			Attribute("admin_username", String, "Admin username for key management", func() {
+				Example("admin")
+			})
+			Attribute("admin_password", String, "Admin password for key management", func() {
+				Example("admin_password123!")
+			})
+			Required("total_shares", "min_shares", "admin_username", "admin_password")
 		})
 		Result(func() {
 			Attribute("shares", ArrayOf(String), "The generated key shares")
+			Attribute("admin_username", String, "The admin user's username", func() {
+				Example("admin")
+			})
 		})
-		Error("invalid_parameters", String, "Invalid parameters provided")
+		Error("invalid_parameters", ErrorResult, "Invalid parameters provided")
 		Error("internal_error", String, "Internal server error")
 		Error("key_already_exists", String, "A master key already exists")
 		HTTP(func() {

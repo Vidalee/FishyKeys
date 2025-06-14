@@ -23,6 +23,10 @@ type GlobalSettingsRepository interface {
 	GetSetting(ctx context.Context, key string) (string, error)
 	// GetSettings retrieves values for multiple keys
 	GetSettings(ctx context.Context, keys ...string) (map[string]string, error)
+	// DeleteSetting deletes a single setting by its key
+	DeleteSetting(ctx context.Context, key string) error
+	// DeleteSettings deletes multiple settings by their keys
+	DeleteSettings(ctx context.Context, keys ...string) error
 }
 
 type globalSettingsRepository struct {
@@ -131,4 +135,46 @@ func (r *globalSettingsRepository) GetSettings(ctx context.Context, keys ...stri
 	}
 
 	return result, nil
+}
+
+// DeleteSetting deletes a single setting by its key
+func (r *globalSettingsRepository) DeleteSetting(ctx context.Context, key string) error {
+	query := `
+		DELETE FROM global_settings
+		WHERE key = $1
+	`
+
+	cmd, err := r.pool.Exec(ctx, query, key)
+	if err != nil {
+		return err
+	}
+
+	if cmd.RowsAffected() == 0 {
+		return ErrSettingNotFound
+	}
+
+	return nil
+}
+
+// DeleteSettings deletes multiple settings by their keys
+func (r *globalSettingsRepository) DeleteSettings(ctx context.Context, keys ...string) error {
+	if len(keys) == 0 {
+		return nil
+	}
+
+	query := `
+		DELETE FROM global_settings
+		WHERE key = ANY($1)
+	`
+
+	cmd, err := r.pool.Exec(ctx, query, keys)
+	if err != nil {
+		return err
+	}
+
+	if cmd.RowsAffected() == 0 {
+		return ErrSettingNotFound
+	}
+
+	return nil
 }

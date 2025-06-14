@@ -149,6 +149,15 @@ func (km *KeyManager) RollbackToLocked() {
 	km.masterKey = nil
 }
 
+// RollbackToUninitialized rollback state to uninitialized, called something went wrong during initialization
+func (km *KeyManager) RollbackToUninitialized() {
+	km.mu.Lock()
+	defer km.mu.Unlock()
+
+	km.state = StateUninitialized
+	km.masterKey = nil
+}
+
 func (km *KeyManager) Status() (state State, currentSharesNumber int, minShares int, maxShares int) {
 	km.mu.RLock()
 	defer km.mu.RUnlock()
