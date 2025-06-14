@@ -147,6 +147,15 @@ func TestUsersService_AuthUser(t *testing.T) {
 			expectedError:     true,
 			expectedErrorText: "invalid username or password",
 		},
+		{
+			name:              "nonexistent user",
+			createUser:        false,
+			username:          "nonexistent",
+			password:          "password",
+			passwordToEnter:   "password",
+			expectedError:     true,
+			expectedErrorText: "invalid username or password",
+		},
 	}
 
 	for _, tt := range tests {
