@@ -15,13 +15,9 @@ import (
 func setupUsersTestService(t *testing.T) *UsersService {
 	keyManager := crypto.GetDefaultKeyManager()
 	masterKey, err := crypto.GenerateSecret()
-	if err != nil {
-		t.Fatalf("failed to generate master key: %v", err)
-	}
+	require.NoError(t, err, "failed to generate master key")
 	err = keyManager.SetNewMasterKey(masterKey, 1, 1)
-	if err != nil {
-		t.Fatalf("failed to set new master key: %v", err)
-	}
+	require.NoError(t, err, "failed to set new master key")
 	repo := repository.NewUsersRepository(testDB)
 	return NewUsersService(keyManager, repo)
 }

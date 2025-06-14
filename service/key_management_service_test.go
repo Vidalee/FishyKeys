@@ -21,6 +21,13 @@ func setupKeyTestService() *KeyManagementService {
 	return NewKeyManagementService(keyManager, settingsRepository, usersRepository)
 }
 
+func clearKeyServiceTables(t *testing.T, ctx context.Context) {
+	err := testutil.ClearTable(ctx, "global_settings")
+	require.NoError(t, err)
+	err = testutil.ClearTable(ctx, "users")
+	require.NoError(t, err)
+}
+
 func TestKeyManagementService_CreateMasterKey(t *testing.T) {
 	service := setupKeyTestService()
 	ctx := context.Background()
@@ -85,8 +92,7 @@ func TestKeyManagementService_CreateMasterKey(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := testutil.ClearTable(ctx, "global_settings")
-			require.NoError(t, err)
+			clearKeyServiceTables(t, ctx)
 
 			payload := &genkey.CreateMasterKeyPayload{
 				TotalShares:   tt.totalShares,
@@ -143,8 +149,7 @@ func TestKeyManagementService_GetKeyStatus(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("no key set", func(t *testing.T) {
-		err := testutil.ClearTable(ctx, "global_settings")
-		require.NoError(t, err)
+		clearKeyServiceTables(t, ctx)
 		service := setupKeyTestService()
 		result, err := service.GetKeyStatus(ctx)
 		assert.Error(t, err)
@@ -152,16 +157,17 @@ func TestKeyManagementService_GetKeyStatus(t *testing.T) {
 	})
 
 	t.Run("key exists and unlocked", func(t *testing.T) {
-		err := testutil.ClearTable(ctx, "global_settings")
-		require.NoError(t, err)
+		clearKeyServiceTables(t, ctx)
 		service := setupKeyTestService()
 
 		// First create a master key
-		payload := &genkey.CreateMasterKeyPayload{
-			TotalShares: 5,
-			MinShares:   3,
+		createPayload := &genkey.CreateMasterKeyPayload{
+			TotalShares:   5,
+			MinShares:     3,
+			AdminUsername: "admin",
+			AdminPassword: "admin_password",
 		}
-		_, err = service.CreateMasterKey(ctx, payload)
+		_, err := service.CreateMasterKey(ctx, createPayload)
 		require.NoError(t, err)
 
 		result, err := service.GetKeyStatus(ctx)
@@ -174,15 +180,16 @@ func TestKeyManagementService_GetKeyStatus(t *testing.T) {
 	})
 
 	t.Run("key exists but locked", func(t *testing.T) {
-		err := testutil.ClearTable(ctx, "global_settings")
-		require.NoError(t, err)
+		clearKeyServiceTables(t, ctx)
 		// First create a service and set up the key
 		setupService := setupKeyTestService()
-		payload := &genkey.CreateMasterKeyPayload{
-			TotalShares: 5,
-			MinShares:   3,
+		createPayload := &genkey.CreateMasterKeyPayload{
+			TotalShares:   5,
+			MinShares:     3,
+			AdminUsername: "admin",
+			AdminPassword: "admin_password",
 		}
-		_, err = setupService.CreateMasterKey(ctx, payload)
+		_, err := setupService.CreateMasterKey(ctx, createPayload)
 		require.NoError(t, err)
 
 		// Create a new service instance to test locked state
@@ -201,8 +208,7 @@ func TestKeyManagementService_AddShare(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("no key set", func(t *testing.T) {
-		err := testutil.ClearTable(ctx, "global_settings")
-		require.NoError(t, err)
+		clearKeyServiceTables(t, ctx)
 		service := setupKeyTestService()
 		payload := &genkey.AddSharePayload{
 			Share: "invalid_share",
@@ -214,14 +220,15 @@ func TestKeyManagementService_AddShare(t *testing.T) {
 	})
 
 	t.Run("valid shares sequence", func(t *testing.T) {
-		err := testutil.ClearTable(ctx, "global_settings")
-		require.NoError(t, err)
+		clearKeyServiceTables(t, ctx)
 		setupService := setupKeyTestService()
 
 		// First create a master key
 		createPayload := &genkey.CreateMasterKeyPayload{
-			TotalShares: 5,
-			MinShares:   3,
+			TotalShares:   5,
+			MinShares:     3,
+			AdminUsername: "admin",
+			AdminPassword: "admin_password",
 		}
 		createResult, err := setupService.CreateMasterKey(ctx, createPayload)
 		require.NoError(t, err)
@@ -264,13 +271,14 @@ func TestKeyManagementService_AddShare(t *testing.T) {
 	})
 
 	t.Run("valid shares but checksum wrong", func(t *testing.T) {
-		err := testutil.ClearTable(ctx, "global_settings")
-		require.NoError(t, err)
+		clearKeyServiceTables(t, ctx)
 		setupService := setupKeyTestService()
 
 		createPayload := &genkey.CreateMasterKeyPayload{
-			TotalShares: 5,
-			MinShares:   3,
+			TotalShares:   5,
+			MinShares:     3,
+			AdminUsername: "admin",
+			AdminPassword: "admin_password",
 		}
 		createResult, err := setupService.CreateMasterKey(ctx, createPayload)
 		require.NoError(t, err)
@@ -306,14 +314,15 @@ func TestKeyManagementService_AddShare(t *testing.T) {
 	})
 
 	t.Run("invalid share", func(t *testing.T) {
-		err := testutil.ClearTable(ctx, "global_settings")
-		require.NoError(t, err)
+		clearKeyServiceTables(t, ctx)
 		setupService := setupKeyTestService()
 
 		// First create a master key
 		createPayload := &genkey.CreateMasterKeyPayload{
-			TotalShares: 5,
-			MinShares:   3,
+			TotalShares:   5,
+			MinShares:     3,
+			AdminUsername: "admin",
+			AdminPassword: "admin_password",
 		}
 		createResult, err := setupService.CreateMasterKey(ctx, createPayload)
 		require.NoError(t, err)
@@ -354,8 +363,10 @@ func TestKeyManagementService_EndToEndUnlock(t *testing.T) {
 
 	// Step 1: Create master key with 5 total, 3 min shares
 	createPayload := &genkey.CreateMasterKeyPayload{
-		TotalShares: 5,
-		MinShares:   3,
+		TotalShares:   5,
+		MinShares:     3,
+		AdminUsername: "admin",
+		AdminPassword: "admin_password",
 	}
 	createResult, err := setupService.CreateMasterKey(ctx, createPayload)
 	require.NoError(t, err)
@@ -416,26 +427,26 @@ func TestKeyManagementService_DeleteShare(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("no key set", func(t *testing.T) {
-		err := testutil.ClearTable(ctx, "global_settings")
-		require.NoError(t, err)
+		clearKeyServiceTables(t, ctx)
 		service := setupKeyTestService()
 		payload := &genkey.DeleteSharePayload{
 			Index: 0,
 		}
 
-		err = service.DeleteShare(ctx, payload)
+		err := service.DeleteShare(ctx, payload)
 		assert.Error(t, err)
 	})
 
 	t.Run("invalid index", func(t *testing.T) {
-		err := testutil.ClearTable(ctx, "global_settings")
-		require.NoError(t, err)
+		clearKeyServiceTables(t, ctx)
 		setupService := setupKeyTestService()
 
 		// First create a master key
 		createPayload := &genkey.CreateMasterKeyPayload{
-			TotalShares: 5,
-			MinShares:   3,
+			TotalShares:   5,
+			MinShares:     3,
+			AdminUsername: "admin",
+			AdminPassword: "admin_password",
 		}
 		createResult, err := setupService.CreateMasterKey(ctx, createPayload)
 		require.NoError(t, err)
@@ -466,14 +477,15 @@ func TestKeyManagementService_DeleteShare(t *testing.T) {
 	})
 
 	t.Run("valid share deletion", func(t *testing.T) {
-		err := testutil.ClearTable(ctx, "global_settings")
-		require.NoError(t, err)
+		clearKeyServiceTables(t, ctx)
 		setupService := setupKeyTestService()
 
 		// First create a master key
 		createPayload := &genkey.CreateMasterKeyPayload{
-			TotalShares: 5,
-			MinShares:   3,
+			TotalShares:   5,
+			MinShares:     3,
+			AdminUsername: "admin",
+			AdminPassword: "admin_password",
 		}
 		createResult, err := setupService.CreateMasterKey(ctx, createPayload)
 		require.NoError(t, err)
