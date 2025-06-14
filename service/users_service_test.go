@@ -101,3 +101,80 @@ func TestUsersService_CreateUser(t *testing.T) {
 		})
 	}
 }
+
+func TestUsersService_AuthUser(t *testing.T) {
+	service := setupUsersTestService(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		name              string
+		createUser        bool
+		username          string
+		password          string
+		passwordToEnter   string
+		expectedError     bool
+		expectedErrorText string
+	}{
+		{
+			name:              "empty password",
+			createUser:        false,
+			username:          "username",
+			password:          "",
+			expectedError:     true,
+			expectedErrorText: "username and password must be provided",
+		},
+		{
+			name:            "correct credentials",
+			createUser:      true,
+			username:        "username",
+			password:        "password",
+			passwordToEnter: "password",
+			expectedError:   false,
+		},
+		{
+			name:              "wrong password",
+			createUser:        true,
+			username:          "username",
+			password:          "password",
+			passwordToEnter:   "wrong_password",
+			expectedError:     true,
+			expectedErrorText: "invalid username or password",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := testutil.ClearTable(ctx, "users")
+			require.NoError(t, err)
+
+			if tt.createUser {
+				createPayload := &genusers.CreateUserPayload{
+					Username: tt.username,
+					Password: tt.password,
+				}
+				_, err := service.CreateUser(ctx, createPayload)
+				require.NoError(t, err, "failed to create user for auth test")
+			}
+
+			payload := &genusers.AuthUserPayload{
+				Username: tt.username,
+				Password: tt.passwordToEnter,
+			}
+
+			result, err := service.AuthUser(ctx, payload)
+
+			if tt.expectedError {
+				assert.Error(t, err)
+				assert.Nil(t, result)
+				assert.Equal(t, tt.expectedErrorText, err.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, result)
+				assert.NotNil(t, result.Username)
+				assert.Equal(t, tt.username, *result.Username)
+
+				//check token once we properly implement it
+			}
+		})
+	}
+}

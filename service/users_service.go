@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	genusers "github.com/Vidalee/FishyKeys/gen/users"
@@ -35,12 +36,14 @@ func (s *UsersService) CreateUser(ctx context.Context, payload *genusers.CreateU
 		return nil, genusers.InternalError("could not check user existence")
 	}
 
-	encryptedPassword, err := crypto.Encrypt(s.keyManager, []byte(payload.Password))
+	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, genusers.InternalError("could not encrypt password: " + err.Error())
 	}
 
-	err = s.usersRepository.CreateUser(ctx, payload.Username, encryptedPassword)
+	encodedPassword := base64.StdEncoding.EncodeToString(encryptedPassword)
+
+	err = s.usersRepository.CreateUser(ctx, payload.Username, encodedPassword)
 	if err != nil {
 		return nil, genusers.InternalError("could not create user")
 	}
@@ -49,17 +52,26 @@ func (s *UsersService) CreateUser(ctx context.Context, payload *genusers.CreateU
 }
 
 func (s *UsersService) AuthUser(ctx context.Context, payload *genusers.AuthUserPayload) (*genusers.AuthUserResult, error) {
+	if payload.Username == "" || payload.Password == "" {
+		return nil, genusers.MakeInvalidParameters(fmt.Errorf("username and password must be provided"))
+	}
+
 	user, err := s.usersRepository.GetUserByUsername(ctx, payload.Username)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserNotFound) {
-			return nil, genusers.Unauthorized("invalid username or password")
+			return nil, genusers.MakeUnauthorized(fmt.Errorf("invalid username or password"))
 		}
-		return nil, genusers.InternalError("could not authenticate user")
+		return nil, genusers.InternalError("could not retrieve user")
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(payload.Password))
+	encryptedPassword, err := base64.StdEncoding.DecodeString(user.Password)
 	if err != nil {
-		return nil, genusers.Unauthorized("invalid username or password")
+		return nil, genusers.MakeUnauthorized(fmt.Errorf("invalid username or password"))
+	}
+
+	err = bcrypt.CompareHashAndPassword(encryptedPassword, []byte(payload.Password))
+	if err != nil {
+		return nil, genusers.MakeUnauthorized(fmt.Errorf("invalid username or password"))
 	}
 
 	token := "fake-auth-token"

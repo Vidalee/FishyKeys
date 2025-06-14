@@ -314,8 +314,9 @@ func EncodeAuthUserRequest(encoder func(*http.Request) goahttp.Encoder) func(*ht
 // auth user endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeAuthUserResponse may return the following errors:
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
 //   - "internal_error" (type users.InternalError): http.StatusInternalServerError
-//   - "unauthorized" (type users.Unauthorized): http.StatusUnauthorized
 //   - error: internal error
 func DecodeAuthUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -343,6 +344,34 @@ func DecodeAuthUserResponse(decoder func(*http.Response) goahttp.Decoder, restor
 			}
 			res := NewAuthUserResultOK(&body)
 			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body AuthUserUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("users", "auth user", err)
+			}
+			err = ValidateAuthUserUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "auth user", err)
+			}
+			return nil, NewAuthUserUnauthorized(&body)
+		case http.StatusBadRequest:
+			var (
+				body AuthUserInvalidParametersResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("users", "auth user", err)
+			}
+			err = ValidateAuthUserInvalidParametersResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "auth user", err)
+			}
+			return nil, NewAuthUserInvalidParameters(&body)
 		case http.StatusInternalServerError:
 			var (
 				body string
@@ -353,16 +382,6 @@ func DecodeAuthUserResponse(decoder func(*http.Response) goahttp.Decoder, restor
 				return nil, goahttp.ErrDecodingError("users", "auth user", err)
 			}
 			return nil, NewAuthUserInternalError(body)
-		case http.StatusUnauthorized:
-			var (
-				body string
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "auth user", err)
-			}
-			return nil, NewAuthUserUnauthorized(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("users", "auth user", resp.StatusCode, string(body))

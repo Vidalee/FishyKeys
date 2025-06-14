@@ -72,7 +72,8 @@ func (c *Client) DeleteUser(ctx context.Context, p *DeleteUserPayload) (err erro
 
 // AuthUser calls the "auth user" endpoint of the "users" service.
 // AuthUser may return the following errors:
-//   - "unauthorized" (type Unauthorized)
+//   - "unauthorized" (type *goa.ServiceError): Invalid username or password
+//   - "invalid_parameters" (type *goa.ServiceError): Invalid input
 //   - "internal_error" (type InternalError)
 //   - error: internal error
 func (c *Client) AuthUser(ctx context.Context, p *AuthUserPayload) (res *AuthUserResult, err error) {

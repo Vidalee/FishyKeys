@@ -91,9 +91,6 @@ type User struct {
 // Internal server error
 type InternalError string
 
-// Invalid username or password
-type Unauthorized string
-
 // User does not exist
 type UserNotFound string
 
@@ -112,23 +109,6 @@ func (e InternalError) ErrorName() string {
 // GoaErrorName returns "internal_error".
 func (e InternalError) GoaErrorName() string {
 	return "internal_error"
-}
-
-// Error returns an error description.
-func (e Unauthorized) Error() string {
-	return "Invalid username or password"
-}
-
-// ErrorName returns "unauthorized".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e Unauthorized) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "unauthorized".
-func (e Unauthorized) GoaErrorName() string {
-	return "unauthorized"
 }
 
 // Error returns an error description.
@@ -156,4 +136,9 @@ func MakeUsernameTaken(err error) *goa.ServiceError {
 // MakeInvalidParameters builds a goa.ServiceError from an error.
 func MakeInvalidParameters(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "invalid_parameters", false, false, false)
+}
+
+// MakeUnauthorized builds a goa.ServiceError from an error.
+func MakeUnauthorized(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "unauthorized", false, false, false)
 }
