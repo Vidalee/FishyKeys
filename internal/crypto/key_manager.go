@@ -31,11 +31,6 @@ type KeyManager struct {
 	maxShares int
 }
 
-var (
-	instance *KeyManager
-	once     sync.Once
-)
-
 // GetDefaultKeyManager returns a new instance of KeyManager with uninitialized state
 func GetDefaultKeyManager() *KeyManager {
 	return &KeyManager{

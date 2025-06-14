@@ -20,7 +20,7 @@ func NewServer(pool *pgxpool.Pool) http.Handler {
 	keyService := service.NewKeyManagementService(keyManager, keyRepo)
 
 	usersRepo := repository.NewUsersRepository(pool)
-	userService := service.NewUsersService(usersRepo)
+	userService := service.NewUsersService(keyManager, usersRepo)
 
 	keyManagementEndpoints := keymanagement.NewEndpoints(keyService)
 	usersEndpoints := users.NewEndpoints(userService)

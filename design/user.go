@@ -14,7 +14,7 @@ var UserType = Type("User", func() {
 var _ = Service("users", func() {
 	Description("User service manages user accounts and authentication")
 
-	Method("create", func() {
+	Method("create user", func() {
 		Description("Create a new user")
 		Payload(func() {
 			Attribute("username", String, "Username of the new user", func() {
@@ -29,7 +29,7 @@ var _ = Service("users", func() {
 			Attribute("username", String, "The username of the created user")
 		})
 		Error("username_taken", String, "Username already exists")
-		Error("invalid_input", String, "Invalid input")
+		Error("invalid_input", ErrorResult, "Invalid input")
 		Error("internal_error", String, "Internal server error")
 		HTTP(func() {
 			POST("/users")
@@ -40,7 +40,7 @@ var _ = Service("users", func() {
 		})
 	})
 
-	Method("list", func() {
+	Method("list users", func() {
 		Description("List all users")
 		Result(ArrayOf(UserType))
 		Error("internal_error", String, "Internal server error")
@@ -51,7 +51,7 @@ var _ = Service("users", func() {
 		})
 	})
 
-	Method("delete", func() {
+	Method("delete user", func() {
 		Description("Delete a user by username")
 		Payload(func() {
 			Attribute("username", String, "Username of the user to delete", func() {
@@ -60,6 +60,7 @@ var _ = Service("users", func() {
 			Required("username")
 		})
 		Error("user_not_found", String, "User does not exist")
+		Error("invalid_input", ErrorResult, "Invalid input")
 		Error("internal_error", String, "Internal server error")
 		HTTP(func() {
 			DELETE("/users/{username}")
@@ -69,7 +70,7 @@ var _ = Service("users", func() {
 		})
 	})
 
-	Method("auth", func() {
+	Method("auth user", func() {
 		Description("Authenticate a user with username and password")
 		Payload(func() {
 			Attribute("username", String, "Username", func() {
