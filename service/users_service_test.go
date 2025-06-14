@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
+	"golang.org/x/crypto/bcrypt"
 	"testing"
 
 	genusers "github.com/Vidalee/FishyKeys/gen/users"
@@ -90,13 +92,18 @@ func TestUsersService_CreateUser(t *testing.T) {
 				assert.Equal(t, tt.username, *result.Username)
 
 				user, err := service.usersRepository.GetUserByUsername(ctx, tt.username)
-				require.NoError(t, err)
+				assert.NoError(t, err)
 
 				assert.Equal(t, tt.username, user.Username)
 
-				decryptedPassword, err := crypto.Decrypt(service.keyManager, user.Password)
-				require.NoError(t, err)
-				assert.Equal(t, tt.password, string(decryptedPassword))
+				//use bcrypt
+				encryptedPassword, err := base64.StdEncoding.DecodeString(user.Password)
+				assert.NoError(t, err, "failed to decode encrypted password")
+
+				err = bcrypt.CompareHashAndPassword(encryptedPassword, []byte(tt.password))
+				assert.NoError(t, err, "password does not match")
+
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -176,5 +183,32 @@ func TestUsersService_AuthUser(t *testing.T) {
 				//check token once we properly implement it
 			}
 		})
+	}
+}
+
+func TestUsersService_ListUsers(t *testing.T) {
+	service := setupUsersTestService(t)
+	ctx := context.Background()
+	err := testutil.ClearTable(ctx, "users")
+
+	users, err := service.ListUsers(ctx)
+	assert.NoError(t, err)
+	assert.Empty(t, users, "expected no users after clearing table")
+
+	testUsers := []genusers.CreateUserPayload{
+		{Username: "user1", Password: "password1"},
+		{Username: "user2", Password: "password2"},
+	}
+
+	for _, user := range testUsers {
+		_, err := service.CreateUser(ctx, &user)
+		assert.NoError(t, err, "failed to create test user")
+	}
+
+	users, err = service.ListUsers(ctx)
+	assert.NoError(t, err, "failed to list users")
+	assert.Len(t, users, len(testUsers), "expected to find all test users")
+	for i, user := range users {
+		assert.Equal(t, testUsers[i].Username, user.Username, "usernames should match")
 	}
 }
