@@ -9,9 +9,22 @@ interface CreateMasterKeyProps {
 export default function CreateMasterKey({ onCreatingKey }: CreateMasterKeyProps) {
   const [totalShares, setTotalShares] = useState(5)
   const [minShares, setMinShares] = useState(3)
+  const [adminUsername, setAdminUsername] = useState('')
+  const [adminPassword, setAdminPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [shares, setShares] = useState<string[] | null>(null)
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
+
+  const handleCopyShare = async (share: string, index: number) => {
+    try {
+      await navigator.clipboard.writeText(share)
+      setCopiedIndex(index)
+      setTimeout(() => setCopiedIndex(null), 2000) // Reset after 2 seconds
+    } catch (err) {
+      console.error('Failed to copy share:', err)
+    }
+  }
 
   const handleCreateKey = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -19,10 +32,21 @@ export default function CreateMasterKey({ onCreatingKey }: CreateMasterKeyProps)
     setError(null)
     onCreatingKey(true)
     try {
-      const generatedShares = await createMasterKey(totalShares, minShares)
+      const generatedShares = await createMasterKey(totalShares, minShares, adminUsername, adminPassword)
       setShares(generatedShares)
     } catch (err: any) {
-      setError(err?.body || 'Failed to create master key')
+      let errorMessage = 'Failed to create master key'
+      if (err?.body) {
+        console.log(err.body)
+        if (err.body.name === 'invalid_parameters') {
+          errorMessage = err.body.message
+        } else if (err.body === 'key_already_exists') {
+          errorMessage = 'A master key already exists'
+        } else if (err.body === 'internal_error') {
+          errorMessage = 'Internal server error occurred'
+        }
+      }
+      setError(errorMessage)
       onCreatingKey(false)
     } finally {
       setLoading(false)
@@ -47,6 +71,13 @@ export default function CreateMasterKey({ onCreatingKey }: CreateMasterKeyProps)
               <div key={index} className={styles.shareItem}>
                 <span className={styles.shareIndex}>Share {index + 1}:</span>
                 <code className={styles.shareCode}>{share}</code>
+                <button
+                  onClick={() => handleCopyShare(share, index)}
+                  className={styles.copyButton}
+                  title="Copy to clipboard"
+                >
+                  {copiedIndex === index ? '✓' : '📋'}
+                </button>
               </div>
             ))}
           </div>
@@ -62,6 +93,34 @@ export default function CreateMasterKey({ onCreatingKey }: CreateMasterKeyProps)
     <div className={styles.container}>
       <form className={styles.card} onSubmit={handleCreateKey}>
         <div className={styles.title}>Create Master Key</div>
+        <div className={styles.inputGroup}>
+          <label htmlFor="admin-username" className={styles.label}>
+            Admin Username
+          </label>
+          <input
+            id="admin-username"
+            name="admin-username"
+            type="text"
+            required
+            className={styles.input}
+            value={adminUsername}
+            onChange={(e) => setAdminUsername(e.target.value)}
+          />
+        </div>
+        <div className={styles.inputGroup}>
+          <label htmlFor="admin-password" className={styles.label}>
+            Admin Password
+          </label>
+          <input
+            id="admin-password"
+            name="admin-password"
+            type="password"
+            required
+            className={styles.input}
+            value={adminPassword}
+            onChange={(e) => setAdminPassword(e.target.value)}
+          />
+        </div>
         <div className={styles.inputGroup}>
           <label htmlFor="total-shares" className={styles.label}>
             Total Number of Shares
@@ -99,7 +158,11 @@ export default function CreateMasterKey({ onCreatingKey }: CreateMasterKeyProps)
             <span>{error}</span>
           </div>
         )}
-        <button type="submit" className={styles.button} disabled={loading || minShares > totalShares}>
+        <button 
+          type="submit" 
+          className={styles.button} 
+          disabled={loading || minShares > totalShares || !adminUsername || !adminPassword}
+        >
           {loading ? 'Creating...' : 'Create Master Key'}
         </button>
       </form>

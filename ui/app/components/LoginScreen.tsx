@@ -1,6 +1,7 @@
 'use client'
 
 import {useState} from 'react'
+import {login} from '../api/users'
 import styles from './LoginScreen.module.css'
 
 export default function LoginScreen() {
@@ -14,22 +15,26 @@ export default function LoginScreen() {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      })
-      if (!response.ok) {
-        let msg = 'Login failed'
-        try {
-          const data = await response.text()
-          if (data) msg = data
-        } catch {}
-        throw new Error(msg)
-      }
-      // You can handle successful login here (e.g., redirect)
+      const data = await login(username, password)
+      // Store the auth token
+      localStorage.setItem('authToken', data.token)
+      // You can store the username too if needed
+      localStorage.setItem('username', data.username)
+      
+      // Redirect or update app state as needed
+      window.location.href = '/dashboard' // Or use your router
     } catch (err: any) {
-      setError(err?.message || 'Login failed')
+      let errorMessage = 'Login failed'
+      if (err?.body) {
+        if (err.body.name === 'unauthorized') {
+          errorMessage = 'Invalid username or password'
+        } else if (err.body.name === 'invalid_parameters') {
+          errorMessage = err.body.message
+        } else if (err.body.name === 'internal_error') {
+          errorMessage = 'Internal server error occurred'
+        }
+      }
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }

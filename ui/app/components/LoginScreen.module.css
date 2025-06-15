@@ -93,25 +93,48 @@
 }
 
 .shareItem {
-  margin: 10px 0;
-  padding: 10px;
-  background: white;
-  border-radius: 4px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px;
+  background: #f5f5f5;
+  border-radius: 4px;
 }
 
 .shareIndex {
-  font-weight: bold;
+  font-weight: 500;
   min-width: 80px;
 }
 
 .shareCode {
+  flex: 1;
   font-family: monospace;
-  background: #f0f0f0;
-  padding: 5px 10px;
+  padding: 4px 8px;
+  background: #fff;
   border-radius: 4px;
-  flex-grow: 1;
-  word-break: break-all;
+  border: 1px solid #ddd;
+}
+
+.copyButton {
+  padding: 4px 8px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copyButton:hover {
+  background: #f0f0f0;
+  border-color: #ccc;
+}
+
+.copyButton:active {
+  background: #e0e0e0;
 } 

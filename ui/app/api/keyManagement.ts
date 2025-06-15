@@ -1,10 +1,11 @@
 import {KeyStatus, ShareResponse} from '../types'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE
-  ? `${process.env.NEXT_PUBLIC_API_BASE}/key_management`
-  : '/key_management'
+const API_BASE = "/key_management"
+
 
 export async function getKeyStatus(): Promise<KeyStatus> {
+  console.log(API_BASE, process.env.NEXT_PUBLIC_API_BASE)
+
   const response = await fetch(`${API_BASE}/status`);
   if (!response.ok) {
     let errorBody: any = null;
@@ -19,13 +20,23 @@ export async function getKeyStatus(): Promise<KeyStatus> {
   return response.json();
 }
 
-export async function createMasterKey(totalShares: number, minShares: number): Promise<string[]> {
+export async function createMasterKey(
+  totalShares: number, 
+  minShares: number, 
+  adminUsername: string, 
+  adminPassword: string
+): Promise<string[]> {
   const response = await fetch(`${API_BASE}/create_master_key`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ total_shares: totalShares, min_shares: minShares }),
+    body: JSON.stringify({ 
+      total_shares: totalShares, 
+      min_shares: minShares,
+      admin_username: adminUsername,
+      admin_password: adminPassword
+    }),
   });
   if (!response.ok) {
     let errorBody: any = null;

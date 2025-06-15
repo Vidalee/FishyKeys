@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
         source: '/key_management/:path*',
         destination: `${process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'}/key_management/:path*`,
       },
+      {
+        source: '/users/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'}/users/:path*`,
+      },
     ]
   },
 };
