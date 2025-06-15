@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	genusers "github.com/Vidalee/FishyKeys/gen/users"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"strconv"
 
@@ -114,7 +115,7 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		return nil, genkey.InternalError("error setting new master key: " + err.Error())
 	}
 
-	encryptedPassword, err := crypto.Encrypt(s.keyManager, []byte(payload.AdminPassword))
+	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.AdminPassword), bcrypt.DefaultCost)
 	if err != nil {
 		s.keyManager.RollbackToUninitialized()
 
@@ -128,7 +129,7 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		return nil, genusers.InternalError("could not encrypt password: " + err.Error())
 	}
 
-	err = s.usersRepository.CreateUser(ctx, payload.AdminUsername, encryptedPassword)
+	err = s.usersRepository.CreateUser(ctx, payload.AdminUsername, string(encryptedPassword))
 	if err != nil {
 		s.keyManager.RollbackToUninitialized()
 

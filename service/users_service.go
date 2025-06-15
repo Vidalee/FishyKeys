@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	genusers "github.com/Vidalee/FishyKeys/gen/users"
@@ -41,9 +40,7 @@ func (s *UsersService) CreateUser(ctx context.Context, payload *genusers.CreateU
 		return nil, genusers.InternalError("could not encrypt password: " + err.Error())
 	}
 
-	encodedPassword := base64.StdEncoding.EncodeToString(encryptedPassword)
-
-	err = s.usersRepository.CreateUser(ctx, payload.Username, encodedPassword)
+	err = s.usersRepository.CreateUser(ctx, payload.Username, string(encryptedPassword))
 	if err != nil {
 		return nil, genusers.InternalError("could not create user")
 	}
@@ -64,12 +61,7 @@ func (s *UsersService) AuthUser(ctx context.Context, payload *genusers.AuthUserP
 		return nil, genusers.InternalError("could not retrieve user")
 	}
 
-	encryptedPassword, err := base64.StdEncoding.DecodeString(user.Password)
-	if err != nil {
-		return nil, genusers.MakeUnauthorized(fmt.Errorf("invalid username or password"))
-	}
-
-	err = bcrypt.CompareHashAndPassword(encryptedPassword, []byte(payload.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(payload.Password))
 	if err != nil {
 		return nil, genusers.MakeUnauthorized(fmt.Errorf("invalid username or password"))
 	}
