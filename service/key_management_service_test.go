@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"golang.org/x/crypto/bcrypt"
 	"strconv"
 	"testing"
 
@@ -136,9 +137,8 @@ func TestKeyManagementService_CreateMasterKey(t *testing.T) {
 
 				assert.Equal(t, tt.adminUsername, user.Username)
 
-				decryptedPassword, err := crypto.Decrypt(service.keyManager, user.Password)
-				require.NoError(t, err)
-				assert.Equal(t, tt.adminPassword, string(decryptedPassword))
+				err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(tt.adminPassword))
+				assert.NoError(t, err)
 			}
 		})
 	}

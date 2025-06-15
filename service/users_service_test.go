@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/base64"
 	"golang.org/x/crypto/bcrypt"
 	"testing"
 
@@ -96,11 +95,7 @@ func TestUsersService_CreateUser(t *testing.T) {
 
 				assert.Equal(t, tt.username, user.Username)
 
-				//use bcrypt
-				encryptedPassword, err := base64.StdEncoding.DecodeString(user.Password)
-				assert.NoError(t, err, "failed to decode encrypted password")
-
-				err = bcrypt.CompareHashAndPassword(encryptedPassword, []byte(tt.password))
+				err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(tt.password))
 				assert.NoError(t, err, "password does not match")
 
 				assert.NoError(t, err)
