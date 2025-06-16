@@ -91,15 +91,15 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 
 	masterKey, err := crypto.GenerateSecret()
 	if err != nil {
-		return nil, genkey.InternalError("error generating master key: " + err.Error())
+		return nil, genkey.MakeInternalError(fmt.Errorf("error generating master key: %v", err))
 	}
 	checksum, err := crypto.EncryptWithKey(masterKey, []byte(checksumExpectedValue))
 	if err != nil {
-		return nil, genkey.InternalError("error encrypting master key checksum: " + err.Error())
+		return nil, genkey.MakeInternalError(fmt.Errorf("error encrypting master key checksum: %v", err))
 	}
 	shares, err := crypto.SplitSecret(masterKey, payload.TotalShares, payload.MinShares)
 	if err != nil {
-		return nil, genkey.InternalError("error splitting secret into shares: " + err.Error())
+		return nil, genkey.MakeInternalError(fmt.Errorf("error splitting secret into shares: %v", err))
 	}
 
 	encodedShares := make([]string, len(shares))
@@ -113,12 +113,12 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		columnMasterKeyChecksum: checksum,
 	})
 	if err != nil {
-		return nil, genkey.MakeInternalError(fmt.Errorf("error storing key settings: " + err.Error()))
+		return nil, genkey.MakeInternalError(fmt.Errorf("error storing key settings: %v", err))
 	}
 
 	err = s.keyManager.SetNewMasterKey(masterKey, payload.MinShares, payload.TotalShares)
 	if err != nil {
-		return nil, genkey.MakeInternalError(fmt.Errorf("error setting new master key: " + err.Error()))
+		return nil, genkey.MakeInternalError(fmt.Errorf("error setting new master key: %v", err))
 	}
 
 	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.AdminPassword), bcrypt.DefaultCost)
@@ -128,11 +128,10 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalShares, columnMinShares, columnMasterKeyChecksum)
 		if delErr != nil {
 			return nil, genkey.MakeInternalError(fmt.Errorf(
-				"admin user password encryption failed: " + err.Error() +
-					"; rollback cleanup also failed: " + delErr.Error()))
+				"admin user password encryption failed: %v; rollback cleanup also failed: %v", err, delErr))
 		}
 
-		return nil, genusers.InternalError("could not encrypt password: " + err.Error())
+		return nil, genkey.MakeInternalError(fmt.Errorf("could not encrypt password: %v", err))
 	}
 
 	userId, err := s.usersRepository.CreateUser(ctx, payload.AdminUsername, string(encryptedPassword))
@@ -142,11 +141,10 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalShares, columnMinShares, columnMasterKeyChecksum)
 		if delErr != nil {
 			return nil, genkey.MakeInternalError(fmt.Errorf(
-				"could not create admin user: " + err.Error() +
-					"; rollback cleanup also failed: " + delErr.Error()))
+				"could not create admin user: %v; rollback cleanup also failed: %v", err, delErr))
 		}
 
-		return nil, genkey.MakeInternalError(fmt.Errorf("could not create admin user"))
+		return nil, genkey.MakeInternalError(fmt.Errorf("could not create admin user: %v", err))
 	}
 
 	role, err := s.rolesRepository.GetRoleByName(ctx, "admin")
@@ -156,12 +154,16 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalShares, columnMinShares, columnMasterKeyChecksum)
 		if delErr != nil {
 			return nil, genkey.MakeInternalError(fmt.Errorf(
-				"could not retrieve admin role: " + err.Error() +
-					"; rollback cleanup also failed: " + delErr.Error()))
+				"could not retrieve admin role: %v; rollback cleanup also failed: %v", err, delErr))
 		}
+
+		return nil, genkey.MakeInternalError(fmt.Errorf("could not retrieve admin role: %v", err))
 	}
 
 	err = s.userRolesRepository.AssignRoleToUser(ctx, userId, role.ID)
+	if err != nil {
+		return nil, genkey.MakeInternalError(fmt.Errorf("could not assign role to admin user: %v", err))
+	}
 
 	return &genkey.CreateMasterKeyResult{
 		Shares:        encodedShares,
