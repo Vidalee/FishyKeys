@@ -1,1 +1,1070 @@
-{"swagger":"2.0","info":{"title":"FishyKeys API","description":"The FishyKeys API for key management","version":"1.0"},"host":"localhost:8080","consumes":["application/json","application/xml","application/gob"],"produces":["application/json","application/xml","application/gob"],"paths":{"/key_management/create_master_key":{"post":{"tags":["key_management"],"summary":"create_master_key key_management","description":"Create a new master key and split it into shares","operationId":"key_management#create_master_key","parameters":[{"name":"create_master_key_request_body","in":"body","required":true,"schema":{"$ref":"#/definitions/KeyManagementCreateMasterKeyRequestBody","required":["total_shares","min_shares","admin_username","admin_password"]}}],"responses":{"201":{"description":"Created response.","schema":{"$ref":"#/definitions/KeyManagementCreateMasterKeyResponseBody"}},"400":{"description":"Bad Request response.","schema":{"$ref":"#/definitions/KeyManagementCreateMasterKeyInvalidParametersResponseBody"}},"409":{"description":"Conflict response.","schema":{"type":"string"}},"500":{"description":"Internal Server Error response.","schema":{"type":"string"}}},"schemes":["http"]}},"/key_management/share":{"post":{"tags":["key_management"],"summary":"add_share key_management","description":"Add a share to unlock the master key","operationId":"key_management#add_share","parameters":[{"name":"add_share_request_body","in":"body","required":true,"schema":{"$ref":"#/definitions/KeyManagementAddShareRequestBody","required":["share"]}}],"responses":{"201":{"description":"Created response.","schema":{"$ref":"#/definitions/KeyManagementAddShareResponseBody","required":["index","unlocked"]}},"400":{"description":"Bad Request response.","schema":{"type":"string"}},"404":{"description":"Not Found response.","schema":{"type":"string"}},"409":{"description":"Conflict response.","schema":{"type":"string"}},"500":{"description":"Internal Server Error response.","schema":{"type":"string"}}},"schemes":["http"]},"delete":{"tags":["key_management"],"summary":"delete_share key_management","description":"Delete a share from the key management system","operationId":"key_management#delete_share","parameters":[{"name":"delete_share_request_body","in":"body","required":true,"schema":{"$ref":"#/definitions/KeyManagementDeleteShareRequestBody","required":["index"]}}],"responses":{"200":{"description":"OK response."},"400":{"description":"Bad Request response.","schema":{"type":"string"}},"404":{"description":"Not Found response.","schema":{"type":"string"}},"409":{"description":"Conflict response.","schema":{"type":"string"}},"500":{"description":"Internal Server Error response.","schema":{"type":"string"}}},"schemes":["http"]}},"/key_management/status":{"get":{"tags":["key_management"],"summary":"get_key_status key_management","description":"Get the current status of the master key","operationId":"key_management#get_key_status","responses":{"200":{"description":"OK response.","schema":{"$ref":"#/definitions/KeyManagementGetKeyStatusResponseBody","required":["is_locked","current_shares","min_shares","total_shares"]}},"404":{"description":"Not Found response.","schema":{"type":"string"}},"500":{"description":"Internal Server Error response.","schema":{"type":"string"}}},"schemes":["http"]}},"/users":{"get":{"tags":["users"],"summary":"list users users","description":"List all users","operationId":"users#list users","responses":{"200":{"description":"OK response.","schema":{"type":"array","items":{"$ref":"#/definitions/User"}}},"500":{"description":"Internal Server Error response.","schema":{"type":"string"}}},"schemes":["http"]},"post":{"tags":["users"],"summary":"create user users","description":"Create a new user","operationId":"users#create user","parameters":[{"name":"Create UserRequestBody","in":"body","required":true,"schema":{"$ref":"#/definitions/UsersCreateUserRequestBody","required":["username","password"]}}],"responses":{"201":{"description":"Created response.","schema":{"$ref":"#/definitions/UsersCreateUserResponseBody"}},"400":{"description":"Bad Request response.","schema":{"$ref":"#/definitions/UsersCreateUserInvalidParametersResponseBody"}},"409":{"description":"Conflict response.","schema":{"$ref":"#/definitions/UsersCreateUserUsernameTakenResponseBody"}},"500":{"description":"Internal Server Error response.","schema":{"type":"string"}}},"schemes":["http"]}},"/users/auth":{"post":{"tags":["users"],"summary":"auth user users","description":"Authenticate a user with username and password","operationId":"users#auth user","parameters":[{"name":"Auth UserRequestBody","in":"body","required":true,"schema":{"$ref":"#/definitions/UsersAuthUserRequestBody","required":["username","password"]}}],"responses":{"200":{"description":"OK response.","schema":{"$ref":"#/definitions/UsersAuthUserResponseBody"}},"400":{"description":"Bad Request response.","schema":{"$ref":"#/definitions/UsersAuthUserInvalidParametersResponseBody"}},"401":{"description":"Unauthorized response.","schema":{"$ref":"#/definitions/UsersAuthUserUnauthorizedResponseBody"}},"500":{"description":"Internal Server Error response.","schema":{"type":"string"}}},"schemes":["http"]}},"/users/{username}":{"delete":{"tags":["users"],"summary":"delete user users","description":"Delete a user by username","operationId":"users#delete user","parameters":[{"name":"username","in":"path","description":"Username of the user to delete","required":true,"type":"string"}],"responses":{"200":{"description":"OK response."},"404":{"description":"Not Found response.","schema":{"$ref":"#/definitions/UsersDeleteUserUserNotFoundResponseBody"}},"500":{"description":"Internal Server Error response.","schema":{"type":"string"}}},"schemes":["http"]}}},"definitions":{"KeyManagementAddShareRequestBody":{"title":"KeyManagementAddShareRequestBody","type":"object","properties":{"share":{"type":"string","description":"One of the shares need to unlock the master key","example":"EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0"}},"example":{"share":"EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0"},"required":["share"]},"KeyManagementAddShareResponseBody":{"title":"KeyManagementAddShareResponseBody","type":"object","properties":{"index":{"type":"integer","description":"The index of the share added","example":4864005717453730110,"format":"int64"},"unlocked":{"type":"boolean","description":"Whether the master key has been unlocked","example":false}},"example":{"index":7645663036194808677,"unlocked":false},"required":["index","unlocked"]},"KeyManagementCreateMasterKeyInvalidParametersResponseBody":{"title":"Mediatype identifier: application/vnd.goa.error; view=default","type":"object","properties":{"fault":{"type":"boolean","description":"Is the error a server-side fault?","example":true},"id":{"type":"string","description":"ID is a unique identifier for this particular occurrence of the problem.","example":"123abc"},"message":{"type":"string","description":"Message is a human-readable explanation specific to this occurrence of the problem.","example":"parameter 'p' must be an integer"},"name":{"type":"string","description":"Name is the name of this class of errors.","example":"bad_request"},"temporary":{"type":"boolean","description":"Is the error temporary?","example":false},"timeout":{"type":"boolean","description":"Is the error a timeout?","example":false}},"description":"Invalid parameters provided (default view)","example":{"fault":false,"id":"123abc","message":"parameter 'p' must be an integer","name":"bad_request","temporary":true,"timeout":true},"required":["name","id","message","temporary","timeout","fault"]},"KeyManagementCreateMasterKeyRequestBody":{"title":"KeyManagementCreateMasterKeyRequestBody","type":"object","properties":{"admin_password":{"type":"string","description":"Admin password for key management","example":"admin_password123!"},"admin_username":{"type":"string","description":"Admin username for key management","example":"admin"},"min_shares":{"type":"integer","description":"Minimum number of shares required to reconstruct the key","example":3,"format":"int64"},"total_shares":{"type":"integer","description":"Total number of shares to create","example":5,"format":"int64"}},"example":{"admin_password":"admin_password123!","admin_username":"admin","min_shares":3,"total_shares":5},"required":["total_shares","min_shares","admin_username","admin_password"]},"KeyManagementCreateMasterKeyResponseBody":{"title":"KeyManagementCreateMasterKeyResponseBody","type":"object","properties":{"admin_username":{"type":"string","description":"The admin user's username","example":"admin"},"shares":{"type":"array","items":{"type":"string","example":"Sed possimus occaecati nesciunt eos commodi."},"description":"The generated key shares","example":["Aut eum et eaque ipsam.","Rem mollitia et est ratione.","Voluptates sunt quia autem laboriosam sunt."]}},"example":{"admin_username":"admin","shares":["Optio molestiae nesciunt architecto.","Facere quos doloribus repellendus.","Qui quia corrupti.","Non optio reiciendis dolore animi deleniti aut."]}},"KeyManagementDeleteShareRequestBody":{"title":"KeyManagementDeleteShareRequestBody","type":"object","properties":{"index":{"type":"integer","description":"The index of the share to delete","example":1,"format":"int64"}},"example":{"index":1},"required":["index"]},"KeyManagementGetKeyStatusResponseBody":{"title":"KeyManagementGetKeyStatusResponseBody","type":"object","properties":{"current_shares":{"type":"integer","description":"Number of shares currently held","example":5372148105612043479,"format":"int64"},"is_locked":{"type":"boolean","description":"Whether the key is currently locked","example":true},"min_shares":{"type":"integer","description":"Minimum number of shares required","example":6301691789677483758,"format":"int64"},"total_shares":{"type":"integer","description":"Total number of shares","example":3058226914185531902,"format":"int64"}},"example":{"current_shares":2687299236987956368,"is_locked":true,"min_shares":4063444925102994977,"total_shares":6650704053550084319},"required":["is_locked","current_shares","min_shares","total_shares"]},"User":{"title":"User","type":"object","properties":{"created_at":{"type":"string","description":"User creation timestamp","example":"Qui nulla hic molestias esse in."},"updated_at":{"type":"string","description":"User last update timestamp","example":"Sint asperiores repudiandae deleniti sit rerum eveniet."},"username":{"type":"string","description":"The username","example":"Minima consequatur et tenetur qui et."}},"example":{"created_at":"Cum ipsum tenetur blanditiis est pariatur.","updated_at":"Laborum ratione minima.","username":"Tenetur maxime quasi veniam autem temporibus."},"required":["username","created_at","updated_at"]},"UsersAuthUserInvalidParametersResponseBody":{"title":"Mediatype identifier: application/vnd.goa.error; view=default","type":"object","properties":{"fault":{"type":"boolean","description":"Is the error a server-side fault?","example":false},"id":{"type":"string","description":"ID is a unique identifier for this particular occurrence of the problem.","example":"123abc"},"message":{"type":"string","description":"Message is a human-readable explanation specific to this occurrence of the problem.","example":"parameter 'p' must be an integer"},"name":{"type":"string","description":"Name is the name of this class of errors.","example":"bad_request"},"temporary":{"type":"boolean","description":"Is the error temporary?","example":true},"timeout":{"type":"boolean","description":"Is the error a timeout?","example":false}},"description":"Invalid input (default view)","example":{"fault":false,"id":"123abc","message":"parameter 'p' must be an integer","name":"bad_request","temporary":false,"timeout":true},"required":["name","id","message","temporary","timeout","fault"]},"UsersAuthUserRequestBody":{"title":"UsersAuthUserRequestBody","type":"object","properties":{"password":{"type":"string","description":"Password","example":"s3cr3t"},"username":{"type":"string","description":"Username","example":"alice"}},"example":{"password":"s3cr3t","username":"alice"},"required":["username","password"]},"UsersAuthUserResponseBody":{"title":"UsersAuthUserResponseBody","type":"object","properties":{"token":{"type":"string","description":"JWT or session token","example":"Nisi voluptatem consequatur."},"username":{"type":"string","description":"The username of the authenticated user","example":"Ipsa debitis voluptatum non ducimus."}},"example":{"token":"Consequatur autem ut necessitatibus dolor.","username":"Asperiores natus aliquam laborum illo impedit debitis."}},"UsersAuthUserUnauthorizedResponseBody":{"title":"Mediatype identifier: application/vnd.goa.error; view=default","type":"object","properties":{"fault":{"type":"boolean","description":"Is the error a server-side fault?","example":false},"id":{"type":"string","description":"ID is a unique identifier for this particular occurrence of the problem.","example":"123abc"},"message":{"type":"string","description":"Message is a human-readable explanation specific to this occurrence of the problem.","example":"parameter 'p' must be an integer"},"name":{"type":"string","description":"Name is the name of this class of errors.","example":"bad_request"},"temporary":{"type":"boolean","description":"Is the error temporary?","example":false},"timeout":{"type":"boolean","description":"Is the error a timeout?","example":true}},"description":"Invalid username or password (default view)","example":{"fault":true,"id":"123abc","message":"parameter 'p' must be an integer","name":"bad_request","temporary":false,"timeout":false},"required":["name","id","message","temporary","timeout","fault"]},"UsersCreateUserInvalidParametersResponseBody":{"title":"Mediatype identifier: application/vnd.goa.error; view=default","type":"object","properties":{"fault":{"type":"boolean","description":"Is the error a server-side fault?","example":true},"id":{"type":"string","description":"ID is a unique identifier for this particular occurrence of the problem.","example":"123abc"},"message":{"type":"string","description":"Message is a human-readable explanation specific to this occurrence of the problem.","example":"parameter 'p' must be an integer"},"name":{"type":"string","description":"Name is the name of this class of errors.","example":"bad_request"},"temporary":{"type":"boolean","description":"Is the error temporary?","example":true},"timeout":{"type":"boolean","description":"Is the error a timeout?","example":false}},"description":"Invalid input (default view)","example":{"fault":true,"id":"123abc","message":"parameter 'p' must be an integer","name":"bad_request","temporary":true,"timeout":false},"required":["name","id","message","temporary","timeout","fault"]},"UsersCreateUserRequestBody":{"title":"UsersCreateUserRequestBody","type":"object","properties":{"password":{"type":"string","description":"Password (hashed or plain depending on implementation)","example":"s3cr3t"},"username":{"type":"string","description":"Username of the new user","example":"alice"}},"example":{"password":"s3cr3t","username":"alice"},"required":["username","password"]},"UsersCreateUserResponseBody":{"title":"UsersCreateUserResponseBody","type":"object","properties":{"username":{"type":"string","description":"The username of the created user","example":"Dignissimos error."}},"example":{"username":"Et maxime impedit necessitatibus."}},"UsersCreateUserUsernameTakenResponseBody":{"title":"Mediatype identifier: application/vnd.goa.error; view=default","type":"object","properties":{"fault":{"type":"boolean","description":"Is the error a server-side fault?","example":false},"id":{"type":"string","description":"ID is a unique identifier for this particular occurrence of the problem.","example":"123abc"},"message":{"type":"string","description":"Message is a human-readable explanation specific to this occurrence of the problem.","example":"parameter 'p' must be an integer"},"name":{"type":"string","description":"Name is the name of this class of errors.","example":"bad_request"},"temporary":{"type":"boolean","description":"Is the error temporary?","example":true},"timeout":{"type":"boolean","description":"Is the error a timeout?","example":true}},"description":"Username already exists (default view)","example":{"fault":false,"id":"123abc","message":"parameter 'p' must be an integer","name":"bad_request","temporary":false,"timeout":true},"required":["name","id","message","temporary","timeout","fault"]},"UsersDeleteUserUserNotFoundResponseBody":{"title":"Mediatype identifier: application/vnd.goa.error; view=default","type":"object","properties":{"fault":{"type":"boolean","description":"Is the error a server-side fault?","example":true},"id":{"type":"string","description":"ID is a unique identifier for this particular occurrence of the problem.","example":"123abc"},"message":{"type":"string","description":"Message is a human-readable explanation specific to this occurrence of the problem.","example":"parameter 'p' must be an integer"},"name":{"type":"string","description":"Name is the name of this class of errors.","example":"bad_request"},"temporary":{"type":"boolean","description":"Is the error temporary?","example":true},"timeout":{"type":"boolean","description":"Is the error a timeout?","example":false}},"description":"User not found (default view)","example":{"fault":true,"id":"123abc","message":"parameter 'p' must be an integer","name":"bad_request","temporary":false,"timeout":false},"required":["name","id","message","temporary","timeout","fault"]}}}
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "FishyKeys API",
+    "description": "The FishyKeys API for key management",
+    "version": "1.0"
+  },
+  "host": "localhost:8080",
+  "consumes": [
+    "application/json",
+    "application/xml",
+    "application/gob"
+  ],
+  "produces": [
+    "application/json",
+    "application/xml",
+    "application/gob"
+  ],
+  "paths": {
+    "/key_management/create_master_key": {
+      "post": {
+        "tags": [
+          "key_management"
+        ],
+        "summary": "create_master_key key_management",
+        "description": "Create a new master key and split it into shares",
+        "operationId": "key_management#create_master_key",
+        "parameters": [
+          {
+            "name": "create_master_key_request_body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/KeyManagementCreateMasterKeyRequestBody",
+              "required": [
+                "total_shares",
+                "min_shares",
+                "admin_username",
+                "admin_password"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created response.",
+            "schema": {
+              "$ref": "#/definitions/KeyManagementCreateMasterKeyResponseBody"
+            }
+          },
+          "400": {
+            "description": "Bad Request response.",
+            "schema": {
+              "$ref": "#/definitions/KeyManagementCreateMasterKeyInvalidParametersResponseBody"
+            }
+          },
+          "409": {
+            "description": "Conflict response.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error response.",
+            "schema": {
+              "$ref": "#/definitions/KeyManagementCreateMasterKeyInternalErrorResponseBody"
+            }
+          }
+        },
+        "schemes": [
+          "http"
+        ]
+      }
+    },
+    "/key_management/share": {
+      "post": {
+        "tags": [
+          "key_management"
+        ],
+        "summary": "add_share key_management",
+        "description": "Add a share to unlock the master key",
+        "operationId": "key_management#add_share",
+        "parameters": [
+          {
+            "name": "add_share_request_body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/KeyManagementAddShareRequestBody",
+              "required": [
+                "share"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created response.",
+            "schema": {
+              "$ref": "#/definitions/KeyManagementAddShareResponseBody",
+              "required": [
+                "index",
+                "unlocked"
+              ]
+            }
+          },
+          "400": {
+            "description": "Bad Request response.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "Not Found response.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "409": {
+            "description": "Conflict response.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error response.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "schemes": [
+          "http"
+        ]
+      },
+      "delete": {
+        "tags": [
+          "key_management"
+        ],
+        "summary": "delete_share key_management",
+        "description": "Delete a share from the key management system",
+        "operationId": "key_management#delete_share",
+        "parameters": [
+          {
+            "name": "delete_share_request_body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/KeyManagementDeleteShareRequestBody",
+              "required": [
+                "index"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response."
+          },
+          "400": {
+            "description": "Bad Request response.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "Not Found response.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "409": {
+            "description": "Conflict response.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error response.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "schemes": [
+          "http"
+        ]
+      }
+    },
+    "/key_management/status": {
+      "get": {
+        "tags": [
+          "key_management"
+        ],
+        "summary": "get_key_status key_management",
+        "description": "Get the current status of the master key",
+        "operationId": "key_management#get_key_status",
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "schema": {
+              "$ref": "#/definitions/KeyManagementGetKeyStatusResponseBody",
+              "required": [
+                "is_locked",
+                "current_shares",
+                "min_shares",
+                "total_shares"
+              ]
+            }
+          },
+          "404": {
+            "description": "Not Found response.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error response.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "schemes": [
+          "http"
+        ]
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "list users users",
+        "description": "List all users",
+        "operationId": "users#list users",
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error response.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "schemes": [
+          "http"
+        ]
+      },
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "create user users",
+        "description": "Create a new user",
+        "operationId": "users#create user",
+        "parameters": [
+          {
+            "name": "Create UserRequestBody",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UsersCreateUserRequestBody",
+              "required": [
+                "username",
+                "password"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created response.",
+            "schema": {
+              "$ref": "#/definitions/UsersCreateUserResponseBody"
+            }
+          },
+          "400": {
+            "description": "Bad Request response.",
+            "schema": {
+              "$ref": "#/definitions/UsersCreateUserInvalidParametersResponseBody"
+            }
+          },
+          "409": {
+            "description": "Conflict response.",
+            "schema": {
+              "$ref": "#/definitions/UsersCreateUserUsernameTakenResponseBody"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error response.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "schemes": [
+          "http"
+        ]
+      }
+    },
+    "/users/auth": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "auth user users",
+        "description": "Authenticate a user with username and password",
+        "operationId": "users#auth user",
+        "parameters": [
+          {
+            "name": "Auth UserRequestBody",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UsersAuthUserRequestBody",
+              "required": [
+                "username",
+                "password"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "schema": {
+              "$ref": "#/definitions/UsersAuthUserResponseBody"
+            }
+          },
+          "400": {
+            "description": "Bad Request response.",
+            "schema": {
+              "$ref": "#/definitions/UsersAuthUserInvalidParametersResponseBody"
+            }
+          },
+          "401": {
+            "description": "Unauthorized response.",
+            "schema": {
+              "$ref": "#/definitions/UsersAuthUserUnauthorizedResponseBody"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error response.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "schemes": [
+          "http"
+        ]
+      }
+    },
+    "/users/{username}": {
+      "delete": {
+        "tags": [
+          "users"
+        ],
+        "summary": "delete user users",
+        "description": "Delete a user by username",
+        "operationId": "users#delete user",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Username of the user to delete",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response."
+          },
+          "404": {
+            "description": "Not Found response.",
+            "schema": {
+              "$ref": "#/definitions/UsersDeleteUserUserNotFoundResponseBody"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error response.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "schemes": [
+          "http"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "KeyManagementAddShareRequestBody": {
+      "title": "KeyManagementAddShareRequestBody",
+      "type": "object",
+      "properties": {
+        "share": {
+          "type": "string",
+          "description": "One of the shares need to unlock the master key",
+          "example": "EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0"
+        }
+      },
+      "example": {
+        "share": "EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0"
+      },
+      "required": [
+        "share"
+      ]
+    },
+    "KeyManagementAddShareResponseBody": {
+      "title": "KeyManagementAddShareResponseBody",
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "The index of the share added",
+          "example": 6836499522799983954,
+          "format": "int64"
+        },
+        "unlocked": {
+          "type": "boolean",
+          "description": "Whether the master key has been unlocked",
+          "example": true
+        }
+      },
+      "example": {
+        "index": 3985364364835542493,
+        "unlocked": true
+      },
+      "required": [
+        "index",
+        "unlocked"
+      ]
+    },
+    "KeyManagementCreateMasterKeyInternalErrorResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "Internal server error (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "KeyManagementCreateMasterKeyInvalidParametersResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "Invalid parameters provided (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "KeyManagementCreateMasterKeyRequestBody": {
+      "title": "KeyManagementCreateMasterKeyRequestBody",
+      "type": "object",
+      "properties": {
+        "admin_password": {
+          "type": "string",
+          "description": "Admin password for key management",
+          "example": "admin_password123!"
+        },
+        "admin_username": {
+          "type": "string",
+          "description": "Admin username for key management",
+          "example": "admin"
+        },
+        "min_shares": {
+          "type": "integer",
+          "description": "Minimum number of shares required to reconstruct the key",
+          "example": 3,
+          "format": "int64"
+        },
+        "total_shares": {
+          "type": "integer",
+          "description": "Total number of shares to create",
+          "example": 5,
+          "format": "int64"
+        }
+      },
+      "example": {
+        "admin_password": "admin_password123!",
+        "admin_username": "admin",
+        "min_shares": 3,
+        "total_shares": 5
+      },
+      "required": [
+        "total_shares",
+        "min_shares",
+        "admin_username",
+        "admin_password"
+      ]
+    },
+    "KeyManagementCreateMasterKeyResponseBody": {
+      "title": "KeyManagementCreateMasterKeyResponseBody",
+      "type": "object",
+      "properties": {
+        "admin_username": {
+          "type": "string",
+          "description": "The admin user's username",
+          "example": "admin"
+        },
+        "shares": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "example": "Sed possimus occaecati nesciunt eos commodi."
+          },
+          "description": "The generated key shares",
+          "example": [
+            "Aut eum et eaque ipsam.",
+            "Rem mollitia et est ratione.",
+            "Voluptates sunt quia autem laboriosam sunt."
+          ]
+        }
+      },
+      "example": {
+        "admin_username": "admin",
+        "shares": [
+          "Optio molestiae nesciunt architecto.",
+          "Facere quos doloribus repellendus.",
+          "Qui quia corrupti.",
+          "Non optio reiciendis dolore animi deleniti aut."
+        ]
+      }
+    },
+    "KeyManagementDeleteShareRequestBody": {
+      "title": "KeyManagementDeleteShareRequestBody",
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "The index of the share to delete",
+          "example": 1,
+          "format": "int64"
+        }
+      },
+      "example": {
+        "index": 1
+      },
+      "required": [
+        "index"
+      ]
+    },
+    "KeyManagementGetKeyStatusResponseBody": {
+      "title": "KeyManagementGetKeyStatusResponseBody",
+      "type": "object",
+      "properties": {
+        "current_shares": {
+          "type": "integer",
+          "description": "Number of shares currently held",
+          "example": 6650704053550084319,
+          "format": "int64"
+        },
+        "is_locked": {
+          "type": "boolean",
+          "description": "Whether the key is currently locked",
+          "example": false
+        },
+        "min_shares": {
+          "type": "integer",
+          "description": "Minimum number of shares required",
+          "example": 4864005717453730110,
+          "format": "int64"
+        },
+        "total_shares": {
+          "type": "integer",
+          "description": "Total number of shares",
+          "example": 7698091821871401703,
+          "format": "int64"
+        }
+      },
+      "example": {
+        "current_shares": 7280264691809939389,
+        "is_locked": false,
+        "min_shares": 5550376517080984471,
+        "total_shares": 3638475778790626784
+      },
+      "required": [
+        "is_locked",
+        "current_shares",
+        "min_shares",
+        "total_shares"
+      ]
+    },
+    "User": {
+      "title": "User",
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "description": "User creation timestamp",
+          "example": "Sint asperiores repudiandae deleniti sit rerum eveniet."
+        },
+        "updated_at": {
+          "type": "string",
+          "description": "User last update timestamp",
+          "example": "Tenetur maxime quasi veniam autem temporibus."
+        },
+        "username": {
+          "type": "string",
+          "description": "The username",
+          "example": "Esse in."
+        }
+      },
+      "example": {
+        "created_at": "Laborum ratione minima.",
+        "updated_at": "Et quis vel reiciendis.",
+        "username": "Cum ipsum tenetur blanditiis est pariatur."
+      },
+      "required": [
+        "username",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    "UsersAuthUserInvalidParametersResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": false
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Invalid input (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "UsersAuthUserRequestBody": {
+      "title": "UsersAuthUserRequestBody",
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string",
+          "description": "Password",
+          "example": "s3cr3t"
+        },
+        "username": {
+          "type": "string",
+          "description": "Username",
+          "example": "alice"
+        }
+      },
+      "example": {
+        "password": "s3cr3t",
+        "username": "alice"
+      },
+      "required": [
+        "username",
+        "password"
+      ]
+    },
+    "UsersAuthUserResponseBody": {
+      "title": "UsersAuthUserResponseBody",
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "JWT or session token",
+          "example": "Natus aliquam laborum illo impedit debitis."
+        },
+        "username": {
+          "type": "string",
+          "description": "The username of the authenticated user",
+          "example": "Natus nisi voluptatem consequatur sint."
+        }
+      },
+      "example": {
+        "token": "Aut ratione.",
+        "username": "Consequatur autem ut necessitatibus dolor."
+      }
+    },
+    "UsersAuthUserUnauthorizedResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "Invalid username or password (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "UsersCreateUserInvalidParametersResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Invalid input (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "UsersCreateUserRequestBody": {
+      "title": "UsersCreateUserRequestBody",
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string",
+          "description": "Password (hashed or plain depending on implementation)",
+          "example": "s3cr3t"
+        },
+        "username": {
+          "type": "string",
+          "description": "Username of the new user",
+          "example": "alice"
+        }
+      },
+      "example": {
+        "password": "s3cr3t",
+        "username": "alice"
+      },
+      "required": [
+        "username",
+        "password"
+      ]
+    },
+    "UsersCreateUserResponseBody": {
+      "title": "UsersCreateUserResponseBody",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "Unique identifier for the user",
+          "example": 1828035163576775677,
+          "format": "int64"
+        },
+        "username": {
+          "type": "string",
+          "description": "The username of the created user",
+          "example": "Necessitatibus sint accusamus perferendis."
+        }
+      },
+      "example": {
+        "id": 5475002864767066459,
+        "username": "Aut hic maiores officia eum."
+      }
+    },
+    "UsersCreateUserUsernameTakenResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": false
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "Username already exists (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "UsersDeleteUserUserNotFoundResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "User not found (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    }
+  }
+}

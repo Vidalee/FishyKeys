@@ -283,3 +283,8 @@ func (e WrongShares) GoaErrorName() string {
 func MakeInvalidParameters(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "invalid_parameters", false, false, false)
 }
+
+// MakeInternalError builds a goa.ServiceError from an error.
+func MakeInternalError(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "internal_error", false, false, false)
+}

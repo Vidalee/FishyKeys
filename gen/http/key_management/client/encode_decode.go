@@ -55,7 +55,7 @@ func EncodeCreateMasterKeyRequest(encoder func(*http.Request) goahttp.Encoder) f
 // the response body should be restored after having been read.
 // DecodeCreateMasterKeyResponse may return the following errors:
 //   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
-//   - "internal_error" (type keymanagement.InternalError): http.StatusInternalServerError
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
 //   - "key_already_exists" (type keymanagement.KeyAlreadyExists): http.StatusConflict
 //   - error: internal error
 func DecodeCreateMasterKeyResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
@@ -100,14 +100,18 @@ func DecodeCreateMasterKeyResponse(decoder func(*http.Response) goahttp.Decoder,
 			return nil, NewCreateMasterKeyInvalidParameters(&body)
 		case http.StatusInternalServerError:
 			var (
-				body string
+				body CreateMasterKeyInternalErrorResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("key_management", "create_master_key", err)
 			}
-			return nil, NewCreateMasterKeyInternalError(body)
+			err = ValidateCreateMasterKeyInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("key_management", "create_master_key", err)
+			}
+			return nil, NewCreateMasterKeyInternalError(&body)
 		case http.StatusConflict:
 			var (
 				body string

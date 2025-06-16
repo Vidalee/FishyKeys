@@ -70,6 +70,8 @@ type CreateUserPayload struct {
 type CreateUserResult struct {
 	// The username of the created user
 	Username *string
+	// Unique identifier for the user
+	ID *int
 }
 
 // DeleteUserPayload is the payload type of the users service delete user

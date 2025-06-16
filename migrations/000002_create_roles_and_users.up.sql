@@ -20,3 +20,6 @@ CREATE TABLE IF NOT EXISTS user_roles (
     PRIMARY KEY (user_id, role_id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+INSERT INTO roles (name, color)
+VALUES ('admin', '#FF0000') ON CONFLICT DO NOTHING;

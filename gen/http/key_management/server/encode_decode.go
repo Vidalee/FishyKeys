@@ -83,10 +83,15 @@ func EncodeCreateMasterKeyError(encoder func(context.Context, http.ResponseWrite
 			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		case "internal_error":
-			var res keymanagement.InternalError
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewCreateMasterKeyInternalErrorResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)

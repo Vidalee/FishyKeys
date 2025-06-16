@@ -23,6 +23,7 @@ type Role struct {
 type RolesRepository interface {
 	CreateRole(ctx context.Context, name string, color string) error
 	GetRoleByID(ctx context.Context, id int) (*Role, error)
+	GetRoleByName(ctx context.Context, name string) (*Role, error)
 	ListRoles(ctx context.Context) ([]Role, error)
 }
 
@@ -48,6 +49,16 @@ func (r *rolesRepository) GetRoleByID(ctx context.Context, id int) (*Role, error
 	query := `SELECT id, name, color, created_at, updated_at FROM roles WHERE id = $1`
 	var role Role
 	err := r.pool.QueryRow(ctx, query, id).Scan(&role.ID, &role.Name, &role.Color, &role.CreatedAt, &role.UpdatedAt)
+	if err != nil {
+		return nil, ErrRoleNotFound
+	}
+	return &role, nil
+}
+
+func (r *rolesRepository) GetRoleByName(ctx context.Context, name string) (*Role, error) {
+	query := `SELECT id, name, color, created_at, updated_at FROM roles WHERE name = $1`
+	var role Role
+	err := r.pool.QueryRow(ctx, query, name).Scan(&role.ID, &role.Name, &role.Color, &role.CreatedAt, &role.UpdatedAt)
 	if err != nil {
 		return nil, ErrRoleNotFound
 	}

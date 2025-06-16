@@ -34,9 +34,10 @@ paths:
                             example:
                                 admin_username: admin
                                 shares:
-                                    - Repudiandae blanditiis id cupiditate unde eos.
-                                    - Sit ratione.
-                                    - Et ut magnam labore molestiae.
+                                    - Ratione sint et.
+                                    - Magnam labore molestiae culpa iste adipisci et.
+                                    - Consequatur a illum voluptas fuga voluptates sequi.
+                                    - Rerum recusandae sequi quis ipsum.
                 "400":
                     description: 'invalid_parameters: Invalid parameters provided'
                     content:
@@ -49,16 +50,14 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Ut vel non nam magnam beatae ipsa.
+                                example: Vel non nam magnam beatae ipsa.
                             example: Quidem voluptatibus ducimus.
                 "500":
-                    description: 'internal_error: Internal Server Error response.'
+                    description: 'internal_error: Internal server error'
                     content:
-                        application/json:
+                        application/vnd.goa.error:
                             schema:
-                                type: string
-                                example: Rerum optio est.
-                            example: Et eveniet.
+                                $ref: '#/components/schemas/Error'
     /key_management/share:
         delete:
             tags:
@@ -131,8 +130,8 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/AddShareResponseBody'
                             example:
-                                index: 5890167680709064409
-                                unlocked: true
+                                index: 267635011030857677
+                                unlocked: false
                 "400":
                     description: 'wrong_shares: Bad Request response.'
                     content:
@@ -180,10 +179,10 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/GetKeyStatusResponseBody'
                             example:
-                                current_shares: 7711465592139798484
-                                is_locked: false
-                                min_shares: 816161376085798070
-                                total_shares: 5265395392647482762
+                                current_shares: 7654723300438466742
+                                is_locked: true
+                                min_shares: 53511470712771686
+                                total_shares: 2105022433223144494
                 "404":
                     description: 'no_key_set: Not Found response.'
                     content:
@@ -226,6 +225,9 @@ paths:
                                     - created_at: Necessitatibus dicta optio.
                                       updated_at: Eos ducimus repudiandae et distinctio.
                                       username: Culpa voluptatem impedit tempore et quod.
+                                    - created_at: Necessitatibus dicta optio.
+                                      updated_at: Eos ducimus repudiandae et distinctio.
+                                      username: Culpa voluptatem impedit tempore et quod.
                             example:
                                 - created_at: Necessitatibus dicta optio.
                                   updated_at: Eos ducimus repudiandae et distinctio.
@@ -245,7 +247,7 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Est autem.
+                                example: Ab qui harum distinctio.
                             example: Modi at ipsum sapiente et quia sed.
         post:
             tags:
@@ -270,6 +272,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/CreateUserResponseBody'
                             example:
+                                id: 6752325125503319315
                                 username: Dignissimos libero ea nobis praesentium non.
                 "400":
                     description: 'invalid_parameters: Invalid input'
@@ -289,7 +292,7 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Sed dolor itaque.
+                                example: Magnam atque est autem sit sit in.
                             example: Eligendi quae adipisci occaecati.
     /users/{username}:
         delete:
@@ -323,7 +326,7 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Sit in rem dolor ab qui.
+                                example: Cumque amet et.
                             example: Mollitia quos.
     /users/auth:
         post:
@@ -369,7 +372,7 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Quo eveniet deleniti praesentium ex eum.
+                                example: Et eveniet.
                             example: Sit qui natus voluptas.
 components:
     schemas:
@@ -408,14 +411,14 @@ components:
                 token:
                     type: string
                     description: JWT or session token
-                    example: Dolorum sed consequatur eos doloribus sit.
+                    example: Magni veniam occaecati.
                 username:
                     type: string
                     description: The username of the authenticated user
-                    example: Distinctio facilis cumque amet et aut.
+                    example: Excepturi dolorum sed consequatur eos doloribus sit.
             example:
-                token: Rerum autem rerum omnis reiciendis.
-                username: Magni veniam occaecati.
+                token: Quo eveniet deleniti praesentium ex eum.
+                username: Rerum autem rerum omnis reiciendis.
         CreateMasterKeyRequestBody:
             type: object
             properties:
@@ -458,18 +461,18 @@ components:
                     type: array
                     items:
                         type: string
-                        example: Voluptas nesciunt ipsam eos ut repellendus.
+                        example: Ipsam eos ut repellendus sunt.
                     description: The generated key shares
                     example:
-                        - Qui sint sapiente architecto.
-                        - Voluptatem ad amet sint est.
+                        - Sint sapiente architecto vero voluptatem ad amet.
+                        - Est eligendi aut quae.
             example:
                 admin_username: admin
                 shares:
-                    - Quae vel occaecati voluptate dolorem omnis sed.
-                    - Qui et quis.
-                    - Eius et.
-                    - Vel eos quis occaecati.
+                    - Voluptate dolorem.
+                    - Sed et qui et quis eaque.
+                    - Et dignissimos vel eos quis.
+                    - Enim dolore est temporibus nam.
         CreateUserRequestBody:
             type: object
             properties:
@@ -490,12 +493,18 @@ components:
         CreateUserResponseBody:
             type: object
             properties:
+                id:
+                    type: integer
+                    description: Unique identifier for the user
+                    example: 2431615301122470772
+                    format: int64
                 username:
                     type: string
                     description: The username of the created user
                     example: Voluptas aspernatur quia cupiditate sint molestiae adipisci.
             example:
-                username: Asperiores dolorem sed incidunt id.
+                id: 2634242440342999069
+                username: Dolorem sed incidunt id dolore sed.
         DeleteShareRequestBody:
             type: object
             properties:
@@ -514,7 +523,7 @@ components:
                 fault:
                     type: boolean
                     description: Is the error a server-side fault?
-                    example: false
+                    example: true
                 id:
                     type: string
                     description: ID is a unique identifier for this particular occurrence of the problem.
@@ -542,7 +551,7 @@ components:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: true
+                timeout: false
             required:
                 - name
                 - id
@@ -588,19 +597,19 @@ components:
                 created_at:
                     type: string
                     description: User creation timestamp
-                    example: Qui quia et similique.
+                    example: Quia et similique nihil iste et.
                 updated_at:
                     type: string
                     description: User last update timestamp
-                    example: Iste et animi explicabo sed.
+                    example: Explicabo sed sed accusantium.
                 username:
                     type: string
                     description: The username
-                    example: Aperiam nemo et rerum quidem expedita.
+                    example: Rerum quidem expedita optio.
             example:
-                created_at: Eos et nisi.
-                updated_at: Beatae et eligendi.
-                username: Accusantium commodi repudiandae et molestias quasi eveniet.
+                created_at: Quasi eveniet cupiditate eos et.
+                updated_at: Eos beatae et eligendi consequatur voluptas.
+                username: Repudiandae et.
             required:
                 - username
                 - created_at

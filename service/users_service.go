@@ -40,12 +40,12 @@ func (s *UsersService) CreateUser(ctx context.Context, payload *genusers.CreateU
 		return nil, genusers.InternalError("could not encrypt password: " + err.Error())
 	}
 
-	err = s.usersRepository.CreateUser(ctx, payload.Username, string(encryptedPassword))
+	userId, err := s.usersRepository.CreateUser(ctx, payload.Username, string(encryptedPassword))
 	if err != nil {
 		return nil, genusers.InternalError("could not create user")
 	}
 
-	return &genusers.CreateUserResult{Username: &payload.Username}, nil
+	return &genusers.CreateUserResult{Username: &payload.Username, ID: &userId}, nil
 }
 
 func (s *UsersService) AuthUser(ctx context.Context, payload *genusers.AuthUserPayload) (*genusers.AuthUserResult, error) {

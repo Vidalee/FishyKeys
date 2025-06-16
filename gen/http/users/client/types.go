@@ -35,6 +35,8 @@ type AuthUserRequestBody struct {
 type CreateUserResponseBody struct {
 	// The username of the created user
 	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
+	// Unique identifier for the user
+	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 }
 
 // ListUsersResponseBody is the type of the "users" service "list users"
@@ -175,6 +177,7 @@ func NewAuthUserRequestBody(p *users.AuthUserPayload) *AuthUserRequestBody {
 func NewCreateUserResultCreated(body *CreateUserResponseBody) *users.CreateUserResult {
 	v := &users.CreateUserResult{
 		Username: body.Username,
+		ID:       body.ID,
 	}
 
 	return v

@@ -31,7 +31,7 @@ var _ = Service("key_management", func() {
 			})
 		})
 		Error("invalid_parameters", ErrorResult, "Invalid parameters provided")
-		Error("internal_error", String, "Internal server error")
+		Error("internal_error", ErrorResult, "Internal server error")
 		Error("key_already_exists", String, "A master key already exists")
 		HTTP(func() {
 			POST("/key_management/create_master_key")

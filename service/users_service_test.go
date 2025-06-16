@@ -94,7 +94,7 @@ func TestUsersService_CreateUser(t *testing.T) {
 				assert.NoError(t, err)
 
 				assert.Equal(t, tt.username, user.Username)
-
+				assert.Equal(t, 1, user.ID)
 				err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(tt.password))
 				assert.NoError(t, err, "password does not match")
 

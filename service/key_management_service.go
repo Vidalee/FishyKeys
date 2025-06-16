@@ -28,15 +28,19 @@ const (
 )
 
 type KeyManagementService struct {
-	keyManager         *crypto.KeyManager
-	settingsRepository repository.GlobalSettingsRepository
-	usersRepository    repository.UsersRepository
+	keyManager          *crypto.KeyManager
+	settingsRepository  repository.GlobalSettingsRepository
+	usersRepository     repository.UsersRepository
+	rolesRepository     repository.RolesRepository
+	userRolesRepository repository.UserRolesRepository
 }
 
 func NewKeyManagementService(
 	keyManager *crypto.KeyManager,
 	settingsRepository repository.GlobalSettingsRepository,
 	usersRepository repository.UsersRepository,
+	rolesRepository repository.RolesRepository,
+	userRolesRepository repository.UserRolesRepository,
 ) *KeyManagementService {
 	keySettings, err := settingsRepository.GetSettings(context.Background(), columnMasterKeyChecksum, columnTotalShares, columnMinShares)
 	if err != nil {
@@ -59,9 +63,11 @@ func NewKeyManagementService(
 	}
 
 	return &KeyManagementService{
-		keyManager:         keyManager,
-		settingsRepository: settingsRepository,
-		usersRepository:    usersRepository,
+		keyManager:          keyManager,
+		settingsRepository:  settingsRepository,
+		usersRepository:     usersRepository,
+		rolesRepository:     rolesRepository,
+		userRolesRepository: userRolesRepository,
 	}
 }
 
@@ -107,12 +113,12 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		columnMasterKeyChecksum: checksum,
 	})
 	if err != nil {
-		return nil, genkey.InternalError("error storing key settings: " + err.Error())
+		return nil, genkey.MakeInternalError(fmt.Errorf("error storing key settings: " + err.Error()))
 	}
 
 	err = s.keyManager.SetNewMasterKey(masterKey, payload.MinShares, payload.TotalShares)
 	if err != nil {
-		return nil, genkey.InternalError("error setting new master key: " + err.Error())
+		return nil, genkey.MakeInternalError(fmt.Errorf("error setting new master key: " + err.Error()))
 	}
 
 	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.AdminPassword), bcrypt.DefaultCost)
@@ -121,27 +127,41 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 
 		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalShares, columnMinShares, columnMasterKeyChecksum)
 		if delErr != nil {
-			return nil, genkey.InternalError(
+			return nil, genkey.MakeInternalError(fmt.Errorf(
 				"admin user password encryption failed: " + err.Error() +
-					"; rollback cleanup also failed: " + delErr.Error())
+					"; rollback cleanup also failed: " + delErr.Error()))
 		}
 
 		return nil, genusers.InternalError("could not encrypt password: " + err.Error())
 	}
 
-	err = s.usersRepository.CreateUser(ctx, payload.AdminUsername, string(encryptedPassword))
+	userId, err := s.usersRepository.CreateUser(ctx, payload.AdminUsername, string(encryptedPassword))
 	if err != nil {
 		s.keyManager.RollbackToUninitialized()
 
 		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalShares, columnMinShares, columnMasterKeyChecksum)
 		if delErr != nil {
-			return nil, genkey.InternalError(
+			return nil, genkey.MakeInternalError(fmt.Errorf(
 				"could not create admin user: " + err.Error() +
-					"; rollback cleanup also failed: " + delErr.Error())
+					"; rollback cleanup also failed: " + delErr.Error()))
 		}
 
-		return nil, genusers.InternalError("could not create admin user")
+		return nil, genkey.MakeInternalError(fmt.Errorf("could not create admin user"))
 	}
+
+	role, err := s.rolesRepository.GetRoleByName(ctx, "admin")
+	if err != nil {
+		s.keyManager.RollbackToUninitialized()
+
+		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalShares, columnMinShares, columnMasterKeyChecksum)
+		if delErr != nil {
+			return nil, genkey.MakeInternalError(fmt.Errorf(
+				"could not retrieve admin role: " + err.Error() +
+					"; rollback cleanup also failed: " + delErr.Error()))
+		}
+	}
+
+	err = s.userRolesRepository.AssignRoleToUser(ctx, userId, role.ID)
 
 	return &genkey.CreateMasterKeyResult{
 		Shares:        encodedShares,
