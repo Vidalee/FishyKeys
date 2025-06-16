@@ -2,7 +2,6 @@
 
 import {useEffect, useState} from 'react'
 import {KeyStatus} from '../types'
-import ShareManager from './ShareManager'
 import LoginScreen from './LoginScreen'
 import CreateMasterKey from './CreateMasterKey'
 import {getKeyStatus} from '../api/keyManagement'
@@ -13,6 +12,13 @@ export default function KeyManager() {
   const [error, setError] = useState<string | null>(null)
   const [noKey, setNoKey] = useState(false)
   const [isCreatingKey, setIsCreatingKey] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  useEffect(() => {
+    // Check if user is authenticated
+    const token = localStorage.getItem('authToken')
+    setIsAuthenticated(!!token)
+  }, [])
 
   const fetchKeyStatus = async () => {
     if (isCreatingKey) return
@@ -38,6 +44,10 @@ export default function KeyManager() {
     return () => clearInterval(interval)
   }, [isCreatingKey])
 
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true)
+  }
+
   if (error) {
     return (
       <div className={styles.container}>
@@ -53,17 +63,19 @@ export default function KeyManager() {
     return <CreateMasterKey onCreatingKey={setIsCreatingKey} />
   }
 
-  if (!keyStatus || !keyStatus.is_locked) {
-    return <LoginScreen />
+  if (!isAuthenticated) {
+    return <LoginScreen onLoginSuccess={handleLoginSuccess}/>
   }
 
-  return (
-    <div className={styles.container}>
-      <div className={styles.inner}>
-        <div className={styles.title}>FishyKeys</div>
-        <div className={styles.subtitle}>Secure Key Management System</div>
-        <ShareManager keyStatus={keyStatus} onStatusChange={fetchKeyStatus} />
-      </div>
-    </div>
-  )
+  if (!keyStatus) {
+    return (
+        <div className={styles.container}>
+          <div className={styles.loading}>Loading...</div>
+        </div>
+    )
+  }
+
+  // If we have a key status and user is authenticated, redirect to dashboard
+  window.location.href = '/dashboard'
+  return null
 } 
