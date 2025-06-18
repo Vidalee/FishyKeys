@@ -24,6 +24,15 @@ func setupKeyTestService() *KeyManagementService {
 	return NewKeyManagementService(keyManager, settingsRepository, usersRepository, rolesRepository, userRolesRepository, secretsRepository)
 }
 
+func setupKeyTestServiceWithKeyManager(keyManager *crypto.KeyManager) *KeyManagementService {
+	settingsRepository := repository.NewGlobalSettingsRepository(testDB)
+	usersRepository := repository.NewUsersRepository(testDB)
+	rolesRepository := repository.NewRolesRepository(testDB)
+	userRolesRepository := repository.NewUserRolesRepository(testDB)
+	secretsRepository := repository.NewSecretsRepository(testDB)
+	return NewKeyManagementService(keyManager, settingsRepository, usersRepository, rolesRepository, userRolesRepository, secretsRepository)
+}
+
 func clearKeyServiceTables(t *testing.T, ctx context.Context) {
 	err := testutil.ClearTable(ctx, "global_settings")
 	require.NoError(t, err)

@@ -2,29 +2,40 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	genusers "github.com/Vidalee/FishyKeys/gen/users"
 	"github.com/Vidalee/FishyKeys/internal/crypto"
 	"github.com/Vidalee/FishyKeys/repository"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"time"
 )
+
+type JwtClaims struct {
+	Username string `json:"username"`
+	jwt.RegisteredClaims
+}
 
 type UsersService struct {
 	keyManager               *crypto.KeyManager
 	usersRepository          repository.UsersRepository
 	globalSettingsRepository repository.GlobalSettingsRepository
+	secretsRepository        repository.SecretsRepository
 }
 
 func NewUsersService(
 	keyManager *crypto.KeyManager,
 	usersRepository repository.UsersRepository,
 	globalSettingsRepository repository.GlobalSettingsRepository,
+	secretsRepository repository.SecretsRepository,
 ) *UsersService {
 	return &UsersService{
 		keyManager:               keyManager,
 		usersRepository:          usersRepository,
 		globalSettingsRepository: globalSettingsRepository,
+		secretsRepository:        secretsRepository,
 	}
 }
 
@@ -75,11 +86,31 @@ func (s *UsersService) AuthUser(ctx context.Context, payload *genusers.AuthUserP
 		return nil, genusers.MakeUnauthorized(fmt.Errorf("invalid username or password"))
 	}
 
-	token := "fake-auth-token"
+	decryptedSecret, err := s.secretsRepository.GetSecretByPath(ctx, s.keyManager, "internal/jwt_signing_key")
+	if err != nil {
+		return nil, genusers.InternalError("could not retrieve JWT signing key")
+	}
+	decodedSecret, err := base64.StdEncoding.DecodeString(decryptedSecret.DecryptedValue)
+	if err != nil {
+		return nil, genusers.InternalError("could not decode JWT signing key: " + err.Error())
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"iss":      "FishyKeys",
+		"sub":      user.Username,
+		"iat":      jwt.NewNumericDate(time.Now()),
+		"username": user.Username,
+		"exp":      jwt.NewNumericDate(decryptedSecret.CreatedAt.Add(24 * time.Hour)),
+	})
+
+	tokenString, err := token.SignedString(decodedSecret)
+	if err != nil {
+		return nil, genusers.InternalError("could not sign JWT token: " + err.Error())
+	}
 
 	return &genusers.AuthUserResult{
 		Username: &user.Username,
-		Token:    &token,
+		Token:    &tokenString,
 	}, nil
 }
 

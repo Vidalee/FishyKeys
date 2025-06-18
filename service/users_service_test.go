@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
+	genkey "github.com/Vidalee/FishyKeys/gen/key_management"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"testing"
 
@@ -21,7 +24,17 @@ func setupUsersTestService(t *testing.T) *UsersService {
 	require.NoError(t, err, "failed to set new master key")
 	usersRepo := repository.NewUsersRepository(testDB)
 	globalSettingsRepo := repository.NewGlobalSettingsRepository(testDB)
-	return NewUsersService(keyManager, usersRepo, globalSettingsRepo)
+	secretsRepo := repository.NewSecretsRepository(testDB)
+	return NewUsersService(keyManager, usersRepo, globalSettingsRepo, secretsRepo)
+}
+
+func clearUsersServiceTables(t *testing.T, ctx context.Context) {
+	err := testutil.ClearTable(ctx, "global_settings")
+	require.NoError(t, err)
+	err = testutil.ClearTable(ctx, "users")
+	require.NoError(t, err)
+	err = testutil.ClearTable(ctx, "secrets")
+	require.NoError(t, err)
 }
 
 func TestUsersService_CreateUser(t *testing.T) {
@@ -68,8 +81,7 @@ func TestUsersService_CreateUser(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := testutil.ClearTable(ctx, "users")
-			require.NoError(t, err)
+			clearUsersServiceTables(t, ctx)
 
 			payload := &genusers.CreateUserPayload{
 				Username: tt.username,
@@ -156,15 +168,25 @@ func TestUsersService_AuthUser(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := testutil.ClearTable(ctx, "users")
-			require.NoError(t, err)
+			clearUsersServiceTables(t, ctx)
 
 			if tt.createUser {
+				createMasterKeyPayload := &genkey.CreateMasterKeyPayload{
+					TotalShares:   3,
+					MinShares:     2,
+					AdminUsername: "admin",
+					AdminPassword: "password",
+				}
+
+				keyService := setupKeyTestServiceWithKeyManager(service.keyManager)
+				_, err := keyService.CreateMasterKey(ctx, createMasterKeyPayload)
+				require.NoError(t, err, "failed to create master key for auth test")
+
 				createPayload := &genusers.CreateUserPayload{
 					Username: tt.username,
 					Password: tt.password,
 				}
-				_, err := service.CreateUser(ctx, createPayload)
+				_, err = service.CreateUser(ctx, createPayload)
 				require.NoError(t, err, "failed to create user for auth test")
 			}
 
@@ -185,7 +207,23 @@ func TestUsersService_AuthUser(t *testing.T) {
 				assert.NotNil(t, result.Username)
 				assert.Equal(t, tt.username, *result.Username)
 
-				//check token once we properly implement it
+				assert.NotNil(t, result.Token, "token should not be nil")
+				token, err := jwt.ParseWithClaims(*result.Token, &JwtClaims{}, func(token *jwt.Token) (interface{}, error) {
+					if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+						return nil, jwt.ErrSignatureInvalid
+					}
+					decryptedSecret, err := service.secretsRepository.GetSecretByPath(ctx, service.keyManager, "internal/jwt_signing_key")
+					if err != nil {
+						return nil, genusers.InternalError("could not retrieve JWT signing key")
+					}
+
+					return base64.StdEncoding.DecodeString(decryptedSecret.DecryptedValue)
+				})
+				assert.NoError(t, err, "failed to parse JWT token")
+				assert.True(t, token.Valid, "token should be valid")
+				claims, ok := token.Claims.(*JwtClaims)
+				assert.True(t, ok, "claims should be of type JwtClaims")
+				assert.Equal(t, tt.username, claims.Username, "username in claims should match")
 			}
 		})
 	}
@@ -194,7 +232,8 @@ func TestUsersService_AuthUser(t *testing.T) {
 func TestUsersService_ListUsers(t *testing.T) {
 	service := setupUsersTestService(t)
 	ctx := context.Background()
-	err := testutil.ClearTable(ctx, "users")
+
+	clearUsersServiceTables(t, ctx)
 
 	users, err := service.ListUsers(ctx)
 	assert.NoError(t, err)
@@ -253,8 +292,7 @@ func TestUsersService_DeleteUser(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := testutil.ClearTable(ctx, "users")
-			require.NoError(t, err)
+			clearUsersServiceTables(t, ctx)
 
 			if tt.createUser {
 				createPayload := &genusers.CreateUserPayload{
@@ -269,7 +307,7 @@ func TestUsersService_DeleteUser(t *testing.T) {
 				Username: tt.username,
 			}
 
-			err = service.DeleteUser(ctx, payload)
+			err := service.DeleteUser(ctx, payload)
 
 			if tt.expectedError {
 				assert.Error(t, err)
