@@ -11,12 +11,21 @@ import (
 )
 
 type UsersService struct {
-	keyManager      *crypto.KeyManager
-	usersRepository repository.UsersRepository
+	keyManager               *crypto.KeyManager
+	usersRepository          repository.UsersRepository
+	globalSettingsRepository repository.GlobalSettingsRepository
 }
 
-func NewUsersService(keyManager *crypto.KeyManager, usersRepository repository.UsersRepository) *UsersService {
-	return &UsersService{keyManager: keyManager, usersRepository: usersRepository}
+func NewUsersService(
+	keyManager *crypto.KeyManager,
+	usersRepository repository.UsersRepository,
+	globalSettingsRepository repository.GlobalSettingsRepository,
+) *UsersService {
+	return &UsersService{
+		keyManager:               keyManager,
+		usersRepository:          usersRepository,
+		globalSettingsRepository: globalSettingsRepository,
+	}
 }
 
 func (s *UsersService) CreateUser(ctx context.Context, payload *genusers.CreateUserPayload) (*genusers.CreateUserResult, error) {

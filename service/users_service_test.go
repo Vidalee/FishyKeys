@@ -19,8 +19,9 @@ func setupUsersTestService(t *testing.T) *UsersService {
 	require.NoError(t, err, "failed to generate master key")
 	err = keyManager.SetNewMasterKey(masterKey, 1, 1)
 	require.NoError(t, err, "failed to set new master key")
-	repo := repository.NewUsersRepository(testDB)
-	return NewUsersService(keyManager, repo)
+	usersRepo := repository.NewUsersRepository(testDB)
+	globalSettingsRepo := repository.NewGlobalSettingsRepository(testDB)
+	return NewUsersService(keyManager, usersRepo, globalSettingsRepo)
 }
 
 func TestUsersService_CreateUser(t *testing.T) {

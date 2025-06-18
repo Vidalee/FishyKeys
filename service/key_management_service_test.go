@@ -20,13 +20,16 @@ func setupKeyTestService() *KeyManagementService {
 	usersRepository := repository.NewUsersRepository(testDB)
 	rolesRepository := repository.NewRolesRepository(testDB)
 	userRolesRepository := repository.NewUserRolesRepository(testDB)
-	return NewKeyManagementService(keyManager, settingsRepository, usersRepository, rolesRepository, userRolesRepository)
+	secretsRepository := repository.NewSecretsRepository(testDB)
+	return NewKeyManagementService(keyManager, settingsRepository, usersRepository, rolesRepository, userRolesRepository, secretsRepository)
 }
 
 func clearKeyServiceTables(t *testing.T, ctx context.Context) {
 	err := testutil.ClearTable(ctx, "global_settings")
 	require.NoError(t, err)
 	err = testutil.ClearTable(ctx, "users")
+	require.NoError(t, err)
+	err = testutil.ClearTable(ctx, "secrets")
 	require.NoError(t, err)
 }
 
@@ -109,7 +112,7 @@ func TestKeyManagementService_CreateMasterKey(t *testing.T) {
 				assert.Error(t, err)
 				assert.Nil(t, result)
 
-				settings, err := service.settingsRepository.GetSettings(ctx, columnTotalShares, columnMinShares, columnMasterKeyChecksum)
+				settings, err := service.settingsRepository.GetSettings(ctx, columnTotalSharesColumn, columnMinSharesColumn, columnMasterKeyChecksumColumn)
 				assert.Error(t, err)
 				assert.Nil(t, settings)
 				assert.Equal(t, "setting not found", err.Error())
@@ -119,19 +122,25 @@ func TestKeyManagementService_CreateMasterKey(t *testing.T) {
 				assert.Len(t, result.Shares, tt.totalShares)
 
 				// Verify database values
-				settings, err := service.settingsRepository.GetSettings(ctx, columnTotalShares, columnMinShares, columnMasterKeyChecksum)
+				settings, err := service.settingsRepository.GetSettings(ctx, columnTotalSharesColumn, columnMinSharesColumn, columnMasterKeyChecksumColumn)
 				require.NoError(t, err)
 
-				storedTotalShares, err := strconv.Atoi(settings[columnTotalShares])
+				storedTotalShares, err := strconv.Atoi(settings[columnTotalSharesColumn])
 				require.NoError(t, err)
 				assert.Equal(t, tt.totalShares, storedTotalShares)
 
-				storedMinShares, err := strconv.Atoi(settings[columnMinShares])
+				storedMinShares, err := strconv.Atoi(settings[columnMinSharesColumn])
 				require.NoError(t, err)
 				assert.Equal(t, tt.minShares, storedMinShares)
 
 				// Verify checksum exists and is not empty
-				assert.NotEmpty(t, settings[columnMasterKeyChecksum])
+				assert.NotEmpty(t, settings[columnMasterKeyChecksumColumn])
+
+				//jwtSigningKey, exists := settings[jwtSigningKeyColumn]
+				//assert.True(t, exists)
+				//assert.NotEmpty(t, jwtSigningKey)
+				//_, err = base64.StdEncoding.DecodeString(settings[columnMasterKeyChecksumColumn])
+				//assert.NoError(t, err)
 
 				// Verify admin user
 				user, err := service.usersRepository.GetUserByUsername(ctx, tt.adminUsername)
@@ -282,7 +291,7 @@ func TestKeyManagementService_AddShare(t *testing.T) {
 		service := setupKeyTestService()
 
 		// Tamper with the checksum in the DB
-		err = service.settingsRepository.StoreSetting(ctx, columnMasterKeyChecksum, "d3adbeef")
+		err = service.settingsRepository.StoreSetting(ctx, columnMasterKeyChecksumColumn, "d3adbeef")
 		require.NoError(t, err)
 
 		for i := range 3 {

@@ -21,10 +21,10 @@ var (
 )
 
 const (
-	columnTotalShares       = "total_shares"
-	columnMinShares         = "min_shares"
-	columnMasterKeyChecksum = "master_key_checksum"
-	checksumExpectedValue   = "fishykeys_checksum"
+	columnTotalSharesColumn       = "total_shares"
+	columnMinSharesColumn         = "min_shares"
+	columnMasterKeyChecksumColumn = "master_key_checksum"
+	checksumExpectedValue         = "fishykeys_checksum"
 )
 
 type KeyManagementService struct {
@@ -33,6 +33,7 @@ type KeyManagementService struct {
 	usersRepository     repository.UsersRepository
 	rolesRepository     repository.RolesRepository
 	userRolesRepository repository.UserRolesRepository
+	secretsRepository   repository.SecretsRepository
 }
 
 func NewKeyManagementService(
@@ -41,18 +42,19 @@ func NewKeyManagementService(
 	usersRepository repository.UsersRepository,
 	rolesRepository repository.RolesRepository,
 	userRolesRepository repository.UserRolesRepository,
+	secretsRepository repository.SecretsRepository,
 ) *KeyManagementService {
-	keySettings, err := settingsRepository.GetSettings(context.Background(), columnMasterKeyChecksum, columnTotalShares, columnMinShares)
+	keySettings, err := settingsRepository.GetSettings(context.Background(), columnMasterKeyChecksumColumn, columnTotalSharesColumn, columnMinSharesColumn)
 	if err != nil {
 		if !errors.Is(err, repository.ErrSettingNotFound) {
 			log.Fatalf("error retrieving key settings on service init: %v", err)
 		}
 	} else {
-		minShares, err := strconv.Atoi(keySettings[columnMinShares])
+		minShares, err := strconv.Atoi(keySettings[columnMinSharesColumn])
 		if err != nil {
 			log.Fatalf("error parsing min shares from db: %v", err)
 		}
-		totalShares, err := strconv.Atoi(keySettings[columnTotalShares])
+		totalShares, err := strconv.Atoi(keySettings[columnTotalSharesColumn])
 		if err != nil {
 			log.Fatalf("error parsing total shares from db: %v", err)
 		}
@@ -68,6 +70,7 @@ func NewKeyManagementService(
 		usersRepository:     usersRepository,
 		rolesRepository:     rolesRepository,
 		userRolesRepository: userRolesRepository,
+		secretsRepository:   secretsRepository,
 	}
 }
 
@@ -84,7 +87,7 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		return nil, genusers.MakeInvalidParameters(fmt.Errorf("password must be at least 8 characters long"))
 	}
 
-	_, err := s.settingsRepository.GetSetting(ctx, columnMasterKeyChecksum)
+	_, err := s.settingsRepository.GetSetting(ctx, columnMasterKeyChecksumColumn)
 	if err == nil {
 		return nil, genkey.KeyAlreadyExists("master key already exists")
 	}
@@ -108,9 +111,9 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 	}
 
 	err = s.settingsRepository.StoreSettings(ctx, map[string]string{
-		columnTotalShares:       strconv.Itoa(payload.TotalShares),
-		columnMinShares:         strconv.Itoa(payload.MinShares),
-		columnMasterKeyChecksum: checksum,
+		columnTotalSharesColumn:       strconv.Itoa(payload.TotalShares),
+		columnMinSharesColumn:         strconv.Itoa(payload.MinShares),
+		columnMasterKeyChecksumColumn: checksum,
 	})
 	if err != nil {
 		return nil, genkey.MakeInternalError(fmt.Errorf("error storing key settings: %v", err))
@@ -121,25 +124,56 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		return nil, genkey.MakeInternalError(fmt.Errorf("error setting new master key: %v", err))
 	}
 
+	jwtSigningKey, err := crypto.GenerateSecret()
+	if err != nil {
+		s.keyManager.RollbackToUninitialized()
+		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalSharesColumn, columnMinSharesColumn, columnMasterKeyChecksumColumn)
+
+		if delErr != nil {
+			return nil, genkey.MakeInternalError(fmt.Errorf(
+				"error generating JWT signing key: %v; rollback cleanup also failed: %v", err, delErr))
+		}
+		return nil, genkey.MakeInternalError(fmt.Errorf("error generating JWT signing key: %v", err))
+	}
+	_, err = s.secretsRepository.CreateSecret(ctx, s.keyManager, "internal/jwt_signing_key", base64.StdEncoding.EncodeToString(jwtSigningKey))
+	if err != nil {
+		s.keyManager.RollbackToUninitialized()
+		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalSharesColumn, columnMinSharesColumn, columnMasterKeyChecksumColumn)
+
+		if delErr != nil {
+			return nil, genkey.MakeInternalError(fmt.Errorf(
+				"error creating JWT signing key: %v; rollback cleanup also failed: %v", err, delErr))
+		}
+		return nil, genkey.MakeInternalError(fmt.Errorf("error storing JWT signing key: %v", err))
+	}
+
 	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.AdminPassword), bcrypt.DefaultCost)
 	if err != nil {
 		s.keyManager.RollbackToUninitialized()
-
-		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalShares, columnMinShares, columnMasterKeyChecksum)
+		jwtDelErr := s.secretsRepository.DeleteSecret(ctx, "internal/jwt_signing_key")
+		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalSharesColumn, columnMinSharesColumn, columnMasterKeyChecksumColumn)
 		if delErr != nil {
+			if jwtDelErr != nil {
+				return nil, genkey.MakeInternalError(fmt.Errorf(
+					"could not create admin user: %v; rollback cleanup also failed: %v; jwt deletion failed: %v", err, delErr, jwtDelErr))
+			}
 			return nil, genkey.MakeInternalError(fmt.Errorf(
-				"admin user password encryption failed: %v; rollback cleanup also failed: %v", err, delErr))
+				"could not create admin user: %v; rollback cleanup also failed: %v", err, delErr))
 		}
 
-		return nil, genkey.MakeInternalError(fmt.Errorf("could not encrypt password: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("could not create admin user: %v", err))
 	}
 
 	userId, err := s.usersRepository.CreateUser(ctx, payload.AdminUsername, string(encryptedPassword))
 	if err != nil {
 		s.keyManager.RollbackToUninitialized()
-
-		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalShares, columnMinShares, columnMasterKeyChecksum)
+		jwtDelErr := s.secretsRepository.DeleteSecret(ctx, "internal/jwt_signing_key")
+		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalSharesColumn, columnMinSharesColumn, columnMasterKeyChecksumColumn)
 		if delErr != nil {
+			if jwtDelErr != nil {
+				return nil, genkey.MakeInternalError(fmt.Errorf(
+					"could not create admin user: %v; rollback cleanup also failed: %v; jwt deletion failed: %v", err, delErr, jwtDelErr))
+			}
 			return nil, genkey.MakeInternalError(fmt.Errorf(
 				"could not create admin user: %v; rollback cleanup also failed: %v", err, delErr))
 		}
@@ -150,14 +184,18 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 	role, err := s.rolesRepository.GetRoleByName(ctx, "admin")
 	if err != nil {
 		s.keyManager.RollbackToUninitialized()
-
-		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalShares, columnMinShares, columnMasterKeyChecksum)
+		jwtDelErr := s.secretsRepository.DeleteSecret(ctx, "internal/jwt_signing_key")
+		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalSharesColumn, columnMinSharesColumn, columnMasterKeyChecksumColumn)
 		if delErr != nil {
+			if jwtDelErr != nil {
+				return nil, genkey.MakeInternalError(fmt.Errorf(
+					"could not create admin user: %v; rollback cleanup also failed: %v; jwt deletion failed: %v", err, delErr, jwtDelErr))
+			}
 			return nil, genkey.MakeInternalError(fmt.Errorf(
-				"could not retrieve admin role: %v; rollback cleanup also failed: %v", err, delErr))
+				"could not create admin user: %v; rollback cleanup also failed: %v", err, delErr))
 		}
 
-		return nil, genkey.MakeInternalError(fmt.Errorf("could not retrieve admin role: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("could not create admin user: %v", err))
 	}
 
 	err = s.userRolesRepository.AssignRoleToUser(ctx, userId, role.ID)
@@ -172,7 +210,7 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 }
 
 func (s *KeyManagementService) GetKeyStatus(ctx context.Context) (*genkey.GetKeyStatusResult, error) {
-	_, err := s.settingsRepository.GetSetting(ctx, columnMasterKeyChecksum)
+	_, err := s.settingsRepository.GetSetting(ctx, columnMasterKeyChecksumColumn)
 	if err != nil {
 		if errors.Is(err, repository.ErrSettingNotFound) {
 			return nil, genkey.NoKeySet("master key not set")
@@ -217,7 +255,7 @@ func (s *KeyManagementService) AddShare(ctx context.Context, payload *genkey.Add
 	}
 
 	if unlocked {
-		checksum, err := s.settingsRepository.GetSetting(ctx, columnMasterKeyChecksum)
+		checksum, err := s.settingsRepository.GetSetting(ctx, columnMasterKeyChecksumColumn)
 		if err != nil {
 			return nil, genkey.InternalError("error retrieving master key checksum: " + err.Error())
 		}
