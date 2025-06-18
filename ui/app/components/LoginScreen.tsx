@@ -4,11 +4,7 @@ import {useState} from 'react'
 import {login} from '../api/users'
 import styles from './LoginScreen.module.css'
 
-interface LoginScreenProps {
-  onLoginSuccess: () => void
-}
-
-export default function LoginScreen({onLoginSuccess}: LoginScreenProps) {
+export default function LoginScreen() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -24,9 +20,9 @@ export default function LoginScreen({onLoginSuccess}: LoginScreenProps) {
       localStorage.setItem('authToken', data.token)
       // You can store the username too if needed
       localStorage.setItem('username', data.username)
-
-      // Call the onLoginSuccess callback
-      onLoginSuccess()
+      
+      // Redirect or update app state as needed
+      window.location.href = '/dashboard' // Or use your router
     } catch (err: any) {
       let errorMessage = 'Login failed'
       if (err?.body) {
