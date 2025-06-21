@@ -1,0 +1,13 @@
+all: false
+dir: 'gen/mocks'
+filename: '{{.InterfaceFile | base | trimSuffix ".go"}}_mock.go'
+force-file-write: true
+pkgname: '{{.SrcPackageName}}mocks'
+recursive: true
+require-template-schema-exists: true
+template: testify
+template-schema: '{{.Template}}.schema.json'
+packages:
+  github.com/Vidalee/FishyKeys/repository:
+    interfaces:
+      SecretsRepository:

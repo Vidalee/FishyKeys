@@ -17,7 +17,6 @@ func JWTMiddleware(secretsRepository repository.SecretsRepository, keyManager *c
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			tokenHeaderValue := r.Header.Get("Authorization")
-
 			if tokenHeaderValue == "" {
 				next.ServeHTTP(w, r)
 				return

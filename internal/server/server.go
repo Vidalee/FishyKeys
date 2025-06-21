@@ -1,18 +1,17 @@
 package server
 
 import (
-	"github.com/Vidalee/FishyKeys/gen/users"
-	"github.com/Vidalee/FishyKeys/internal/server/middleware"
-	"github.com/Vidalee/FishyKeys/repository"
-	"github.com/Vidalee/FishyKeys/service"
-	"net/http"
-
 	keysvvr "github.com/Vidalee/FishyKeys/gen/http/key_management/server"
 	userssvvr "github.com/Vidalee/FishyKeys/gen/http/users/server"
 	"github.com/Vidalee/FishyKeys/gen/key_management"
+	"github.com/Vidalee/FishyKeys/gen/users"
 	"github.com/Vidalee/FishyKeys/internal/crypto"
+	"github.com/Vidalee/FishyKeys/internal/server/middleware"
+	"github.com/Vidalee/FishyKeys/repository"
+	"github.com/Vidalee/FishyKeys/service"
 	"github.com/jackc/pgx/v5/pgxpool"
 	goahttp "goa.design/goa/v3/http"
+	"net/http"
 )
 
 func NewServer(pool *pgxpool.Pool) http.Handler {
