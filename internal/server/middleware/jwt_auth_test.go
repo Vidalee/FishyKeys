@@ -29,7 +29,6 @@ func TestJWTMiddleware_NoAuthorizationHeader(t *testing.T) {
 	mw := JWTMiddleware(mockRepo, keyManager)
 
 	testHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// No token in context should be present
 		token := r.Context().Value("token")
 		assert.Nil(t, token)
 		w.WriteHeader(http.StatusOK)
@@ -54,7 +53,6 @@ func TestJWTMiddleware_KeyManagerNotUnlocked(t *testing.T) {
 	resp := httptest.NewRecorder()
 
 	testHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// No token in context should be present
 		token := r.Context().Value("token")
 		assert.Nil(t, token)
 		w.WriteHeader(http.StatusOK)
