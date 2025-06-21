@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/Vidalee/FishyKeys/gen/users"
+	"github.com/Vidalee/FishyKeys/internal/server/middleware"
 	"github.com/Vidalee/FishyKeys/repository"
 	"github.com/Vidalee/FishyKeys/service"
 	"net/http"
@@ -34,6 +35,8 @@ func NewServer(pool *pgxpool.Pool) http.Handler {
 
 	keyManagementHandler := keysvvr.New(keyManagementEndpoints, mux, requestDecoder, responseEncoder, nil, nil)
 	usersHandler := userssvvr.New(usersEndpoints, mux, requestDecoder, responseEncoder, nil, nil)
+
+	mux.Use(middleware.JWTMiddleware(secretsRepo, keyManager))
 
 	keysvvr.Mount(mux, keyManagementHandler)
 	userssvvr.Mount(mux, usersHandler)

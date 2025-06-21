@@ -88,7 +88,7 @@ func (s *UsersService) AuthUser(ctx context.Context, payload *genusers.AuthUserP
 
 	decryptedSecret, err := s.secretsRepository.GetSecretByPath(ctx, s.keyManager, "internal/jwt_signing_key")
 	if err != nil {
-		return nil, genusers.InternalError("could not retrieve JWT signing key")
+		return nil, genusers.InternalError("could not retrieve JWT signing key" + err.Error())
 	}
 	decodedSecret, err := base64.StdEncoding.DecodeString(decryptedSecret.DecryptedValue)
 	if err != nil {
@@ -100,7 +100,7 @@ func (s *UsersService) AuthUser(ctx context.Context, payload *genusers.AuthUserP
 		"sub":      user.Username,
 		"iat":      jwt.NewNumericDate(time.Now()),
 		"username": user.Username,
-		"exp":      jwt.NewNumericDate(decryptedSecret.CreatedAt.Add(24 * time.Hour)),
+		"exp":      jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 	})
 
 	tokenString, err := token.SignedString(decodedSecret)
