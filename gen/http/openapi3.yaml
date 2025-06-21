@@ -50,7 +50,7 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Vel non nam magnam beatae ipsa.
+                                example: Ut vel non nam magnam beatae ipsa.
                             example: Quidem voluptatibus ducimus.
                 "500":
                     description: 'internal_error: Internal server error'
@@ -241,6 +241,12 @@ paths:
                                 - created_at: Necessitatibus dicta optio.
                                   updated_at: Eos ducimus repudiandae et distinctio.
                                   username: Culpa voluptatem impedit tempore et quod.
+                "401":
+                  description: 'unauthorized: Unauthorized access'
+                  content:
+                    application/vnd.goa.error:
+                      schema:
+                        $ref: '#/components/schemas/Error'
                 "500":
                     description: 'internal_error: Internal Server Error response.'
                     content:
@@ -353,7 +359,7 @@ paths:
                                 $ref: '#/components/schemas/AuthUserResponseBody'
                             example:
                                 token: Dolores aperiam excepturi quisquam.
-                                username: Error consequatur beatae voluptatem voluptatibus qui.
+                                username: Voluptatem voluptatibus qui.
                 "400":
                     description: 'invalid_parameters: Invalid input'
                     content:
@@ -461,18 +467,18 @@ components:
                     type: array
                     items:
                         type: string
-                        example: Ipsam eos ut repellendus sunt.
+                        example: Ut qui sint.
                     description: The generated key shares
                     example:
-                        - Sint sapiente architecto vero voluptatem ad amet.
-                        - Est eligendi aut quae.
+                      - Vero voluptatem.
+                      - Amet sint est eligendi aut quae vel.
+                      - Voluptate dolorem.
+                      - Sed et qui et quis eaque.
             example:
                 admin_username: admin
                 shares:
-                    - Voluptate dolorem.
-                    - Sed et qui et quis eaque.
-                    - Et dignissimos vel eos quis.
-                    - Enim dolore est temporibus nam.
+                  - Dignissimos vel.
+                  - Quis occaecati enim dolore est temporibus.
         CreateUserRequestBody:
             type: object
             properties:
@@ -546,12 +552,12 @@ components:
                     example: true
             description: Invalid parameters provided
             example:
-                fault: true
+              fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: false
+              timeout: true
             required:
                 - name
                 - id
@@ -597,19 +603,19 @@ components:
                 created_at:
                     type: string
                     description: User creation timestamp
-                    example: Quia et similique nihil iste et.
+                    example: Iste et animi explicabo sed.
                 updated_at:
                     type: string
                     description: User last update timestamp
-                    example: Explicabo sed sed accusantium.
+                    example: Accusantium commodi repudiandae et molestias quasi eveniet.
                 username:
                     type: string
                     description: The username
-                    example: Rerum quidem expedita optio.
+                    example: Qui quia et similique.
             example:
-                created_at: Quasi eveniet cupiditate eos et.
-                updated_at: Eos beatae et eligendi consequatur voluptas.
-                username: Repudiandae et.
+              created_at: Beatae et eligendi.
+              updated_at: Voluptas nesciunt ipsam eos ut repellendus.
+              username: Eos et nisi.
             required:
                 - username
                 - created_at

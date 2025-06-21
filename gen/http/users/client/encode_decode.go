@@ -148,6 +148,7 @@ func (c *Client) BuildListUsersRequest(ctx context.Context, v any) (*http.Reques
 // users list users endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeListUsersResponse may return the following errors:
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
 //   - "internal_error" (type users.InternalError): http.StatusInternalServerError
 //   - error: internal error
 func DecodeListUsersResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
@@ -186,6 +187,20 @@ func DecodeListUsersResponse(decoder func(*http.Response) goahttp.Decoder, resto
 			}
 			res := NewListUsersUserOK(body)
 			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body ListUsersUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("users", "list users", err)
+			}
+			err = ValidateListUsersUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "list users", err)
+			}
+			return nil, NewListUsersUnauthorized(&body)
 		case http.StatusInternalServerError:
 			var (
 				body string

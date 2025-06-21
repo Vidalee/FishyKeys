@@ -22,13 +22,15 @@ type Endpoints struct {
 }
 
 // NewEndpoints wraps the methods of the "users" service with endpoints.
-func NewEndpoints(s Service) *Endpoints {
-	return &Endpoints{
+func NewEndpoints(s Service, si ServerInterceptors) *Endpoints {
+	endpoints := &Endpoints{
 		CreateUser: NewCreateUserEndpoint(s),
 		ListUsers:  NewListUsersEndpoint(s),
 		DeleteUser: NewDeleteUserEndpoint(s),
 		AuthUser:   NewAuthUserEndpoint(s),
 	}
+	endpoints.ListUsers = WrapListUsersEndpoint(endpoints.ListUsers, si)
+	return endpoints
 }
 
 // Use applies the given middleware to all the "users" service endpoints.

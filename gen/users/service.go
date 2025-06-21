@@ -120,12 +120,12 @@ func MakeInvalidParameters(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "invalid_parameters", false, false, false)
 }
 
-// MakeUserNotFound builds a goa.ServiceError from an error.
-func MakeUserNotFound(err error) *goa.ServiceError {
-	return goa.NewServiceError(err, "user_not_found", false, false, false)
-}
-
 // MakeUnauthorized builds a goa.ServiceError from an error.
 func MakeUnauthorized(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "unauthorized", false, false, false)
+}
+
+// MakeUserNotFound builds a goa.ServiceError from an error.
+func MakeUserNotFound(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "user_not_found", false, false, false)
 }

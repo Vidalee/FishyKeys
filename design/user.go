@@ -42,13 +42,17 @@ var _ = Service("users", func() {
 	})
 
 	Method("list users", func() {
+		ServerInterceptor(Authentified)
+
 		Description("List all users")
 		Result(ArrayOf(UserType))
 		Error("internal_error", String, "Internal server error")
+		Error("unauthorized", ErrorResult, "Unauthorized access")
 		HTTP(func() {
 			GET("/users")
 			Response(StatusOK)
 			Response("internal_error", StatusInternalServerError)
+			Response("unauthorized", StatusUnauthorized)
 		})
 	})
 

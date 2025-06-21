@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/base64"
 	keysvvr "github.com/Vidalee/FishyKeys/gen/http/key_management/server"
 	userssvvr "github.com/Vidalee/FishyKeys/gen/http/users/server"
 	"github.com/Vidalee/FishyKeys/gen/key_management"
@@ -16,6 +17,7 @@ import (
 
 func NewServer(pool *pgxpool.Pool) http.Handler {
 	keyManager := crypto.GetDefaultKeyManager()
+
 	globalSettingsRepo := repository.NewGlobalSettingsRepository(pool)
 	usersRepo := repository.NewUsersRepository(pool)
 	rolesRepo := repository.NewRolesRepository(pool)
@@ -26,7 +28,7 @@ func NewServer(pool *pgxpool.Pool) http.Handler {
 	userService := service.NewUsersService(keyManager, usersRepo, globalSettingsRepo, secretsRepo)
 
 	keyManagementEndpoints := keymanagement.NewEndpoints(keyService)
-	usersEndpoints := users.NewEndpoints(userService)
+	usersEndpoints := users.NewEndpoints(userService, new(ServerInterceptors))
 
 	mux := goahttp.NewMuxer()
 	requestDecoder := goahttp.RequestDecoder
@@ -39,6 +41,11 @@ func NewServer(pool *pgxpool.Pool) http.Handler {
 
 	keysvvr.Mount(mux, keyManagementHandler)
 	userssvvr.Mount(mux, usersHandler)
+
+	sharea, _ := base64.StdEncoding.DecodeString("1fWlSfHi4R4K2JuolAU4fLXLgt422GVh7uRyZc+TzOc3")
+	shareb, _ := base64.StdEncoding.DecodeString("sQXrxgp9txV5yu9vsAhtbNm5fmgwlLh78swV8fV128xt")
+	keyManager.AddShare(sharea)
+	keyManager.AddShare(shareb)
 
 	return mux
 }

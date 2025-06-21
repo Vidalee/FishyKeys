@@ -49,6 +49,7 @@ func (c *Client) CreateUser(ctx context.Context, p *CreateUserPayload) (res *Cre
 // ListUsers calls the "list users" endpoint of the "users" service.
 // ListUsers may return the following errors:
 //   - "internal_error" (type InternalError)
+//   - "unauthorized" (type *goa.ServiceError): Unauthorized access
 //   - error: internal error
 func (c *Client) ListUsers(ctx context.Context) (res []*User, err error) {
 	var ires any
