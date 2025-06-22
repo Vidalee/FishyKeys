@@ -42,10 +42,5 @@ func NewServer(pool *pgxpool.Pool) http.Handler {
 	keysvvr.Mount(mux, keyManagementHandler)
 	userssvvr.Mount(mux, usersHandler)
 
-	sharea, _ := base64.StdEncoding.DecodeString("1fWlSfHi4R4K2JuolAU4fLXLgt422GVh7uRyZc+TzOc3")
-	shareb, _ := base64.StdEncoding.DecodeString("sQXrxgp9txV5yu9vsAhtbNm5fmgwlLh78swV8fV128xt")
-	keyManager.AddShare(sharea)
-	keyManager.AddShare(shareb)
-
 	return mux
 }
