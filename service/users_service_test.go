@@ -170,6 +170,7 @@ func TestUsersService_AuthUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			clearUsersServiceTables(t, ctx)
 
+			var createUserResult *genusers.CreateUserResult
 			if tt.createUser {
 				createMasterKeyPayload := &genkey.CreateMasterKeyPayload{
 					TotalShares:   3,
@@ -186,7 +187,7 @@ func TestUsersService_AuthUser(t *testing.T) {
 					Username: tt.username,
 					Password: tt.password,
 				}
-				_, err = service.CreateUser(ctx, createPayload)
+				createUserResult, err = service.CreateUser(ctx, createPayload)
 				require.NoError(t, err, "failed to create user for auth test")
 			}
 
@@ -224,6 +225,7 @@ func TestUsersService_AuthUser(t *testing.T) {
 				claims, ok := token.Claims.(*JwtClaims)
 				assert.True(t, ok, "claims should be of type JwtClaims")
 				assert.Equal(t, tt.username, claims.Username, "username in claims should match")
+				assert.Equal(t, *createUserResult.ID, claims.UserID, "user ID in token should match created user ID")
 			}
 		})
 	}

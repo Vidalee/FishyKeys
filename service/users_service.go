@@ -15,6 +15,7 @@ import (
 
 type JwtClaims struct {
 	Username string `json:"username"`
+	UserID   int    `json:"userid"`
 	jwt.RegisteredClaims
 }
 
@@ -101,6 +102,7 @@ func (s *UsersService) AuthUser(ctx context.Context, payload *genusers.AuthUserP
 		"iat":      jwt.NewNumericDate(time.Now()),
 		"username": user.Username,
 		"exp":      jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		"userid":   user.ID,
 	})
 
 	tokenString, err := token.SignedString(decodedSecret)
