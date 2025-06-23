@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/base64"
 	keysvvr "github.com/Vidalee/FishyKeys/gen/http/key_management/server"
 	userssvvr "github.com/Vidalee/FishyKeys/gen/http/users/server"
 	"github.com/Vidalee/FishyKeys/gen/key_management"
