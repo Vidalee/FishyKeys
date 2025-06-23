@@ -143,7 +143,7 @@ func (s *UsersService) DeleteUser(ctx context.Context, payload *genusers.DeleteU
 		if errors.Is(err, repository.ErrUserNotFound) {
 			return genusers.MakeUserNotFound(fmt.Errorf("user not found"))
 		}
-		return genusers.InternalError("could not delete user")
+		return genusers.MakeInternalError(fmt.Errorf("could not delete user"))
 	}
 
 	return nil

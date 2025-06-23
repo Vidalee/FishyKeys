@@ -64,7 +64,9 @@ func (c *Client) ListUsers(ctx context.Context) (res []*User, err error) {
 // DeleteUser may return the following errors:
 //   - "user_not_found" (type *goa.ServiceError): User not found
 //   - "invalid_parameters" (type *goa.ServiceError): Invalid input
-//   - "internal_error" (type InternalError)
+//   - "internal_error" (type *goa.ServiceError): Internal server error
+//   - "forbidden" (type *goa.ServiceError): Forbidden access
+//   - "unauthorized" (type *goa.ServiceError): Unauthorized access
 //   - error: internal error
 func (c *Client) DeleteUser(ctx context.Context, p *DeleteUserPayload) (err error) {
 	_, err = c.DeleteUserEndpoint(ctx, p)

@@ -30,6 +30,7 @@ func NewEndpoints(s Service, si ServerInterceptors) *Endpoints {
 		AuthUser:   NewAuthUserEndpoint(s),
 	}
 	endpoints.ListUsers = WrapListUsersEndpoint(endpoints.ListUsers, si)
+	endpoints.DeleteUser = WrapDeleteUserEndpoint(endpoints.DeleteUser, si)
 	return endpoints
 }
 

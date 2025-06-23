@@ -28,7 +28,10 @@ func NewServer(pool *pgxpool.Pool) http.Handler {
 	userService := service.NewUsersService(keyManager, usersRepo, globalSettingsRepo, secretsRepo)
 
 	keyManagementEndpoints := keymanagement.NewEndpoints(keyService)
-	usersEndpoints := users.NewEndpoints(userService, new(ServerInterceptors))
+	usersEndpoints := users.NewEndpoints(userService, &ServerInterceptors{
+		userRolesRepository: userRolesRepo,
+		rolesRepository:     rolesRepo,
+	})
 
 	mux := goahttp.NewMuxer()
 	requestDecoder := goahttp.RequestDecoder

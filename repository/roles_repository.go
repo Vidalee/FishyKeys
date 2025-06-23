@@ -16,6 +16,7 @@ type Role struct {
 	ID        int
 	Name      string
 	Color     string
+	Admin     bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -25,6 +26,7 @@ type RolesRepository interface {
 	GetRoleByID(ctx context.Context, id int) (*Role, error)
 	GetRoleByName(ctx context.Context, name string) (*Role, error)
 	ListRoles(ctx context.Context) ([]Role, error)
+	GetRolesByIDs(ctx context.Context, ids []int) ([]Role, error)
 }
 
 type rolesRepository struct {
@@ -46,9 +48,9 @@ func (r *rolesRepository) CreateRole(ctx context.Context, name string, color str
 }
 
 func (r *rolesRepository) GetRoleByID(ctx context.Context, id int) (*Role, error) {
-	query := `SELECT id, name, color, created_at, updated_at FROM roles WHERE id = $1`
+	query := `SELECT id, name, color, admin, created_at, updated_at FROM roles WHERE id = $1`
 	var role Role
-	err := r.pool.QueryRow(ctx, query, id).Scan(&role.ID, &role.Name, &role.Color, &role.CreatedAt, &role.UpdatedAt)
+	err := r.pool.QueryRow(ctx, query, id).Scan(&role.ID, &role.Name, &role.Color, &role.Admin, &role.CreatedAt, &role.UpdatedAt)
 	if err != nil {
 		return nil, ErrRoleNotFound
 	}
@@ -56,9 +58,9 @@ func (r *rolesRepository) GetRoleByID(ctx context.Context, id int) (*Role, error
 }
 
 func (r *rolesRepository) GetRoleByName(ctx context.Context, name string) (*Role, error) {
-	query := `SELECT id, name, color, created_at, updated_at FROM roles WHERE name = $1`
+	query := `SELECT id, name, color, admin, created_at, updated_at FROM roles WHERE name = $1`
 	var role Role
-	err := r.pool.QueryRow(ctx, query, name).Scan(&role.ID, &role.Name, &role.Color, &role.CreatedAt, &role.UpdatedAt)
+	err := r.pool.QueryRow(ctx, query, name).Scan(&role.ID, &role.Name, &role.Color, &role.Admin, &role.CreatedAt, &role.UpdatedAt)
 	if err != nil {
 		return nil, ErrRoleNotFound
 	}
@@ -66,7 +68,7 @@ func (r *rolesRepository) GetRoleByName(ctx context.Context, name string) (*Role
 }
 
 func (r *rolesRepository) ListRoles(ctx context.Context) ([]Role, error) {
-	query := `SELECT id, name, color, created_at, updated_at FROM roles`
+	query := `SELECT id, name, color, admin, created_at, updated_at FROM roles ORDER BY created_at`
 	rows, err := r.pool.Query(ctx, query)
 	if err != nil {
 		return nil, err
@@ -76,7 +78,30 @@ func (r *rolesRepository) ListRoles(ctx context.Context) ([]Role, error) {
 	var roles []Role
 	for rows.Next() {
 		var role Role
-		if err := rows.Scan(&role.ID, &role.Name, &role.Color, &role.CreatedAt, &role.UpdatedAt); err != nil {
+		if err := rows.Scan(&role.ID, &role.Name, &role.Color, &role.Admin, &role.CreatedAt, &role.UpdatedAt); err != nil {
+			return nil, err
+		}
+		roles = append(roles, role)
+	}
+	return roles, nil
+}
+
+func (r *rolesRepository) GetRolesByIDs(ctx context.Context, ids []int) ([]Role, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
+	query := `SELECT id, name, color, admin, created_at, updated_at FROM roles WHERE id = ANY($1)`
+	rows, err := r.pool.Query(ctx, query, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var roles []Role
+	for rows.Next() {
+		var role Role
+		if err := rows.Scan(&role.ID, &role.Name, &role.Color, &role.Admin, &role.CreatedAt, &role.UpdatedAt); err != nil {
 			return nil, err
 		}
 		roles = append(roles, role)

@@ -248,7 +248,10 @@ func (c *Client) BuildDeleteUserRequest(ctx context.Context, v any) (*http.Reque
 // should be restored after having been read.
 // DecodeDeleteUserResponse may return the following errors:
 //   - "user_not_found" (type *goa.ServiceError): http.StatusNotFound
-//   - "internal_error" (type users.InternalError): http.StatusInternalServerError
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
+//   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
 //   - error: internal error
 func DecodeDeleteUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -283,14 +286,60 @@ func DecodeDeleteUserResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			return nil, NewDeleteUserUserNotFound(&body)
 		case http.StatusInternalServerError:
 			var (
-				body string
+				body DeleteUserInternalErrorResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("users", "delete user", err)
 			}
-			return nil, NewDeleteUserInternalError(body)
+			err = ValidateDeleteUserInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "delete user", err)
+			}
+			return nil, NewDeleteUserInternalError(&body)
+		case http.StatusBadRequest:
+			var (
+				body DeleteUserInvalidParametersResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("users", "delete user", err)
+			}
+			err = ValidateDeleteUserInvalidParametersResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "delete user", err)
+			}
+			return nil, NewDeleteUserInvalidParameters(&body)
+		case http.StatusForbidden:
+			var (
+				body DeleteUserForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("users", "delete user", err)
+			}
+			err = ValidateDeleteUserForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "delete user", err)
+			}
+			return nil, NewDeleteUserForbidden(&body)
+		case http.StatusUnauthorized:
+			var (
+				body DeleteUserUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("users", "delete user", err)
+			}
+			err = ValidateDeleteUserUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "delete user", err)
+			}
+			return nil, NewDeleteUserUnauthorized(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("users", "delete user", resp.StatusCode, string(body))

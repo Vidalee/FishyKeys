@@ -26,3 +26,16 @@ func wrapListUsersAuthentified(endpoint goa.Endpoint, i ServerInterceptors) goa.
 		return i.Authentified(ctx, info, endpoint)
 	}
 }
+
+// wrapIsAdminDeleteUser applies the IsAdmin server interceptor to endpoints.
+func wrapDeleteUserIsAdmin(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		info := &IsAdminInfo{
+			service:    "users",
+			method:     "DeleteUser",
+			callType:   goa.InterceptorUnary,
+			rawPayload: req,
+		}
+		return i.IsAdmin(ctx, info, endpoint)
+	}
+}

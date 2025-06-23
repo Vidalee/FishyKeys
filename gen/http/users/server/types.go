@@ -124,6 +124,78 @@ type DeleteUserUserNotFoundResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// DeleteUserInternalErrorResponseBody is the type of the "users" service
+// "delete user" endpoint HTTP response body for the "internal_error" error.
+type DeleteUserInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteUserInvalidParametersResponseBody is the type of the "users" service
+// "delete user" endpoint HTTP response body for the "invalid_parameters" error.
+type DeleteUserInvalidParametersResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteUserForbiddenResponseBody is the type of the "users" service "delete
+// user" endpoint HTTP response body for the "forbidden" error.
+type DeleteUserForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteUserUnauthorizedResponseBody is the type of the "users" service
+// "delete user" endpoint HTTP response body for the "unauthorized" error.
+type DeleteUserUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // AuthUserUnauthorizedResponseBody is the type of the "users" service "auth
 // user" endpoint HTTP response body for the "unauthorized" error.
 type AuthUserUnauthorizedResponseBody struct {
@@ -246,6 +318,62 @@ func NewListUsersUnauthorizedResponseBody(res *goa.ServiceError) *ListUsersUnaut
 // result of the "delete user" endpoint of the "users" service.
 func NewDeleteUserUserNotFoundResponseBody(res *goa.ServiceError) *DeleteUserUserNotFoundResponseBody {
 	body := &DeleteUserUserNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteUserInternalErrorResponseBody builds the HTTP response body from
+// the result of the "delete user" endpoint of the "users" service.
+func NewDeleteUserInternalErrorResponseBody(res *goa.ServiceError) *DeleteUserInternalErrorResponseBody {
+	body := &DeleteUserInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteUserInvalidParametersResponseBody builds the HTTP response body
+// from the result of the "delete user" endpoint of the "users" service.
+func NewDeleteUserInvalidParametersResponseBody(res *goa.ServiceError) *DeleteUserInvalidParametersResponseBody {
+	body := &DeleteUserInvalidParametersResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteUserForbiddenResponseBody builds the HTTP response body from the
+// result of the "delete user" endpoint of the "users" service.
+func NewDeleteUserForbiddenResponseBody(res *goa.ServiceError) *DeleteUserForbiddenResponseBody {
+	body := &DeleteUserForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteUserUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "delete user" endpoint of the "users" service.
+func NewDeleteUserUnauthorizedResponseBody(res *goa.ServiceError) *DeleteUserUnauthorizedResponseBody {
+	body := &DeleteUserUnauthorizedResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,

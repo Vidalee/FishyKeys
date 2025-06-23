@@ -129,3 +129,13 @@ func MakeUnauthorized(err error) *goa.ServiceError {
 func MakeUserNotFound(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "user_not_found", false, false, false)
 }
+
+// MakeInternalError builds a goa.ServiceError from an error.
+func MakeInternalError(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "internal_error", false, false, false)
+}
+
+// MakeForbidden builds a goa.ServiceError from an error.
+func MakeForbidden(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "forbidden", false, false, false)
+}

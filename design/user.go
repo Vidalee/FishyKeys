@@ -57,6 +57,8 @@ var _ = Service("users", func() {
 	})
 
 	Method("delete user", func() {
+		ServerInterceptor(IsAdmin)
+
 		Description("Delete a user by username")
 		Payload(func() {
 			Attribute("username", String, "Username of the user to delete", func() {
@@ -66,12 +68,17 @@ var _ = Service("users", func() {
 		})
 		Error("user_not_found", ErrorResult, "User not found")
 		Error("invalid_parameters", ErrorResult, "Invalid input")
-		Error("internal_error", String, "Internal server error")
+		Error("internal_error", ErrorResult, "Internal server error")
+		Error("forbidden", ErrorResult, "Forbidden access")
+		Error("unauthorized", ErrorResult, "Unauthorized access")
 		HTTP(func() {
 			DELETE("/users/{username}")
 			Response(StatusOK)
 			Response("user_not_found", StatusNotFound)
 			Response("internal_error", StatusInternalServerError)
+			Response("invalid_parameters", StatusBadRequest)
+			Response("forbidden", StatusForbidden)
+			Response("unauthorized", StatusUnauthorized)
 		})
 	})
 

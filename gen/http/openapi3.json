@@ -71,7 +71,7 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Ut vel non nam magnam beatae ipsa."
+                  "example": "Maxime doloribus."
                 },
                 "example": "Quidem voluptatibus ducimus."
               }
@@ -121,7 +121,7 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Eos est sit dignissimos ex."
+                  "example": "Asperiores dolorem sed incidunt id."
                 },
                 "example": "Hic placeat maxime."
               }
@@ -133,7 +133,7 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Ut officia earum totam esse."
+                  "example": "Voluptas est et corrupti culpa minus."
                 },
                 "example": "Est et expedita doloremque architecto commodi rerum."
               }
@@ -145,7 +145,7 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Voluptas est et corrupti culpa minus."
+                  "example": "Voluptas aspernatur quia cupiditate sint molestiae adipisci."
                 },
                 "example": "Atque quas ut quidem."
               }
@@ -157,7 +157,7 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Velit praesentium sint."
+                  "example": "Eos est sit dignissimos ex."
                 },
                 "example": "Nam nobis libero repudiandae."
               }
@@ -206,7 +206,7 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Doloribus fugiat ut qui consequatur illum totam."
+                  "example": "Nostrum minima et qui."
                 },
                 "example": "Ducimus eum qui est."
               }
@@ -218,7 +218,7 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Officiis eaque corrupti aut minima nam voluptatem."
+                  "example": "Ut officia earum totam esse."
                 },
                 "example": "Maiores at et ut occaecati harum maiores."
               }
@@ -230,7 +230,7 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Et qui."
+                  "example": "Et atque."
                 },
                 "example": "Aut quis."
               }
@@ -242,7 +242,7 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Inventore inventore nostrum."
+                  "example": "Dignissimos veniam voluptatem."
                 },
                 "example": "Dolorem fuga cupiditate alias quis voluptatibus dignissimos."
               }
@@ -282,7 +282,7 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Explicabo molestiae non voluptatem qui."
+                  "example": "Repellat natus quidem impedit repudiandae accusantium."
                 },
                 "example": "Perspiciatis repellendus facilis est."
               }
@@ -294,7 +294,7 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Omnis quia et repellat natus quidem impedit."
+                  "example": "Ipsum laborum doloribus fugiat ut qui consequatur."
                 },
                 "example": "Rerum ab et aliquam."
               }
@@ -385,7 +385,7 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Ab qui harum distinctio."
+                  "example": "Cumque amet et."
                 },
                 "example": "Modi at ipsum sapiente et quia sed."
               }
@@ -455,7 +455,7 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Magnam atque est autem sit sit in."
+                  "example": "In rem dolor ab qui harum."
                 },
                 "example": "Eligendi quae adipisci occaecati."
               }
@@ -495,8 +495,8 @@
                   "$ref": "#/components/schemas/AuthUserResponseBody"
                 },
                 "example": {
-                  "token": "Dolores aperiam excepturi quisquam.",
-                  "username": "Voluptatem voluptatibus qui."
+                  "token": "Eos sapiente.",
+                  "username": "Dolores aperiam excepturi quisquam."
                 }
               }
             }
@@ -529,7 +529,7 @@
                   "type": "string",
                   "example": "Et eveniet."
                 },
-                "example": "Sit qui natus voluptas."
+                "example": "Mollitia quos."
               }
             }
           }
@@ -562,6 +562,36 @@
           "200": {
             "description": "OK response."
           },
+          "400": {
+            "description": "invalid_parameters: Invalid input",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized: Unauthorized access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "forbidden: Forbidden access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "404": {
             "description": "user_not_found: User not found",
             "content": {
@@ -573,14 +603,12 @@
             }
           },
           "500": {
-            "description": "internal_error: Internal Server Error response.",
+            "description": "internal_error: Internal server error",
             "content": {
-              "application/json": {
+              "application/vnd.goa.error": {
                 "schema": {
-                  "type": "string",
-                  "example": "Cumque amet et."
-                },
-                "example": "Mollitia quos."
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
           }
@@ -612,7 +640,7 @@
           "index": {
             "type": "integer",
             "description": "The index of the share added",
-            "example": 2913369924169603828,
+            "example": 2801840417263867146,
             "format": "int64"
           },
           "unlocked": {
@@ -622,7 +650,7 @@
           }
         },
         "example": {
-          "index": 7498136103528193892,
+          "index": 15565662336377959,
           "unlocked": true
         },
         "required": [
@@ -700,22 +728,20 @@
             "type": "array",
             "items": {
               "type": "string",
-              "example": "Ut qui sint."
+              "example": "Sed et qui et quis eaque."
             },
             "description": "The generated key shares",
             "example": [
-              "Vero voluptatem.",
-              "Amet sint est eligendi aut quae vel.",
-              "Voluptate dolorem.",
-              "Sed et qui et quis eaque."
+              "Dignissimos vel.",
+              "Quis occaecati enim dolore est temporibus."
             ]
           }
         },
         "example": {
           "admin_username": "admin",
           "shares": [
-            "Dignissimos vel.",
-            "Quis occaecati enim dolore est temporibus."
+            "Natus rerum optio est laborum.",
+            "Vel non nam magnam beatae ipsa."
           ]
         }
       },
@@ -748,18 +774,18 @@
           "id": {
             "type": "integer",
             "description": "Unique identifier for the user",
-            "example": 2431615301122470772,
+            "example": 3875426494026184978,
             "format": "int64"
           },
           "username": {
             "type": "string",
             "description": "The username of the created user",
-            "example": "Voluptas aspernatur quia cupiditate sint molestiae adipisci."
+            "example": "Sed dolor itaque."
           }
         },
         "example": {
-          "id": 2634242440342999069,
-          "username": "Dolorem sed incidunt id dolore sed."
+          "id": 5856351231608225095,
+          "username": "Est autem."
         }
       },
       "DeleteShareRequestBody": {
@@ -785,7 +811,7 @@
           "fault": {
             "type": "boolean",
             "description": "Is the error a server-side fault?",
-            "example": true
+            "example": false
           },
           "id": {
             "type": "string",
@@ -815,7 +841,7 @@
         },
         "description": "Invalid parameters provided",
         "example": {
-          "fault": false,
+          "fault": true,
           "id": "123abc",
           "message": "parameter 'p' must be an integer",
           "name": "bad_request",
@@ -837,7 +863,7 @@
           "current_shares": {
             "type": "integer",
             "description": "Number of shares currently held",
-            "example": 6264617142728411854,
+            "example": 459929980538903974,
             "format": "int64"
           },
           "is_locked": {
@@ -848,21 +874,21 @@
           "min_shares": {
             "type": "integer",
             "description": "Minimum number of shares required",
-            "example": 8040308551754500641,
+            "example": 8586128447272736307,
             "format": "int64"
           },
           "total_shares": {
             "type": "integer",
             "description": "Total number of shares",
-            "example": 829438709133849482,
+            "example": 8517354054290568962,
             "format": "int64"
           }
         },
         "example": {
-          "current_shares": 1690118052066438734,
+          "current_shares": 776755407977139347,
           "is_locked": true,
-          "min_shares": 8081814409444049649,
-          "total_shares": 6637934448445347402
+          "min_shares": 7572532649990936888,
+          "total_shares": 921494360688620238
         },
         "required": [
           "is_locked",
@@ -877,23 +903,23 @@
           "created_at": {
             "type": "string",
             "description": "User creation timestamp",
-            "example": "Iste et animi explicabo sed."
+            "example": "Eligendi consequatur voluptas."
           },
           "updated_at": {
             "type": "string",
             "description": "User last update timestamp",
-            "example": "Accusantium commodi repudiandae et molestias quasi eveniet."
+            "example": "Ipsam eos ut repellendus sunt."
           },
           "username": {
             "type": "string",
             "description": "The username",
-            "example": "Qui quia et similique."
+            "example": "Eveniet cupiditate eos et nisi eos beatae."
           }
         },
         "example": {
-          "created_at": "Beatae et eligendi.",
-          "updated_at": "Voluptas nesciunt ipsam eos ut repellendus.",
-          "username": "Eos et nisi."
+          "created_at": "Voluptatem ad amet sint est.",
+          "updated_at": "Aut quae vel occaecati voluptate dolorem.",
+          "username": "Qui sint sapiente architecto."
         },
         "required": [
           "username",

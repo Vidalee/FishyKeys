@@ -227,6 +227,18 @@ paths:
             responses:
                 "200":
                     description: OK response.
+                "400":
+                  description: Bad Request response.
+                  schema:
+                    $ref: '#/definitions/UsersDeleteUserInvalidParametersResponseBody'
+                "401":
+                  description: Unauthorized response.
+                  schema:
+                    $ref: '#/definitions/UsersDeleteUserUnauthorizedResponseBody'
+                "403":
+                  description: Forbidden response.
+                  schema:
+                    $ref: '#/definitions/UsersDeleteUserForbiddenResponseBody'
                 "404":
                     description: Not Found response.
                     schema:
@@ -234,7 +246,7 @@ paths:
                 "500":
                     description: Internal Server Error response.
                     schema:
-                        type: string
+                      $ref: '#/definitions/UsersDeleteUserInternalErrorResponseBody'
             schemes:
                 - http
     /users/auth:
@@ -292,14 +304,14 @@ definitions:
             index:
                 type: integer
                 description: The index of the share added
-                example: 6836499522799983954
+                example: 6301691789677483758
                 format: int64
             unlocked:
                 type: boolean
                 description: Whether the master key has been unlocked
                 example: true
         example:
-            index: 3985364364835542493
+          index: 6465654726740394934
             unlocked: true
         required:
             - index
@@ -327,7 +339,7 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: true
+                example: false
             timeout:
                 type: boolean
                 description: Is the error a timeout?
@@ -338,8 +350,8 @@ definitions:
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
-            timeout: true
+            temporary: false
+            timeout: false
         required:
             - name
             - id
@@ -374,7 +386,7 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: Invalid parameters provided (default view)
         example:
             fault: false
@@ -434,19 +446,18 @@ definitions:
                 type: array
                 items:
                     type: string
-                    example: Sed possimus occaecati nesciunt eos commodi.
+                    example: Quo aut eum et.
                 description: The generated key shares
                 example:
-                    - Aut eum et eaque ipsam.
-                    - Rem mollitia et est ratione.
-                    - Voluptates sunt quia autem laboriosam sunt.
+                  - Culpa rem mollitia et est.
+                  - Eos voluptates.
+                  - Quia autem laboriosam.
+                  - Nostrum assumenda optio.
         example:
             admin_username: admin
             shares:
-                - Optio molestiae nesciunt architecto.
-                - Facere quos doloribus repellendus.
-                - Qui quia corrupti.
-                - Non optio reiciendis dolore animi deleniti aut.
+              - Architecto sint.
+              - Quos doloribus repellendus.
     KeyManagementDeleteShareRequestBody:
         title: KeyManagementDeleteShareRequestBody
         type: object
@@ -467,7 +478,7 @@ definitions:
             current_shares:
                 type: integer
                 description: Number of shares currently held
-                example: 6650704053550084319
+                example: 3102119388426258781
                 format: int64
             is_locked:
                 type: boolean
@@ -476,18 +487,18 @@ definitions:
             min_shares:
                 type: integer
                 description: Minimum number of shares required
-                example: 4864005717453730110
+                example: 7771142693048255194
                 format: int64
             total_shares:
                 type: integer
                 description: Total number of shares
-                example: 7698091821871401703
+                example: 9122517568489913946
                 format: int64
         example:
-            current_shares: 7280264691809939389
-            is_locked: false
-            min_shares: 5550376517080984471
-            total_shares: 3638475778790626784
+          current_shares: 432813050019778879
+          is_locked: true
+          min_shares: 2145518412877319612
+          total_shares: 5372148105612043479
         required:
             - is_locked
             - current_shares
@@ -500,19 +511,19 @@ definitions:
             created_at:
                 type: string
                 description: User creation timestamp
-                example: Sint asperiores repudiandae deleniti sit rerum eveniet.
+                example: Et nihil qui nulla hic.
             updated_at:
                 type: string
                 description: User last update timestamp
-                example: Tenetur maxime quasi veniam autem temporibus.
+                example: Esse in.
             username:
                 type: string
                 description: The username
-                example: Esse in.
+                example: Et qui odio minima consequatur et tenetur.
         example:
-            created_at: Laborum ratione minima.
-            updated_at: Et quis vel reiciendis.
-            username: Cum ipsum tenetur blanditiis est pariatur.
+          created_at: Tenetur maxime quasi veniam autem temporibus.
+          updated_at: Cum ipsum tenetur blanditiis est pariatur.
+          username: Sint asperiores repudiandae deleniti sit rerum eveniet.
         required:
             - username
             - created_at
@@ -524,7 +535,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -540,18 +551,18 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: true
+                example: false
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: true
+                example: false
         description: Invalid input (default view)
         example:
-          fault: false
+          fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
+          temporary: false
             timeout: true
         required:
             - name
@@ -585,14 +596,14 @@ definitions:
             token:
                 type: string
                 description: JWT or session token
-                example: Consequatur autem ut necessitatibus dolor.
+                example: Eum necessitatibus perspiciatis.
             username:
                 type: string
                 description: The username of the authenticated user
-                example: Natus aliquam laborum illo impedit debitis.
+                example: Esse dolores aut quia ea.
         example:
-          token: Dolores aut quia.
-          username: Aut ratione.
+          token: Qui quia et similique.
+          username: Aperiam nemo et rerum quidem expedita.
     UsersAuthUserUnauthorizedResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
@@ -600,7 +611,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: false
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -616,19 +627,19 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: Invalid username or password (default view)
         example:
           fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
-            timeout: false
+          temporary: false
+          timeout: true
         required:
             - name
             - id
@@ -643,7 +654,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -671,7 +682,7 @@ definitions:
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: true
-            timeout: true
+            timeout: false
         required:
             - name
             - id
@@ -704,15 +715,15 @@ definitions:
             id:
                 type: integer
                 description: Unique identifier for the user
-                example: 1828035163576775677
+                example: 7645663036194808677
                 format: int64
             username:
                 type: string
                 description: The username of the created user
-                example: Necessitatibus sint accusamus perferendis.
+                example: Consequuntur non quos.
         example:
-            id: 5475002864767066459
-            username: Aut hic maiores officia eum.
+          id: 3985364364835542493
+          username: Placeat dignissimos error minus.
     UsersCreateUserUsernameTakenResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
@@ -720,6 +731,92 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
+                example: true
+            id:
+              type: string
+              description: ID is a unique identifier for this particular occurrence of the problem.
+              example: 123abc
+            message:
+              type: string
+              description: Message is a human-readable explanation specific to this occurrence of the problem.
+              example: parameter 'p' must be an integer
+            name:
+              type: string
+              description: Name is the name of this class of errors.
+              example: bad_request
+            temporary:
+              type: boolean
+              description: Is the error temporary?
+              example: true
+            timeout:
+              type: boolean
+              description: Is the error a timeout?
+              example: true
+        description: Username already exists (default view)
+        example:
+          fault: false
+          id: 123abc
+          message: parameter 'p' must be an integer
+          name: bad_request
+          temporary: true
+          timeout: true
+        required:
+          - name
+          - id
+          - message
+          - temporary
+          - timeout
+          - fault
+    UsersDeleteUserForbiddenResponseBody:
+      title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+      type: object
+      properties:
+        fault:
+          type: boolean
+          description: Is the error a server-side fault?
+          example: true
+        id:
+          type: string
+          description: ID is a unique identifier for this particular occurrence of the problem.
+          example: 123abc
+        message:
+          type: string
+          description: Message is a human-readable explanation specific to this occurrence of the problem.
+          example: parameter 'p' must be an integer
+        name:
+          type: string
+          description: Name is the name of this class of errors.
+          example: bad_request
+        temporary:
+          type: boolean
+          description: Is the error temporary?
+          example: false
+        timeout:
+          type: boolean
+          description: Is the error a timeout?
+          example: true
+      description: Forbidden access (default view)
+      example:
+        fault: true
+        id: 123abc
+        message: parameter 'p' must be an integer
+        name: bad_request
+        temporary: false
+        timeout: false
+      required:
+        - name
+        - id
+        - message
+        - temporary
+        - timeout
+        - fault
+    UsersDeleteUserInternalErrorResponseBody:
+      title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+      type: object
+      properties:
+        fault:
+          type: boolean
+          description: Is the error a server-side fault?
                 example: false
             id:
                 type: string
@@ -741,7 +838,50 @@ definitions:
                 type: boolean
                 description: Is the error a timeout?
                 example: false
-        description: Username already exists (default view)
+      description: Internal server error (default view)
+      example:
+        fault: false
+        id: 123abc
+        message: parameter 'p' must be an integer
+        name: bad_request
+        temporary: true
+        timeout: false
+      required:
+        - name
+        - id
+        - message
+        - temporary
+        - timeout
+        - fault
+    UsersDeleteUserInvalidParametersResponseBody:
+      title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+      type: object
+      properties:
+        fault:
+          type: boolean
+          description: Is the error a server-side fault?
+          example: false
+        id:
+          type: string
+          description: ID is a unique identifier for this particular occurrence of the problem.
+          example: 123abc
+        message:
+          type: string
+          description: Message is a human-readable explanation specific to this occurrence of the problem.
+          example: parameter 'p' must be an integer
+        name:
+          type: string
+          description: Name is the name of this class of errors.
+          example: bad_request
+        temporary:
+          type: boolean
+          description: Is the error temporary?
+          example: false
+        timeout:
+          type: boolean
+          description: Is the error a timeout?
+          example: true
+      description: Invalid input (default view)
         example:
             fault: false
             id: 123abc
@@ -752,6 +892,49 @@ definitions:
         required:
             - name
             - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    UsersDeleteUserUnauthorizedResponseBody:
+      title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+      type: object
+      properties:
+        fault:
+          type: boolean
+          description: Is the error a server-side fault?
+          example: false
+        id:
+          type: string
+          description: ID is a unique identifier for this particular occurrence of the problem.
+          example: 123abc
+        message:
+          type: string
+          description: Message is a human-readable explanation specific to this occurrence of the problem.
+          example: parameter 'p' must be an integer
+        name:
+          type: string
+          description: Name is the name of this class of errors.
+          example: bad_request
+        temporary:
+          type: boolean
+          description: Is the error temporary?
+          example: false
+        timeout:
+          type: boolean
+          description: Is the error a timeout?
+          example: false
+      description: Unauthorized access (default view)
+      example:
+        fault: true
+        id: 123abc
+        message: parameter 'p' must be an integer
+        name: bad_request
+        temporary: false
+        timeout: false
+      required:
+        - name
+        - id
             - message
             - temporary
             - timeout
@@ -786,11 +969,11 @@ definitions:
               example: false
         description: User not found (default view)
         example:
-          fault: false
+          fault: true
           id: 123abc
           message: parameter 'p' must be an integer
           name: bad_request
-          temporary: false
+          temporary: true
           timeout: true
         required:
           - name
@@ -826,15 +1009,15 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: true
+                example: false
       description: Unauthorized access (default view)
         example:
             fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
-            timeout: false
+            temporary: false
+            timeout: true
         required:
             - name
             - id
