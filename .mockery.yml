@@ -11,3 +11,5 @@ packages:
   github.com/Vidalee/FishyKeys/repository:
     interfaces:
       SecretsRepository:
+      UserRolesRepository:
+      RolesRepository:
