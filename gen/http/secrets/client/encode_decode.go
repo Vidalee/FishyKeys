@@ -56,7 +56,7 @@ func EncodeGetSecretValueRequest(encoder func(*http.Request) goahttp.Encoder) fu
 //   - "secret_not_found" (type *goa.ServiceError): http.StatusNotFound
 //   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
 //   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//   - "internal_error" (type secrets.InternalError): http.StatusInternalServerError
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
 //   - error: internal error
 func DecodeGetSecretValueResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -128,14 +128,18 @@ func DecodeGetSecretValueResponse(decoder func(*http.Response) goahttp.Decoder, 
 			return nil, NewGetSecretValueUnauthorized(&body)
 		case http.StatusInternalServerError:
 			var (
-				body string
+				body GetSecretValueInternalErrorResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("secrets", "get secret value", err)
 			}
-			return nil, NewGetSecretValueInternalError(body)
+			err = ValidateGetSecretValueInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("secrets", "get secret value", err)
+			}
+			return nil, NewGetSecretValueInternalError(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("secrets", "get secret value", resp.StatusCode, string(body))
@@ -181,7 +185,7 @@ func EncodeGetSecretRequest(encoder func(*http.Request) goahttp.Encoder) func(*h
 //   - "secret_not_found" (type *goa.ServiceError): http.StatusNotFound
 //   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
 //   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//   - "internal_error" (type secrets.InternalError): http.StatusInternalServerError
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
 //   - error: internal error
 func DecodeGetSecretResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -257,14 +261,18 @@ func DecodeGetSecretResponse(decoder func(*http.Response) goahttp.Decoder, resto
 			return nil, NewGetSecretUnauthorized(&body)
 		case http.StatusInternalServerError:
 			var (
-				body string
+				body GetSecretInternalErrorResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("secrets", "get secret", err)
 			}
-			return nil, NewGetSecretInternalError(body)
+			err = ValidateGetSecretInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("secrets", "get secret", err)
+			}
+			return nil, NewGetSecretInternalError(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("secrets", "get secret", resp.StatusCode, string(body))

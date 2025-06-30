@@ -22,13 +22,13 @@ func RunMigrations(pool *pgxpool.Pool) error {
 
 	db, err := sql.Open("pgx", connString)
 	if err != nil {
-		return fmt.Errorf("could not create sql.DB: %v", err)
+		return fmt.Errorf("could not create sql.DB: %w", err)
 	}
 	defer db.Close()
 
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
-		return fmt.Errorf("could not create migration driver: %v", err)
+		return fmt.Errorf("could not create migration driver: %w", err)
 	}
 
 	// Not very cool hotfix for not having to change the working directory
@@ -46,12 +46,12 @@ func RunMigrations(pool *pgxpool.Pool) error {
 		driver,
 	)
 	if err != nil {
-		return fmt.Errorf("could not create migration instance: %v", err)
+		return fmt.Errorf("could not create migration instance: %w", err)
 	}
 
 	_, dirty, err := m.Version()
 	if err != nil && !errors.Is(err, migrate.ErrNilVersion) {
-		return fmt.Errorf("could not check migration version: %v", err)
+		return fmt.Errorf("could not check migration version: %w", err)
 	}
 
 	if errors.Is(err, migrate.ErrNilVersion) || dirty {
@@ -62,7 +62,7 @@ func RunMigrations(pool *pgxpool.Pool) error {
 		if errors.Is(err, migrate.ErrNoChange) {
 			return nil
 		}
-		return fmt.Errorf("could not run migrations: %v", err)
+		return fmt.Errorf("could not run migrations: %w", err)
 	}
 
 	log.Println("Database migrations completed successfully")

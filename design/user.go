@@ -32,7 +32,7 @@ var _ = Service("users", func() {
 		})
 		Error("username_taken", ErrorResult, "Username already exists")
 		Error("invalid_parameters", ErrorResult, "Invalid input")
-		Error("internal_error", String, "Internal server error")
+		Error("internal_error", ErrorResult, "Internal server error")
 		HTTP(func() {
 			POST("/users")
 			Response(StatusCreated)
@@ -47,7 +47,7 @@ var _ = Service("users", func() {
 
 		Description("List all users")
 		Result(ArrayOf(UserType))
-		Error("internal_error", String, "Internal server error")
+		Error("internal_error", ErrorResult, "Internal server error")
 		Error("unauthorized", ErrorResult, "Unauthorized access")
 		HTTP(func() {
 			GET("/users")
@@ -100,7 +100,7 @@ var _ = Service("users", func() {
 		})
 		Error("unauthorized", ErrorResult, "Invalid username or password")
 		Error("invalid_parameters", ErrorResult, "Invalid input")
-		Error("internal_error", String, "Internal server error")
+		Error("internal_error", ErrorResult, "Internal server error")
 		HTTP(func() {
 			POST("/users/auth")
 			Response(StatusOK)

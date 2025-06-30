@@ -110,6 +110,25 @@ type GetSecretValueUnauthorizedResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// GetSecretValueInternalErrorResponseBody is the type of the "secrets" service
+// "get secret value" endpoint HTTP response body for the "internal_error"
+// error.
+type GetSecretValueInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // GetSecretSecretNotFoundResponseBody is the type of the "secrets" service
 // "get secret" endpoint HTTP response body for the "secret_not_found" error.
 type GetSecretSecretNotFoundResponseBody struct {
@@ -149,6 +168,24 @@ type GetSecretInvalidParametersResponseBody struct {
 // GetSecretUnauthorizedResponseBody is the type of the "secrets" service "get
 // secret" endpoint HTTP response body for the "unauthorized" error.
 type GetSecretUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetSecretInternalErrorResponseBody is the type of the "secrets" service "get
+// secret" endpoint HTTP response body for the "internal_error" error.
+type GetSecretInternalErrorResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -260,6 +297,20 @@ func NewGetSecretValueUnauthorizedResponseBody(res *goa.ServiceError) *GetSecret
 	return body
 }
 
+// NewGetSecretValueInternalErrorResponseBody builds the HTTP response body
+// from the result of the "get secret value" endpoint of the "secrets" service.
+func NewGetSecretValueInternalErrorResponseBody(res *goa.ServiceError) *GetSecretValueInternalErrorResponseBody {
+	body := &GetSecretValueInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewGetSecretSecretNotFoundResponseBody builds the HTTP response body from
 // the result of the "get secret" endpoint of the "secrets" service.
 func NewGetSecretSecretNotFoundResponseBody(res *goa.ServiceError) *GetSecretSecretNotFoundResponseBody {
@@ -292,6 +343,20 @@ func NewGetSecretInvalidParametersResponseBody(res *goa.ServiceError) *GetSecret
 // result of the "get secret" endpoint of the "secrets" service.
 func NewGetSecretUnauthorizedResponseBody(res *goa.ServiceError) *GetSecretUnauthorizedResponseBody {
 	body := &GetSecretUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetSecretInternalErrorResponseBody builds the HTTP response body from the
+// result of the "get secret" endpoint of the "secrets" service.
+func NewGetSecretInternalErrorResponseBody(res *goa.ServiceError) *GetSecretInternalErrorResponseBody {
+	body := &GetSecretInternalErrorResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,

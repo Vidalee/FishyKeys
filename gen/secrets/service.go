@@ -92,26 +92,6 @@ type User struct {
 	UpdatedAt string
 }
 
-// Internal server error
-type InternalError string
-
-// Error returns an error description.
-func (e InternalError) Error() string {
-	return "Internal server error"
-}
-
-// ErrorName returns "internal_error".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e InternalError) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "internal_error".
-func (e InternalError) GoaErrorName() string {
-	return "internal_error"
-}
-
 // MakeSecretNotFound builds a goa.ServiceError from an error.
 func MakeSecretNotFound(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "secret_not_found", false, false, false)
@@ -125,4 +105,9 @@ func MakeInvalidParameters(err error) *goa.ServiceError {
 // MakeUnauthorized builds a goa.ServiceError from an error.
 func MakeUnauthorized(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "unauthorized", false, false, false)
+}
+
+// MakeInternalError builds a goa.ServiceError from an error.
+func MakeInternalError(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "internal_error", false, false, false)
 }

@@ -35,7 +35,7 @@ func NewClient(createUser, listUsers, deleteUser, authUser goa.Endpoint) *Client
 // CreateUser may return the following errors:
 //   - "username_taken" (type *goa.ServiceError): Username already exists
 //   - "invalid_parameters" (type *goa.ServiceError): Invalid input
-//   - "internal_error" (type InternalError)
+//   - "internal_error" (type *goa.ServiceError): Internal server error
 //   - error: internal error
 func (c *Client) CreateUser(ctx context.Context, p *CreateUserPayload) (res *CreateUserResult, err error) {
 	var ires any
@@ -48,7 +48,7 @@ func (c *Client) CreateUser(ctx context.Context, p *CreateUserPayload) (res *Cre
 
 // ListUsers calls the "list users" endpoint of the "users" service.
 // ListUsers may return the following errors:
-//   - "internal_error" (type InternalError)
+//   - "internal_error" (type *goa.ServiceError): Internal server error
 //   - "unauthorized" (type *goa.ServiceError): Unauthorized access
 //   - error: internal error
 func (c *Client) ListUsers(ctx context.Context) (res []*User, err error) {
@@ -77,7 +77,7 @@ func (c *Client) DeleteUser(ctx context.Context, p *DeleteUserPayload) (err erro
 // AuthUser may return the following errors:
 //   - "unauthorized" (type *goa.ServiceError): Invalid username or password
 //   - "invalid_parameters" (type *goa.ServiceError): Invalid input
-//   - "internal_error" (type InternalError)
+//   - "internal_error" (type *goa.ServiceError): Internal server error
 //   - error: internal error
 func (c *Client) AuthUser(ctx context.Context, p *AuthUserPayload) (res *AuthUserResult, err error) {
 	var ires any

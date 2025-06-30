@@ -109,10 +109,15 @@ func EncodeGetSecretValueError(encoder func(context.Context, http.ResponseWriter
 			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		case "internal_error":
-			var res secrets.InternalError
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewGetSecretValueInternalErrorResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
@@ -213,10 +218,15 @@ func EncodeGetSecretError(encoder func(context.Context, http.ResponseWriter) goa
 			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		case "internal_error":
-			var res secrets.InternalError
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewGetSecretInternalErrorResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)

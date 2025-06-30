@@ -53,17 +53,17 @@ func (s *UsersService) CreateUser(ctx context.Context, payload *genusers.CreateU
 	if err == nil {
 		return nil, genusers.MakeUsernameTaken(fmt.Errorf("username already exists"))
 	} else if !errors.Is(err, repository.ErrUserNotFound) {
-		return nil, genusers.InternalError("could not check user existence")
+		return nil, genusers.MakeInternalError(fmt.Errorf("could not check user existence: %w", err))
 	}
 
 	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, genusers.InternalError("could not encrypt password: " + err.Error())
+		return nil, genusers.MakeInternalError(fmt.Errorf("could not encrypt password: %w", err))
 	}
 
 	userId, err := s.usersRepository.CreateUser(ctx, payload.Username, string(encryptedPassword))
 	if err != nil {
-		return nil, genusers.InternalError("could not create user")
+		return nil, genusers.MakeInternalError(fmt.Errorf("could not create user: %w", err))
 	}
 
 	return &genusers.CreateUserResult{Username: &payload.Username, ID: &userId}, nil
@@ -79,7 +79,7 @@ func (s *UsersService) AuthUser(ctx context.Context, payload *genusers.AuthUserP
 		if errors.Is(err, repository.ErrUserNotFound) {
 			return nil, genusers.MakeUnauthorized(fmt.Errorf("invalid username or password"))
 		}
-		return nil, genusers.InternalError("could not retrieve user")
+		return nil, genusers.MakeInternalError(fmt.Errorf("could not retrieve user: %w", err))
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(payload.Password))
@@ -89,11 +89,11 @@ func (s *UsersService) AuthUser(ctx context.Context, payload *genusers.AuthUserP
 
 	decryptedSecret, err := s.secretsRepository.GetSecretByPath(ctx, s.keyManager, "internal/jwt_signing_key")
 	if err != nil {
-		return nil, genusers.InternalError("could not retrieve JWT signing key" + err.Error())
+		return nil, genusers.MakeInternalError(fmt.Errorf("could not retrieve JWT signing key: %w", err))
 	}
 	decodedSecret, err := base64.StdEncoding.DecodeString(decryptedSecret.DecryptedValue)
 	if err != nil {
-		return nil, genusers.InternalError("could not decode JWT signing key: " + err.Error())
+		return nil, genusers.MakeInternalError(fmt.Errorf("could not decode JWT signing key: %w", err))
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -107,7 +107,7 @@ func (s *UsersService) AuthUser(ctx context.Context, payload *genusers.AuthUserP
 
 	tokenString, err := token.SignedString(decodedSecret)
 	if err != nil {
-		return nil, genusers.InternalError("could not sign JWT token: " + err.Error())
+		return nil, genusers.MakeInternalError(fmt.Errorf("could not sign JWT token: %w", err))
 	}
 
 	return &genusers.AuthUserResult{
@@ -119,7 +119,7 @@ func (s *UsersService) AuthUser(ctx context.Context, payload *genusers.AuthUserP
 func (s *UsersService) ListUsers(ctx context.Context) ([]*genusers.User, error) {
 	users, err := s.usersRepository.ListUsers(ctx)
 	if err != nil {
-		return nil, genusers.InternalError("could not list users")
+		return nil, genusers.MakeInternalError(fmt.Errorf("could not list users: %w", err))
 	}
 
 	result := make([]*genusers.User, 0, len(users))
@@ -143,7 +143,7 @@ func (s *UsersService) DeleteUser(ctx context.Context, payload *genusers.DeleteU
 		if errors.Is(err, repository.ErrUserNotFound) {
 			return genusers.MakeUserNotFound(fmt.Errorf("user not found"))
 		}
-		return genusers.MakeInternalError(fmt.Errorf("could not delete user"))
+		return genusers.MakeInternalError(fmt.Errorf("could not delete user: %w", err))
 	}
 
 	return nil

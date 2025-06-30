@@ -35,7 +35,7 @@ var _ = Service("secrets", func() {
 	Error("secret_not_found", ErrorResult, "Secret not found")
 	Error("invalid_parameters", ErrorResult, "Invalid token path")
 	Error("unauthorized", ErrorResult, "Unauthorized access")
-	Error("internal_error", String, "Internal server error")
+	Error("internal_error", ErrorResult, "Internal server error")
 
 	Method("get secret value", func() {
 		ServerInterceptor(Authentified)

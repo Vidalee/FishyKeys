@@ -56,7 +56,7 @@ func EncodeCreateUserRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 // DecodeCreateUserResponse may return the following errors:
 //   - "username_taken" (type *goa.ServiceError): http.StatusConflict
 //   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
-//   - "internal_error" (type users.InternalError): http.StatusInternalServerError
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
 //   - error: internal error
 func DecodeCreateUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -114,14 +114,18 @@ func DecodeCreateUserResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			return nil, NewCreateUserInvalidParameters(&body)
 		case http.StatusInternalServerError:
 			var (
-				body string
+				body CreateUserInternalErrorResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("users", "create user", err)
 			}
-			return nil, NewCreateUserInternalError(body)
+			err = ValidateCreateUserInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "create user", err)
+			}
+			return nil, NewCreateUserInternalError(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("users", "create user", resp.StatusCode, string(body))
@@ -148,8 +152,8 @@ func (c *Client) BuildListUsersRequest(ctx context.Context, v any) (*http.Reques
 // users list users endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeListUsersResponse may return the following errors:
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
 //   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
-//   - "internal_error" (type users.InternalError): http.StatusInternalServerError
 //   - error: internal error
 func DecodeListUsersResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -187,6 +191,20 @@ func DecodeListUsersResponse(decoder func(*http.Response) goahttp.Decoder, resto
 			}
 			res := NewListUsersUserOK(body)
 			return res, nil
+		case http.StatusInternalServerError:
+			var (
+				body ListUsersInternalErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("users", "list users", err)
+			}
+			err = ValidateListUsersInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "list users", err)
+			}
+			return nil, NewListUsersInternalError(&body)
 		case http.StatusUnauthorized:
 			var (
 				body ListUsersUnauthorizedResponseBody
@@ -201,16 +219,6 @@ func DecodeListUsersResponse(decoder func(*http.Response) goahttp.Decoder, resto
 				return nil, goahttp.ErrValidationError("users", "list users", err)
 			}
 			return nil, NewListUsersUnauthorized(&body)
-		case http.StatusInternalServerError:
-			var (
-				body string
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("users", "list users", err)
-			}
-			return nil, NewListUsersInternalError(body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("users", "list users", resp.StatusCode, string(body))
@@ -384,7 +392,7 @@ func EncodeAuthUserRequest(encoder func(*http.Request) goahttp.Encoder) func(*ht
 // DecodeAuthUserResponse may return the following errors:
 //   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
 //   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
-//   - "internal_error" (type users.InternalError): http.StatusInternalServerError
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
 //   - error: internal error
 func DecodeAuthUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -442,14 +450,18 @@ func DecodeAuthUserResponse(decoder func(*http.Response) goahttp.Decoder, restor
 			return nil, NewAuthUserInvalidParameters(&body)
 		case http.StatusInternalServerError:
 			var (
-				body string
+				body AuthUserInternalErrorResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("users", "auth user", err)
 			}
-			return nil, NewAuthUserInternalError(body)
+			err = ValidateAuthUserInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "auth user", err)
+			}
+			return nil, NewAuthUserInternalError(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("users", "auth user", resp.StatusCode, string(body))

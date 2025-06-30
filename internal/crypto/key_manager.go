@@ -93,7 +93,7 @@ func (km *KeyManager) AddShare(share []byte) (index int, unlocked bool, err erro
 		masterKey, err := CombineShares(km.shares)
 		if err != nil {
 			km.shares = km.shares[:len(km.shares)-1]
-			return -1, false, fmt.Errorf("%w: %v", ErrCouldNotRecombine, err)
+			return -1, false, fmt.Errorf("%w: %w", ErrCouldNotRecombine, err)
 		}
 		if len(masterKey) == 0 {
 			km.shares = km.shares[:len(km.shares)-1]

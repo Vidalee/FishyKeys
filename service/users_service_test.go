@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 	genkey "github.com/Vidalee/FishyKeys/gen/key_management"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -215,7 +216,7 @@ func TestUsersService_AuthUser(t *testing.T) {
 					}
 					decryptedSecret, err := service.secretsRepository.GetSecretByPath(ctx, service.keyManager, "internal/jwt_signing_key")
 					if err != nil {
-						return nil, genusers.InternalError("could not retrieve JWT signing key")
+						return nil, genusers.MakeInternalError(fmt.Errorf("could not retrieve JWT signing key: %w", err))
 					}
 
 					return base64.StdEncoding.DecodeString(decryptedSecret.DecryptedValue)

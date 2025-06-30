@@ -30,10 +30,10 @@ func NewClient(getSecretValue, getSecret goa.Endpoint) *Client {
 // GetSecretValue calls the "get secret value" endpoint of the "secrets"
 // service.
 // GetSecretValue may return the following errors:
-//   - "secret_not_found" (type *goa.ServiceError): Token not found
+//   - "secret_not_found" (type *goa.ServiceError): Secret not found
 //   - "invalid_parameters" (type *goa.ServiceError): Invalid token path
 //   - "unauthorized" (type *goa.ServiceError): Unauthorized access
-//   - "internal_error" (type InternalError)
+//   - "internal_error" (type *goa.ServiceError): Internal server error
 //   - error: internal error
 func (c *Client) GetSecretValue(ctx context.Context, p *GetSecretValuePayload) (res *GetSecretValueResult, err error) {
 	var ires any
@@ -46,10 +46,10 @@ func (c *Client) GetSecretValue(ctx context.Context, p *GetSecretValuePayload) (
 
 // GetSecret calls the "get secret" endpoint of the "secrets" service.
 // GetSecret may return the following errors:
-//   - "secret_not_found" (type *goa.ServiceError): Token not found
+//   - "secret_not_found" (type *goa.ServiceError): Secret not found
 //   - "invalid_parameters" (type *goa.ServiceError): Invalid token path
 //   - "unauthorized" (type *goa.ServiceError): Unauthorized access
-//   - "internal_error" (type InternalError)
+//   - "internal_error" (type *goa.ServiceError): Internal server error
 //   - error: internal error
 func (c *Client) GetSecret(ctx context.Context, p *GetSecretPayload) (res *SecretInfo, err error) {
 	var ires any

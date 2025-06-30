@@ -108,6 +108,25 @@ type GetSecretValueUnauthorizedResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// GetSecretValueInternalErrorResponseBody is the type of the "secrets" service
+// "get secret value" endpoint HTTP response body for the "internal_error"
+// error.
+type GetSecretValueInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
 // GetSecretSecretNotFoundResponseBody is the type of the "secrets" service
 // "get secret" endpoint HTTP response body for the "secret_not_found" error.
 type GetSecretSecretNotFoundResponseBody struct {
@@ -147,6 +166,24 @@ type GetSecretInvalidParametersResponseBody struct {
 // GetSecretUnauthorizedResponseBody is the type of the "secrets" service "get
 // secret" endpoint HTTP response body for the "unauthorized" error.
 type GetSecretUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// GetSecretInternalErrorResponseBody is the type of the "secrets" service "get
+// secret" endpoint HTTP response body for the "internal_error" error.
+type GetSecretInternalErrorResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -256,8 +293,15 @@ func NewGetSecretValueUnauthorized(body *GetSecretValueUnauthorizedResponseBody)
 
 // NewGetSecretValueInternalError builds a secrets service get secret value
 // endpoint internal_error error.
-func NewGetSecretValueInternalError(body string) secrets.InternalError {
-	v := secrets.InternalError(body)
+func NewGetSecretValueInternalError(body *GetSecretValueInternalErrorResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
@@ -336,8 +380,15 @@ func NewGetSecretUnauthorized(body *GetSecretUnauthorizedResponseBody) *goa.Serv
 
 // NewGetSecretInternalError builds a secrets service get secret endpoint
 // internal_error error.
-func NewGetSecretInternalError(body string) secrets.InternalError {
-	v := secrets.InternalError(body)
+func NewGetSecretInternalError(body *GetSecretInternalErrorResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
 
 	return v
 }
@@ -432,6 +483,30 @@ func ValidateGetSecretValueUnauthorizedResponseBody(body *GetSecretValueUnauthor
 	return
 }
 
+// ValidateGetSecretValueInternalErrorResponseBody runs the validations defined
+// on get secret value_internal_error_response_body
+func ValidateGetSecretValueInternalErrorResponseBody(body *GetSecretValueInternalErrorResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
 // ValidateGetSecretSecretNotFoundResponseBody runs the validations defined on
 // get secret_secret_not_found_response_body
 func ValidateGetSecretSecretNotFoundResponseBody(body *GetSecretSecretNotFoundResponseBody) (err error) {
@@ -483,6 +558,30 @@ func ValidateGetSecretInvalidParametersResponseBody(body *GetSecretInvalidParame
 // ValidateGetSecretUnauthorizedResponseBody runs the validations defined on
 // get secret_unauthorized_response_body
 func ValidateGetSecretUnauthorizedResponseBody(body *GetSecretUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateGetSecretInternalErrorResponseBody runs the validations defined on
+// get secret_internal_error_response_body
+func ValidateGetSecretInternalErrorResponseBody(body *GetSecretInternalErrorResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}

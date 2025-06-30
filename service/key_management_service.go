@@ -94,15 +94,15 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 
 	masterKey, err := crypto.GenerateSecret()
 	if err != nil {
-		return nil, genkey.MakeInternalError(fmt.Errorf("error generating master key: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("error generating master key: %w", err))
 	}
 	checksum, err := crypto.EncryptWithKey(masterKey, []byte(checksumExpectedValue))
 	if err != nil {
-		return nil, genkey.MakeInternalError(fmt.Errorf("error encrypting master key checksum: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("error encrypting master key checksum: %w", err))
 	}
 	shares, err := crypto.SplitSecret(masterKey, payload.TotalShares, payload.MinShares)
 	if err != nil {
-		return nil, genkey.MakeInternalError(fmt.Errorf("error splitting secret into shares: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("error splitting secret into shares: %w", err))
 	}
 
 	encodedShares := make([]string, len(shares))
@@ -116,12 +116,12 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		columnMasterKeyChecksumColumn: checksum,
 	})
 	if err != nil {
-		return nil, genkey.MakeInternalError(fmt.Errorf("error storing key settings: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("error storing key settings: %w", err))
 	}
 
 	err = s.keyManager.SetNewMasterKey(masterKey, payload.MinShares, payload.TotalShares)
 	if err != nil {
-		return nil, genkey.MakeInternalError(fmt.Errorf("error setting new master key: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("error setting new master key: %w", err))
 	}
 
 	jwtSigningKey, err := crypto.GenerateSecret()
@@ -131,9 +131,9 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 
 		if delErr != nil {
 			return nil, genkey.MakeInternalError(fmt.Errorf(
-				"error generating JWT signing key: %v; rollback cleanup also failed: %v", err, delErr))
+				"error generating JWT signing key: %v; rollback cleanup also failed: %w", err, delErr))
 		}
-		return nil, genkey.MakeInternalError(fmt.Errorf("error generating JWT signing key: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("error generating JWT signing key: %w", err))
 	}
 	_, err = s.secretsRepository.CreateSecret(ctx, s.keyManager, "internal/jwt_signing_key", base64.StdEncoding.EncodeToString(jwtSigningKey))
 	if err != nil {
@@ -142,9 +142,9 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 
 		if delErr != nil {
 			return nil, genkey.MakeInternalError(fmt.Errorf(
-				"error creating JWT signing key: %v; rollback cleanup also failed: %v", err, delErr))
+				"error creating JWT signing key: %v; rollback cleanup also failed: %w", err, delErr))
 		}
-		return nil, genkey.MakeInternalError(fmt.Errorf("error storing JWT signing key: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("error storing JWT signing key: %w", err))
 	}
 
 	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(payload.AdminPassword), bcrypt.DefaultCost)
@@ -155,13 +155,13 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		if delErr != nil {
 			if jwtDelErr != nil {
 				return nil, genkey.MakeInternalError(fmt.Errorf(
-					"could not create admin user: %v; rollback cleanup also failed: %v; jwt deletion failed: %v", err, delErr, jwtDelErr))
+					"could not create admin user: %v; rollback cleanup also failed: %v; jwt deletion failed: %w", err, delErr, jwtDelErr))
 			}
 			return nil, genkey.MakeInternalError(fmt.Errorf(
-				"could not create admin user: %v; rollback cleanup also failed: %v", err, delErr))
+				"could not create admin user: %v; rollback cleanup also failed: %w", err, delErr))
 		}
 
-		return nil, genkey.MakeInternalError(fmt.Errorf("could not create admin user: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("could not create admin user: %w", err))
 	}
 
 	userId, err := s.usersRepository.CreateUser(ctx, payload.AdminUsername, string(encryptedPassword))
@@ -172,13 +172,13 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		if delErr != nil {
 			if jwtDelErr != nil {
 				return nil, genkey.MakeInternalError(fmt.Errorf(
-					"could not create admin user: %v; rollback cleanup also failed: %v; jwt deletion failed: %v", err, delErr, jwtDelErr))
+					"could not create admin user: %v; rollback cleanup also failed: %v; jwt deletion failed: %w", err, delErr, jwtDelErr))
 			}
 			return nil, genkey.MakeInternalError(fmt.Errorf(
-				"could not create admin user: %v; rollback cleanup also failed: %v", err, delErr))
+				"could not create admin user: %v; rollback cleanup also failed: %w", err, delErr))
 		}
 
-		return nil, genkey.MakeInternalError(fmt.Errorf("could not create admin user: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("could not create admin user: %w", err))
 	}
 
 	role, err := s.rolesRepository.GetRoleByName(ctx, "admin")
@@ -189,18 +189,18 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		if delErr != nil {
 			if jwtDelErr != nil {
 				return nil, genkey.MakeInternalError(fmt.Errorf(
-					"could not create admin user: %v; rollback cleanup also failed: %v; jwt deletion failed: %v", err, delErr, jwtDelErr))
+					"could not create admin user: %v; rollback cleanup also failed: %v; jwt deletion failed: %w", err, delErr, jwtDelErr))
 			}
 			return nil, genkey.MakeInternalError(fmt.Errorf(
-				"could not create admin user: %v; rollback cleanup also failed: %v", err, delErr))
+				"could not create admin user: %v; rollback cleanup also failed: %w", err, delErr))
 		}
 
-		return nil, genkey.MakeInternalError(fmt.Errorf("could not create admin user: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("could not create admin user: %w", err))
 	}
 
 	err = s.userRolesRepository.AssignRoleToUser(ctx, userId, role.ID)
 	if err != nil {
-		return nil, genkey.MakeInternalError(fmt.Errorf("could not assign role to admin user: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("could not assign role to admin user: %w", err))
 	}
 
 	return &genkey.CreateMasterKeyResult{
@@ -215,7 +215,7 @@ func (s *KeyManagementService) GetKeyStatus(ctx context.Context) (*genkey.GetKey
 		if errors.Is(err, repository.ErrSettingNotFound) {
 			return nil, genkey.MakeNoKeySet(fmt.Errorf("master key not set"))
 		}
-		return nil, genkey.MakeInternalError(fmt.Errorf("error retrieving key status: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("error retrieving key status: %w", err))
 	}
 
 	state, currentSharesNumber, minShares, totalShares := s.keyManager.Status()
@@ -237,7 +237,7 @@ func (s *KeyManagementService) AddShare(ctx context.Context, payload *genkey.Add
 
 	decodedShare, err := base64.StdEncoding.DecodeString(payload.Share)
 	if err != nil {
-		return nil, genkey.MakeInternalError(fmt.Errorf("error decoding share: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("error decoding share: %w", err))
 	}
 
 	index, unlocked, err := s.keyManager.AddShare(decodedShare)
@@ -249,20 +249,20 @@ func (s *KeyManagementService) AddShare(ctx context.Context, payload *genkey.Add
 			return nil, genkey.MakeNoKeySet(fmt.Errorf("no master key configured"))
 		}
 		if errors.Is(err, crypto.ErrCouldNotRecombine) {
-			return nil, genkey.MakeCouldNotRecombine(fmt.Errorf("could not recombine shares: %v", err))
+			return nil, genkey.MakeCouldNotRecombine(fmt.Errorf("could not recombine shares: %w", err))
 		}
-		return nil, genkey.MakeInternalError(fmt.Errorf("error adding share: %v", err))
+		return nil, genkey.MakeInternalError(fmt.Errorf("error adding share: %w", err))
 	}
 
 	if unlocked {
 		checksum, err := s.settingsRepository.GetSetting(ctx, columnMasterKeyChecksumColumn)
 		if err != nil {
-			return nil, genkey.MakeInternalError(fmt.Errorf("error retrieving master key checksum: %v", err))
+			return nil, genkey.MakeInternalError(fmt.Errorf("error retrieving master key checksum: %w", err))
 		}
 		decryptedChecksum, err := crypto.Decrypt(s.keyManager, checksum)
 		if err != nil {
 			s.keyManager.RollbackToLocked()
-			return nil, genkey.MakeWrongShares(fmt.Errorf("error decrypting master key checksum: %v", err))
+			return nil, genkey.MakeWrongShares(fmt.Errorf("error decrypting master key checksum: %w", err))
 		}
 		if string(decryptedChecksum) != checksumExpectedValue {
 			s.keyManager.RollbackToLocked()
