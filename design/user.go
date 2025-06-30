@@ -19,6 +19,7 @@ var _ = Service("users", func() {
 		Payload(func() {
 			Attribute("username", String, "Username of the new user", func() {
 				Example("alice")
+				MinLength(3)
 			})
 			Attribute("password", String, "Password (hashed or plain depending on implementation)", func() {
 				Example("s3cr3t")

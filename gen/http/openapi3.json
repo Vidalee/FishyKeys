@@ -477,7 +477,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateUserRequestBody"
+                "$ref": "#/components/schemas/AuthUserRequestBody"
               },
               "example": {
                 "password": "s3cr3t",
@@ -658,6 +658,29 @@
           "unlocked"
         ]
       },
+      "AuthUserRequestBody": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "Password",
+            "example": "s3cr3t"
+          },
+          "username": {
+            "type": "string",
+            "description": "Username",
+            "example": "alice"
+          }
+        },
+        "example": {
+          "password": "s3cr3t",
+          "username": "alice"
+        },
+        "required": [
+          "username",
+          "password"
+        ]
+      },
       "AuthUserResponseBody": {
         "type": "object",
         "properties": {
@@ -756,7 +779,8 @@
           "username": {
             "type": "string",
             "description": "Username of the new user",
-            "example": "alice"
+            "example": "alice",
+            "minLength": 3
           }
         },
         "example": {

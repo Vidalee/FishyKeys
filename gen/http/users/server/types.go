@@ -8,6 +8,8 @@
 package server
 
 import (
+	"unicode/utf8"
+
 	users "github.com/Vidalee/FishyKeys/gen/users"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -448,6 +450,11 @@ func ValidateCreateUserRequestBody(body *CreateUserRequestBody) (err error) {
 	}
 	if body.Password == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("password", "body"))
+	}
+	if body.Username != nil {
+		if utf8.RuneCountInString(*body.Username) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.username", *body.Username, utf8.RuneCountInString(*body.Username), 3, true))
+		}
 	}
 	return
 }

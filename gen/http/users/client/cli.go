@@ -10,8 +10,10 @@ package client
 import (
 	"encoding/json"
 	"fmt"
+	"unicode/utf8"
 
 	users "github.com/Vidalee/FishyKeys/gen/users"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildCreateUserPayload builds the payload for the users create user endpoint
@@ -23,6 +25,12 @@ func BuildCreateUserPayload(usersCreateUserBody string) (*users.CreateUserPayloa
 		err = json.Unmarshal([]byte(usersCreateUserBody), &body)
 		if err != nil {
 			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"password\": \"s3cr3t\",\n      \"username\": \"alice\"\n   }'")
+		}
+		if utf8.RuneCountInString(body.Username) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.username", body.Username, utf8.RuneCountInString(body.Username), 3, true))
+		}
+		if err != nil {
+			return nil, err
 		}
 	}
 	v := &users.CreateUserPayload{

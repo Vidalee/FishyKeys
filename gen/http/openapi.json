@@ -950,7 +950,8 @@
         "username": {
           "type": "string",
           "description": "Username of the new user",
-          "example": "alice"
+          "example": "alice",
+          "minLength": 3
         }
       },
       "example": {

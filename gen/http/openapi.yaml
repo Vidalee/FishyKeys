@@ -702,6 +702,7 @@ definitions:
                 type: string
                 description: Username of the new user
                 example: alice
+                minLength: 3
         example:
             password: s3cr3t
             username: alice
