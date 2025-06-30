@@ -99,186 +99,6 @@ type GetKeyStatusResult struct {
 	TotalShares int
 }
 
-// Could not recombine the shares to unlock the key
-type CouldNotRecombine string
-
-// Internal server error
-type InternalError string
-
-// Invalid parameters provided
-type InvalidParameters string
-
-// A master key already exists
-type KeyAlreadyExists string
-
-// The master key is already unlocked
-type KeyAlreadyUnlocked string
-
-// No master key has been set
-type NoKeySet string
-
-// The maximum number of shares has been reached
-type TooManyShares string
-
-// The index provided does not match any share
-type WrongIndex string
-
-// The key recombined from the shares is not the correct key
-type WrongShares string
-
-// Error returns an error description.
-func (e CouldNotRecombine) Error() string {
-	return "Could not recombine the shares to unlock the key"
-}
-
-// ErrorName returns "could_not_recombine".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e CouldNotRecombine) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "could_not_recombine".
-func (e CouldNotRecombine) GoaErrorName() string {
-	return "could_not_recombine"
-}
-
-// Error returns an error description.
-func (e InternalError) Error() string {
-	return "Internal server error"
-}
-
-// ErrorName returns "internal_error".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e InternalError) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "internal_error".
-func (e InternalError) GoaErrorName() string {
-	return "internal_error"
-}
-
-// Error returns an error description.
-func (e InvalidParameters) Error() string {
-	return "Invalid parameters provided"
-}
-
-// ErrorName returns "invalid_parameters".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e InvalidParameters) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "invalid_parameters".
-func (e InvalidParameters) GoaErrorName() string {
-	return "invalid_parameters"
-}
-
-// Error returns an error description.
-func (e KeyAlreadyExists) Error() string {
-	return "A master key already exists"
-}
-
-// ErrorName returns "key_already_exists".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e KeyAlreadyExists) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "key_already_exists".
-func (e KeyAlreadyExists) GoaErrorName() string {
-	return "key_already_exists"
-}
-
-// Error returns an error description.
-func (e KeyAlreadyUnlocked) Error() string {
-	return "The master key is already unlocked"
-}
-
-// ErrorName returns "key_already_unlocked".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e KeyAlreadyUnlocked) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "key_already_unlocked".
-func (e KeyAlreadyUnlocked) GoaErrorName() string {
-	return "key_already_unlocked"
-}
-
-// Error returns an error description.
-func (e NoKeySet) Error() string {
-	return "No master key has been set"
-}
-
-// ErrorName returns "no_key_set".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e NoKeySet) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "no_key_set".
-func (e NoKeySet) GoaErrorName() string {
-	return "no_key_set"
-}
-
-// Error returns an error description.
-func (e TooManyShares) Error() string {
-	return "The maximum number of shares has been reached"
-}
-
-// ErrorName returns "too_many_shares".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e TooManyShares) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "too_many_shares".
-func (e TooManyShares) GoaErrorName() string {
-	return "too_many_shares"
-}
-
-// Error returns an error description.
-func (e WrongIndex) Error() string {
-	return "The index provided does not match any share"
-}
-
-// ErrorName returns "wrong_index".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e WrongIndex) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "wrong_index".
-func (e WrongIndex) GoaErrorName() string {
-	return "wrong_index"
-}
-
-// Error returns an error description.
-func (e WrongShares) Error() string {
-	return "The key recombined from the shares is not the correct key"
-}
-
-// ErrorName returns "wrong_shares".
-//
-// Deprecated: Use GoaErrorName - https://github.com/goadesign/goa/issues/3105
-func (e WrongShares) ErrorName() string {
-	return e.GoaErrorName()
-}
-
-// GoaErrorName returns "wrong_shares".
-func (e WrongShares) GoaErrorName() string {
-	return "wrong_shares"
-}
-
 // MakeInvalidParameters builds a goa.ServiceError from an error.
 func MakeInvalidParameters(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "invalid_parameters", false, false, false)
@@ -287,4 +107,39 @@ func MakeInvalidParameters(err error) *goa.ServiceError {
 // MakeInternalError builds a goa.ServiceError from an error.
 func MakeInternalError(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "internal_error", false, false, false)
+}
+
+// MakeKeyAlreadyExists builds a goa.ServiceError from an error.
+func MakeKeyAlreadyExists(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "key_already_exists", false, false, false)
+}
+
+// MakeNoKeySet builds a goa.ServiceError from an error.
+func MakeNoKeySet(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "no_key_set", false, false, false)
+}
+
+// MakeTooManyShares builds a goa.ServiceError from an error.
+func MakeTooManyShares(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "too_many_shares", false, false, false)
+}
+
+// MakeCouldNotRecombine builds a goa.ServiceError from an error.
+func MakeCouldNotRecombine(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "could_not_recombine", false, false, false)
+}
+
+// MakeWrongShares builds a goa.ServiceError from an error.
+func MakeWrongShares(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "wrong_shares", false, false, false)
+}
+
+// MakeKeyAlreadyUnlocked builds a goa.ServiceError from an error.
+func MakeKeyAlreadyUnlocked(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "key_already_unlocked", false, false, false)
+}
+
+// MakeWrongIndex builds a goa.ServiceError from an error.
+func MakeWrongIndex(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "wrong_index", false, false, false)
 }

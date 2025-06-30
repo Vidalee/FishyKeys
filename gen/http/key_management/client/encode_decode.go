@@ -56,7 +56,7 @@ func EncodeCreateMasterKeyRequest(encoder func(*http.Request) goahttp.Encoder) f
 // DecodeCreateMasterKeyResponse may return the following errors:
 //   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
 //   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
-//   - "key_already_exists" (type keymanagement.KeyAlreadyExists): http.StatusConflict
+//   - "key_already_exists" (type *goa.ServiceError): http.StatusConflict
 //   - error: internal error
 func DecodeCreateMasterKeyResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -114,14 +114,18 @@ func DecodeCreateMasterKeyResponse(decoder func(*http.Response) goahttp.Decoder,
 			return nil, NewCreateMasterKeyInternalError(&body)
 		case http.StatusConflict:
 			var (
-				body string
+				body CreateMasterKeyKeyAlreadyExistsResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("key_management", "create_master_key", err)
 			}
-			return nil, NewCreateMasterKeyKeyAlreadyExists(body)
+			err = ValidateCreateMasterKeyKeyAlreadyExistsResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("key_management", "create_master_key", err)
+			}
+			return nil, NewCreateMasterKeyKeyAlreadyExists(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("key_management", "create_master_key", resp.StatusCode, string(body))
@@ -148,8 +152,8 @@ func (c *Client) BuildGetKeyStatusRequest(ctx context.Context, v any) (*http.Req
 // key_management get_key_status endpoint. restoreBody controls whether the
 // response body should be restored after having been read.
 // DecodeGetKeyStatusResponse may return the following errors:
-//   - "internal_error" (type keymanagement.InternalError): http.StatusInternalServerError
-//   - "no_key_set" (type keymanagement.NoKeySet): http.StatusNotFound
+//   - "no_key_set" (type *goa.ServiceError): http.StatusNotFound
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
 //   - error: internal error
 func DecodeGetKeyStatusResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -181,26 +185,34 @@ func DecodeGetKeyStatusResponse(decoder func(*http.Response) goahttp.Decoder, re
 			}
 			res := NewGetKeyStatusResultOK(&body)
 			return res, nil
-		case http.StatusInternalServerError:
-			var (
-				body string
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("key_management", "get_key_status", err)
-			}
-			return nil, NewGetKeyStatusInternalError(body)
 		case http.StatusNotFound:
 			var (
-				body string
+				body GetKeyStatusNoKeySetResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("key_management", "get_key_status", err)
 			}
-			return nil, NewGetKeyStatusNoKeySet(body)
+			err = ValidateGetKeyStatusNoKeySetResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("key_management", "get_key_status", err)
+			}
+			return nil, NewGetKeyStatusNoKeySet(&body)
+		case http.StatusInternalServerError:
+			var (
+				body GetKeyStatusInternalErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("key_management", "get_key_status", err)
+			}
+			err = ValidateGetKeyStatusInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("key_management", "get_key_status", err)
+			}
+			return nil, NewGetKeyStatusInternalError(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("key_management", "get_key_status", resp.StatusCode, string(body))
@@ -243,13 +255,13 @@ func EncodeAddShareRequest(encoder func(*http.Request) goahttp.Encoder) func(*ht
 // key_management add_share endpoint. restoreBody controls whether the response
 // body should be restored after having been read.
 // DecodeAddShareResponse may return the following errors:
-//   - "could_not_recombine" (type keymanagement.CouldNotRecombine): http.StatusBadRequest
-//   - "invalid_parameters" (type keymanagement.InvalidParameters): http.StatusBadRequest
-//   - "wrong_shares" (type keymanagement.WrongShares): http.StatusBadRequest
-//   - "internal_error" (type keymanagement.InternalError): http.StatusInternalServerError
-//   - "key_already_unlocked" (type keymanagement.KeyAlreadyUnlocked): http.StatusConflict
-//   - "too_many_shares" (type keymanagement.TooManyShares): http.StatusConflict
-//   - "no_key_set" (type keymanagement.NoKeySet): http.StatusNotFound
+//   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
+//   - "could_not_recombine" (type *goa.ServiceError): http.StatusBadRequest
+//   - "wrong_shares" (type *goa.ServiceError): http.StatusBadRequest
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
+//   - "too_many_shares" (type *goa.ServiceError): http.StatusConflict
+//   - "key_already_unlocked" (type *goa.ServiceError): http.StatusConflict
+//   - "no_key_set" (type *goa.ServiceError): http.StatusNotFound
 //   - error: internal error
 func DecodeAddShareResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -284,87 +296,115 @@ func DecodeAddShareResponse(decoder func(*http.Response) goahttp.Decoder, restor
 		case http.StatusBadRequest:
 			en := resp.Header.Get("goa-error")
 			switch en {
-			case "could_not_recombine":
-				var (
-					body string
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("key_management", "add_share", err)
-				}
-				return nil, NewAddShareCouldNotRecombine(body)
 			case "invalid_parameters":
 				var (
-					body string
+					body AddShareInvalidParametersResponseBody
 					err  error
 				)
 				err = decoder(resp).Decode(&body)
 				if err != nil {
 					return nil, goahttp.ErrDecodingError("key_management", "add_share", err)
 				}
-				return nil, NewAddShareInvalidParameters(body)
+				err = ValidateAddShareInvalidParametersResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("key_management", "add_share", err)
+				}
+				return nil, NewAddShareInvalidParameters(&body)
+			case "could_not_recombine":
+				var (
+					body AddShareCouldNotRecombineResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("key_management", "add_share", err)
+				}
+				err = ValidateAddShareCouldNotRecombineResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("key_management", "add_share", err)
+				}
+				return nil, NewAddShareCouldNotRecombine(&body)
 			case "wrong_shares":
 				var (
-					body string
+					body AddShareWrongSharesResponseBody
 					err  error
 				)
 				err = decoder(resp).Decode(&body)
 				if err != nil {
 					return nil, goahttp.ErrDecodingError("key_management", "add_share", err)
 				}
-				return nil, NewAddShareWrongShares(body)
+				err = ValidateAddShareWrongSharesResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("key_management", "add_share", err)
+				}
+				return nil, NewAddShareWrongShares(&body)
 			default:
 				body, _ := io.ReadAll(resp.Body)
 				return nil, goahttp.ErrInvalidResponse("key_management", "add_share", resp.StatusCode, string(body))
 			}
 		case http.StatusInternalServerError:
 			var (
-				body string
+				body AddShareInternalErrorResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("key_management", "add_share", err)
 			}
-			return nil, NewAddShareInternalError(body)
+			err = ValidateAddShareInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("key_management", "add_share", err)
+			}
+			return nil, NewAddShareInternalError(&body)
 		case http.StatusConflict:
 			en := resp.Header.Get("goa-error")
 			switch en {
-			case "key_already_unlocked":
-				var (
-					body string
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("key_management", "add_share", err)
-				}
-				return nil, NewAddShareKeyAlreadyUnlocked(body)
 			case "too_many_shares":
 				var (
-					body string
+					body AddShareTooManySharesResponseBody
 					err  error
 				)
 				err = decoder(resp).Decode(&body)
 				if err != nil {
 					return nil, goahttp.ErrDecodingError("key_management", "add_share", err)
 				}
-				return nil, NewAddShareTooManyShares(body)
+				err = ValidateAddShareTooManySharesResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("key_management", "add_share", err)
+				}
+				return nil, NewAddShareTooManyShares(&body)
+			case "key_already_unlocked":
+				var (
+					body AddShareKeyAlreadyUnlockedResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("key_management", "add_share", err)
+				}
+				err = ValidateAddShareKeyAlreadyUnlockedResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("key_management", "add_share", err)
+				}
+				return nil, NewAddShareKeyAlreadyUnlocked(&body)
 			default:
 				body, _ := io.ReadAll(resp.Body)
 				return nil, goahttp.ErrInvalidResponse("key_management", "add_share", resp.StatusCode, string(body))
 			}
 		case http.StatusNotFound:
 			var (
-				body string
+				body AddShareNoKeySetResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("key_management", "add_share", err)
 			}
-			return nil, NewAddShareNoKeySet(body)
+			err = ValidateAddShareNoKeySetResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("key_management", "add_share", err)
+			}
+			return nil, NewAddShareNoKeySet(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("key_management", "add_share", resp.StatusCode, string(body))
@@ -407,10 +447,10 @@ func EncodeDeleteShareRequest(encoder func(*http.Request) goahttp.Encoder) func(
 // key_management delete_share endpoint. restoreBody controls whether the
 // response body should be restored after having been read.
 // DecodeDeleteShareResponse may return the following errors:
-//   - "internal_error" (type keymanagement.InternalError): http.StatusInternalServerError
-//   - "key_already_unlocked" (type keymanagement.KeyAlreadyUnlocked): http.StatusConflict
-//   - "no_key_set" (type keymanagement.NoKeySet): http.StatusNotFound
-//   - "wrong_index" (type keymanagement.WrongIndex): http.StatusBadRequest
+//   - "no_key_set" (type *goa.ServiceError): http.StatusNotFound
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
+//   - "key_already_unlocked" (type *goa.ServiceError): http.StatusConflict
+//   - "wrong_index" (type *goa.ServiceError): http.StatusBadRequest
 //   - error: internal error
 func DecodeDeleteShareResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
@@ -429,46 +469,62 @@ func DecodeDeleteShareResponse(decoder func(*http.Response) goahttp.Decoder, res
 		switch resp.StatusCode {
 		case http.StatusOK:
 			return nil, nil
-		case http.StatusInternalServerError:
-			var (
-				body string
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("key_management", "delete_share", err)
-			}
-			return nil, NewDeleteShareInternalError(body)
-		case http.StatusConflict:
-			var (
-				body string
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("key_management", "delete_share", err)
-			}
-			return nil, NewDeleteShareKeyAlreadyUnlocked(body)
 		case http.StatusNotFound:
 			var (
-				body string
+				body DeleteShareNoKeySetResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("key_management", "delete_share", err)
 			}
-			return nil, NewDeleteShareNoKeySet(body)
+			err = ValidateDeleteShareNoKeySetResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("key_management", "delete_share", err)
+			}
+			return nil, NewDeleteShareNoKeySet(&body)
+		case http.StatusInternalServerError:
+			var (
+				body DeleteShareInternalErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("key_management", "delete_share", err)
+			}
+			err = ValidateDeleteShareInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("key_management", "delete_share", err)
+			}
+			return nil, NewDeleteShareInternalError(&body)
+		case http.StatusConflict:
+			var (
+				body DeleteShareKeyAlreadyUnlockedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("key_management", "delete_share", err)
+			}
+			err = ValidateDeleteShareKeyAlreadyUnlockedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("key_management", "delete_share", err)
+			}
+			return nil, NewDeleteShareKeyAlreadyUnlocked(&body)
 		case http.StatusBadRequest:
 			var (
-				body string
+				body DeleteShareWrongIndexResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("key_management", "delete_share", err)
 			}
-			return nil, NewDeleteShareWrongIndex(body)
+			err = ValidateDeleteShareWrongIndexResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("key_management", "delete_share", err)
+			}
+			return nil, NewDeleteShareWrongIndex(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("key_management", "delete_share", resp.StatusCode, string(body))

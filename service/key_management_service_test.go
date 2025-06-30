@@ -317,7 +317,7 @@ func TestKeyManagementService_AddShare(t *testing.T) {
 			} else {
 				assert.Error(t, err)
 				assert.Nil(t, result)
-				assert.Equal(t, "The key recombined from the shares is not the correct key", err.Error())
+				assert.Equal(t, "error decrypting master key checksum: ciphertext too short", err.Error())
 			}
 
 			status, err := service.GetKeyStatus(ctx)

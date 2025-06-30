@@ -36,7 +36,7 @@ func NewClient(createMasterKey, getKeyStatus, addShare, deleteShare goa.Endpoint
 // CreateMasterKey may return the following errors:
 //   - "invalid_parameters" (type *goa.ServiceError): Invalid parameters provided
 //   - "internal_error" (type *goa.ServiceError): Internal server error
-//   - "key_already_exists" (type KeyAlreadyExists)
+//   - "key_already_exists" (type *goa.ServiceError): A master key already exists
 //   - error: internal error
 func (c *Client) CreateMasterKey(ctx context.Context, p *CreateMasterKeyPayload) (res *CreateMasterKeyResult, err error) {
 	var ires any
@@ -50,8 +50,8 @@ func (c *Client) CreateMasterKey(ctx context.Context, p *CreateMasterKeyPayload)
 // GetKeyStatus calls the "get_key_status" endpoint of the "key_management"
 // service.
 // GetKeyStatus may return the following errors:
-//   - "no_key_set" (type NoKeySet)
-//   - "internal_error" (type InternalError)
+//   - "no_key_set" (type *goa.ServiceError): No master key has been set
+//   - "internal_error" (type *goa.ServiceError): Internal server error
 //   - error: internal error
 func (c *Client) GetKeyStatus(ctx context.Context) (res *GetKeyStatusResult, err error) {
 	var ires any
@@ -64,13 +64,13 @@ func (c *Client) GetKeyStatus(ctx context.Context) (res *GetKeyStatusResult, err
 
 // AddShare calls the "add_share" endpoint of the "key_management" service.
 // AddShare may return the following errors:
-//   - "invalid_parameters" (type InvalidParameters)
-//   - "internal_error" (type InternalError)
-//   - "too_many_shares" (type TooManyShares)
-//   - "could_not_recombine" (type CouldNotRecombine)
-//   - "wrong_shares" (type WrongShares)
-//   - "no_key_set" (type NoKeySet)
-//   - "key_already_unlocked" (type KeyAlreadyUnlocked)
+//   - "invalid_parameters" (type *goa.ServiceError): Invalid parameters provided
+//   - "internal_error" (type *goa.ServiceError): Internal server error
+//   - "too_many_shares" (type *goa.ServiceError): The maximum number of shares has been reached
+//   - "could_not_recombine" (type *goa.ServiceError): Could not recombine the shares to unlock the key
+//   - "wrong_shares" (type *goa.ServiceError): The key recombined from the shares is not the correct key
+//   - "no_key_set" (type *goa.ServiceError): No master key has been set
+//   - "key_already_unlocked" (type *goa.ServiceError): The master key is already unlocked
 //   - error: internal error
 func (c *Client) AddShare(ctx context.Context, p *AddSharePayload) (res *AddShareResult, err error) {
 	var ires any
@@ -84,10 +84,10 @@ func (c *Client) AddShare(ctx context.Context, p *AddSharePayload) (res *AddShar
 // DeleteShare calls the "delete_share" endpoint of the "key_management"
 // service.
 // DeleteShare may return the following errors:
-//   - "no_key_set" (type NoKeySet)
-//   - "internal_error" (type InternalError)
-//   - "key_already_unlocked" (type KeyAlreadyUnlocked)
-//   - "wrong_index" (type WrongIndex)
+//   - "no_key_set" (type *goa.ServiceError): No master key has been set
+//   - "internal_error" (type *goa.ServiceError): Internal server error
+//   - "key_already_unlocked" (type *goa.ServiceError): The master key is already unlocked
+//   - "wrong_index" (type *goa.ServiceError): The index provided does not match any share
 //   - error: internal error
 func (c *Client) DeleteShare(ctx context.Context, p *DeleteSharePayload) (err error) {
 	_, err = c.DeleteShareEndpoint(ctx, p)

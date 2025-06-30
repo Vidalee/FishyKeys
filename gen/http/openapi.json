@@ -57,7 +57,7 @@
           "409": {
             "description": "Conflict response.",
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/KeyManagementCreateMasterKeyKeyAlreadyExistsResponseBody"
             }
           },
           "500": {
@@ -107,25 +107,25 @@
           "400": {
             "description": "Bad Request response.",
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/KeyManagementAddShareWrongSharesResponseBody"
             }
           },
           "404": {
             "description": "Not Found response.",
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/KeyManagementAddShareNoKeySetResponseBody"
             }
           },
           "409": {
             "description": "Conflict response.",
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/KeyManagementAddShareKeyAlreadyUnlockedResponseBody"
             }
           },
           "500": {
             "description": "Internal Server Error response.",
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/KeyManagementAddShareInternalErrorResponseBody"
             }
           }
         },
@@ -160,25 +160,25 @@
           "400": {
             "description": "Bad Request response.",
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/KeyManagementDeleteShareWrongIndexResponseBody"
             }
           },
           "404": {
             "description": "Not Found response.",
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/KeyManagementDeleteShareNoKeySetResponseBody"
             }
           },
           "409": {
             "description": "Conflict response.",
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/KeyManagementDeleteShareKeyAlreadyUnlockedResponseBody"
             }
           },
           "500": {
             "description": "Internal Server Error response.",
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/KeyManagementDeleteShareInternalErrorResponseBody"
             }
           }
         },
@@ -211,13 +211,13 @@
           "404": {
             "description": "Not Found response.",
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/KeyManagementGetKeyStatusNoKeySetResponseBody"
             }
           },
           "500": {
             "description": "Internal Server Error response.",
             "schema": {
-              "type": "string"
+              "$ref": "#/definitions/KeyManagementGetKeyStatusInternalErrorResponseBody"
             }
           }
         },
@@ -541,49 +541,60 @@
     }
   },
   "definitions": {
-    "KeyManagementAddShareRequestBody": {
-      "title": "KeyManagementAddShareRequestBody",
+    "KeyManagementAddShareCouldNotRecombineResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
       "type": "object",
       "properties": {
-        "share": {
-          "type": "string",
-          "description": "One of the shares need to unlock the master key",
-          "example": "EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0"
-        }
-      },
-      "example": {
-        "share": "EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0"
-      },
-      "required": [
-        "share"
-      ]
-    },
-    "KeyManagementAddShareResponseBody": {
-      "title": "KeyManagementAddShareResponseBody",
-      "type": "object",
-      "properties": {
-        "index": {
-          "type": "integer",
-          "description": "The index of the share added",
-          "example": 6409706751481372932,
-          "format": "int64"
-        },
-        "unlocked": {
+        "fault": {
           "type": "boolean",
-          "description": "Whether the master key has been unlocked",
+          "description": "Is the error a server-side fault?",
+          "example": false
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
           "example": false
         }
       },
+      "description": "Could not recombine the shares to unlock the key (default view)",
       "example": {
-        "index": 6169314233791394279,
-        "unlocked": false
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": true
       },
       "required": [
-        "index",
-        "unlocked"
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
       ]
     },
-    "KeyManagementCreateMasterKeyInternalErrorResponseBody": {
+    "KeyManagementAddShareInternalErrorResponseBody": {
       "title": "Mediatype identifier: application/vnd.goa.error; view=default",
       "type": "object",
       "properties": {
@@ -620,12 +631,12 @@
       },
       "description": "Internal server error (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": false,
-        "timeout": false
+        "timeout": true
       },
       "required": [
         "name",
@@ -636,7 +647,7 @@
         "fault"
       ]
     },
-    "KeyManagementCreateMasterKeyInvalidParametersResponseBody": {
+    "KeyManagementAddShareInvalidParametersResponseBody": {
       "title": "Mediatype identifier: application/vnd.goa.error; view=default",
       "type": "object",
       "properties": {
@@ -672,6 +683,419 @@
         }
       },
       "description": "Invalid parameters provided (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "KeyManagementAddShareKeyAlreadyUnlockedResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "The master key is already unlocked (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "KeyManagementAddShareNoKeySetResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "No master key has been set (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "KeyManagementAddShareRequestBody": {
+      "title": "KeyManagementAddShareRequestBody",
+      "type": "object",
+      "properties": {
+        "share": {
+          "type": "string",
+          "description": "One of the shares need to unlock the master key",
+          "example": "EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0"
+        }
+      },
+      "example": {
+        "share": "EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0"
+      },
+      "required": [
+        "share"
+      ]
+    },
+    "KeyManagementAddShareResponseBody": {
+      "title": "KeyManagementAddShareResponseBody",
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "The index of the share added",
+          "example": 6744913881541961862,
+          "format": "int64"
+        },
+        "unlocked": {
+          "type": "boolean",
+          "description": "Whether the master key has been unlocked",
+          "example": false
+        }
+      },
+      "example": {
+        "index": 6518574107503557211,
+        "unlocked": false
+      },
+      "required": [
+        "index",
+        "unlocked"
+      ]
+    },
+    "KeyManagementAddShareTooManySharesResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "The maximum number of shares has been reached (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "KeyManagementAddShareWrongSharesResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": false
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "The key recombined from the shares is not the correct key (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "KeyManagementCreateMasterKeyInternalErrorResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Internal server error (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "KeyManagementCreateMasterKeyInvalidParametersResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Invalid parameters provided (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "KeyManagementCreateMasterKeyKeyAlreadyExistsResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "A master key already exists (default view)",
       "example": {
         "fault": true,
         "id": "123abc",
@@ -742,22 +1166,183 @@
           "type": "array",
           "items": {
             "type": "string",
-            "example": "Est inventore cum qui excepturi."
+            "example": "Ex ratione qui itaque."
           },
           "description": "The generated key shares",
           "example": [
-            "Ullam vel dolorum exercitationem consequuntur non quos.",
-            "Debitis placeat dignissimos."
+            "EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0",
+            "EXAMPLEB5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU1",
+            "EXAMPLEC5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU2"
           ]
         }
       },
       "example": {
         "admin_username": "admin",
         "shares": [
-          "Et maxime impedit necessitatibus.",
-          "Accusamus perferendis."
+          "EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0",
+          "EXAMPLEB5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU1",
+          "EXAMPLEC5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU2"
         ]
       }
+    },
+    "KeyManagementDeleteShareInternalErrorResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "Internal server error (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "KeyManagementDeleteShareKeyAlreadyUnlockedResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "The master key is already unlocked (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "KeyManagementDeleteShareNoKeySetResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "No master key has been set (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
     },
     "KeyManagementDeleteShareRequestBody": {
       "title": "KeyManagementDeleteShareRequestBody",
@@ -777,6 +1362,165 @@
         "index"
       ]
     },
+    "KeyManagementDeleteShareWrongIndexResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "The index provided does not match any share (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "KeyManagementGetKeyStatusInternalErrorResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Internal server error (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "KeyManagementGetKeyStatusNoKeySetResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "No master key has been set (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
     "KeyManagementGetKeyStatusResponseBody": {
       "title": "KeyManagementGetKeyStatusResponseBody",
       "type": "object",
@@ -784,7 +1528,7 @@
         "current_shares": {
           "type": "integer",
           "description": "Number of shares currently held",
-          "example": 529220007119854575,
+          "example": 8596011842194639124,
           "format": "int64"
         },
         "is_locked": {
@@ -795,21 +1539,21 @@
         "min_shares": {
           "type": "integer",
           "description": "Minimum number of shares required",
-          "example": 6772079528695378523,
+          "example": 7450857859587741566,
           "format": "int64"
         },
         "total_shares": {
           "type": "integer",
           "description": "Total number of shares",
-          "example": 1300446162783111436,
+          "example": 3000252592497270781,
           "format": "int64"
         }
       },
       "example": {
-        "current_shares": 5885736550970909816,
+        "current_shares": 8059959751435884757,
         "is_locked": true,
-        "min_shares": 6082693792273107902,
-        "total_shares": 9050998196324050230
+        "min_shares": 6597967831032783709,
+        "total_shares": 6553916485925491878
       },
       "required": [
         "is_locked",
@@ -851,14 +1595,24 @@
           "description": "Members authorized to access the secret",
           "example": [
             {
-              "created_at": "Voluptas numquam aut et sed voluptatum.",
-              "updated_at": "Reprehenderit est et culpa voluptatem.",
-              "username": "Sunt eos in ut."
+              "created_at": "Officia tempora sed eum aspernatur sint ut.",
+              "updated_at": "Excepturi deleniti.",
+              "username": "Neque dolores libero temporibus omnis."
             },
             {
-              "created_at": "Voluptas numquam aut et sed voluptatum.",
-              "updated_at": "Reprehenderit est et culpa voluptatem.",
-              "username": "Sunt eos in ut."
+              "created_at": "Officia tempora sed eum aspernatur sint ut.",
+              "updated_at": "Excepturi deleniti.",
+              "username": "Neque dolores libero temporibus omnis."
+            },
+            {
+              "created_at": "Officia tempora sed eum aspernatur sint ut.",
+              "updated_at": "Excepturi deleniti.",
+              "username": "Neque dolores libero temporibus omnis."
+            },
+            {
+              "created_at": "Officia tempora sed eum aspernatur sint ut.",
+              "updated_at": "Excepturi deleniti.",
+              "username": "Neque dolores libero temporibus omnis."
             }
           ]
         },
@@ -906,24 +1660,19 @@
       "example": {
         "authorized_members": [
           {
-            "created_at": "Voluptas numquam aut et sed voluptatum.",
-            "updated_at": "Reprehenderit est et culpa voluptatem.",
-            "username": "Sunt eos in ut."
+            "created_at": "Officia tempora sed eum aspernatur sint ut.",
+            "updated_at": "Excepturi deleniti.",
+            "username": "Neque dolores libero temporibus omnis."
           },
           {
-            "created_at": "Voluptas numquam aut et sed voluptatum.",
-            "updated_at": "Reprehenderit est et culpa voluptatem.",
-            "username": "Sunt eos in ut."
+            "created_at": "Officia tempora sed eum aspernatur sint ut.",
+            "updated_at": "Excepturi deleniti.",
+            "username": "Neque dolores libero temporibus omnis."
           },
           {
-            "created_at": "Voluptas numquam aut et sed voluptatum.",
-            "updated_at": "Reprehenderit est et culpa voluptatem.",
-            "username": "Sunt eos in ut."
-          },
-          {
-            "created_at": "Voluptas numquam aut et sed voluptatum.",
-            "updated_at": "Reprehenderit est et culpa voluptatem.",
-            "username": "Sunt eos in ut."
+            "created_at": "Officia tempora sed eum aspernatur sint ut.",
+            "updated_at": "Excepturi deleniti.",
+            "username": "Neque dolores libero temporibus omnis."
           }
         ],
         "authorized_roles": [
@@ -942,9 +1691,9 @@
         ],
         "created_at": "2025-06-30T12:00:00Z",
         "owner": {
-          "created_at": "Voluptas numquam aut et sed voluptatum.",
-          "updated_at": "Reprehenderit est et culpa voluptatem.",
-          "username": "Sunt eos in ut."
+          "created_at": "Officia tempora sed eum aspernatur sint ut.",
+          "updated_at": "Excepturi deleniti.",
+          "username": "Neque dolores libero temporibus omnis."
         },
         "path": "customers/google/api_key",
         "updated_at": "2025-06-30T15:00:00Z"
@@ -977,17 +1726,17 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "Invalid token path (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
@@ -1028,7 +1777,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -1048,7 +1797,7 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
@@ -1058,12 +1807,12 @@
       },
       "description": "Token not found (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": false,
-        "timeout": true
+        "timeout": false
       },
       "required": [
         "name",
@@ -1101,12 +1850,12 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": false
+          "example": true
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "Unauthorized access (default view)",
@@ -1115,8 +1864,8 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
-        "timeout": false
+        "temporary": true,
+        "timeout": true
       },
       "required": [
         "name",
@@ -1154,7 +1903,7 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
@@ -1164,11 +1913,11 @@
       },
       "description": "Invalid token path (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
+        "temporary": false,
         "timeout": true
       },
       "required": [
@@ -1225,7 +1974,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": true
+          "example": false
         },
         "id": {
           "type": "string",
@@ -1245,7 +1994,7 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": false
+          "example": true
         },
         "timeout": {
           "type": "boolean",
@@ -1255,12 +2004,12 @@
       },
       "description": "Token not found (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": false,
-        "timeout": false
+        "timeout": true
       },
       "required": [
         "name",
@@ -1298,7 +2047,7 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
@@ -1313,7 +2062,7 @@
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": true,
-        "timeout": false
+        "timeout": true
       },
       "required": [
         "name",
@@ -1331,23 +2080,23 @@
         "created_at": {
           "type": "string",
           "description": "User creation timestamp",
-          "example": "Quis vel reiciendis distinctio sint."
+          "example": "Rem mollitia et est ratione."
         },
         "updated_at": {
           "type": "string",
           "description": "User last update timestamp",
-          "example": "Debitis voluptatum non ducimus natus nisi."
+          "example": "Voluptates sunt quia autem laboriosam sunt."
         },
         "username": {
           "type": "string",
           "description": "The username",
-          "example": "Est pariatur dolorem laborum ratione minima maxime."
+          "example": "Eum et eaque ipsam."
         }
       },
       "example": {
-        "created_at": "Laborum illo impedit debitis quia.",
-        "updated_at": "Autem ut necessitatibus dolor earum aut.",
-        "username": "Consequatur sint asperiores natus."
+        "created_at": "Nesciunt architecto sint facere quos doloribus.",
+        "updated_at": "Veniam qui.",
+        "username": "Assumenda optio."
       },
       "required": [
         "username",
@@ -1362,7 +2111,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": true
+          "example": false
         },
         "id": {
           "type": "string",
@@ -1387,16 +2136,16 @@
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "Invalid input (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
+        "temporary": false,
         "timeout": false
       },
       "required": [
@@ -1439,17 +2188,17 @@
         "token": {
           "type": "string",
           "description": "JWT or session token",
-          "example": "Est laborum ut vel non nam magnam."
+          "example": "Quis vel reiciendis distinctio sint."
         },
         "username": {
           "type": "string",
           "description": "The username of the authenticated user",
-          "example": "Dolore est temporibus nam laboriosam natus rerum."
+          "example": "Est pariatur dolorem laborum ratione minima maxime."
         }
       },
       "example": {
-        "token": "Eius maxime doloribus.",
-        "username": "Ipsa ad est quidem corporis officia."
+        "token": "Consequatur sint asperiores natus.",
+        "username": "Debitis voluptatum non ducimus natus nisi."
       }
     },
     "UsersAuthUserUnauthorizedResponseBody": {
@@ -1459,7 +2208,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -1479,12 +2228,12 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "Invalid username or password (default view)",
@@ -1494,7 +2243,7 @@
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": true,
-        "timeout": true
+        "timeout": false
       },
       "required": [
         "name",
@@ -1512,7 +2261,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": true
+          "example": false
         },
         "id": {
           "type": "string",
@@ -1547,7 +2296,7 @@
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": true,
-        "timeout": true
+        "timeout": false
       },
       "required": [
         "name",
@@ -1590,18 +2339,18 @@
         "id": {
           "type": "integer",
           "description": "Unique identifier for the user",
-          "example": 3327879190062902293,
+          "example": 7645663036194808677,
           "format": "int64"
         },
         "username": {
           "type": "string",
           "description": "The username of the created user",
-          "example": "Iste et animi explicabo sed."
+          "example": "Consequuntur non quos."
         }
       },
       "example": {
-        "id": 4219795490900341216,
-        "username": "Commodi repudiandae et molestias quasi."
+        "id": 3985364364835542493,
+        "username": "Placeat dignissimos error minus."
       }
     },
     "UsersCreateUserUsernameTakenResponseBody": {
@@ -1641,12 +2390,12 @@
       },
       "description": "Username already exists (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": true,
-        "timeout": false
+        "timeout": true
       },
       "required": [
         "name",
@@ -1684,12 +2433,12 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": false
+          "example": true
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "Forbidden access (default view)",
@@ -1698,7 +2447,7 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
+        "temporary": true,
         "timeout": true
       },
       "required": [
@@ -1717,7 +2466,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -1742,16 +2491,16 @@
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "Internal server error (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
+        "temporary": false,
         "timeout": false
       },
       "required": [
@@ -1795,17 +2544,17 @@
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "Invalid input (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": false,
-        "timeout": true
+        "timeout": false
       },
       "required": [
         "name",
@@ -1823,7 +2572,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -1896,22 +2645,22 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "User not found (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
-        "timeout": false
+        "temporary": true,
+        "timeout": true
       },
       "required": [
         "name",
@@ -1949,7 +2698,7 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": false
+          "example": true
         },
         "timeout": {
           "type": "boolean",
@@ -1959,12 +2708,12 @@
       },
       "description": "Unauthorized access (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
-        "timeout": true
+        "temporary": false,
+        "timeout": false
       },
       "required": [
         "name",

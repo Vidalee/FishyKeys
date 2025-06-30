@@ -25,14 +25,20 @@ var _ = Service("key_management", func() {
 			Required("total_shares", "min_shares", "admin_username", "admin_password")
 		})
 		Result(func() {
-			Attribute("shares", ArrayOf(String), "The generated key shares")
+			Attribute("shares", ArrayOf(String), "The generated key shares", func() {
+				Example([]string{
+					"EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0",
+					"EXAMPLEB5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU1",
+					"EXAMPLEC5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU2",
+				})
+			})
 			Attribute("admin_username", String, "The admin user's username", func() {
 				Example("admin")
 			})
 		})
 		Error("invalid_parameters", ErrorResult, "Invalid parameters provided")
 		Error("internal_error", ErrorResult, "Internal server error")
-		Error("key_already_exists", String, "A master key already exists")
+		Error("key_already_exists", ErrorResult, "A master key already exists")
 		HTTP(func() {
 			POST("/key_management/create_master_key")
 			Response(StatusCreated)
@@ -51,8 +57,8 @@ var _ = Service("key_management", func() {
 			Attribute("total_shares", Int, "Total number of shares")
 			Required("is_locked", "current_shares", "min_shares", "total_shares")
 		})
-		Error("no_key_set", String, "No master key has been set")
-		Error("internal_error", String, "Internal server error")
+		Error("no_key_set", ErrorResult, "No master key has been set")
+		Error("internal_error", ErrorResult, "Internal server error")
 		HTTP(func() {
 			GET("/key_management/status")
 			Response(StatusOK)
@@ -74,13 +80,13 @@ var _ = Service("key_management", func() {
 			Attribute("unlocked", Boolean, "Whether the master key has been unlocked")
 			Required("index", "unlocked")
 		})
-		Error("invalid_parameters", String, "Invalid parameters provided")
-		Error("internal_error", String, "Internal server error")
-		Error("too_many_shares", String, "The maximum number of shares has been reached")
-		Error("could_not_recombine", String, "Could not recombine the shares to unlock the key")
-		Error("wrong_shares", String, "The key recombined from the shares is not the correct key")
-		Error("no_key_set", String, "No master key has been set")
-		Error("key_already_unlocked", String, "The master key is already unlocked")
+		Error("invalid_parameters", ErrorResult, "Invalid parameters provided")
+		Error("internal_error", ErrorResult, "Internal server error")
+		Error("too_many_shares", ErrorResult, "The maximum number of shares has been reached")
+		Error("could_not_recombine", ErrorResult, "Could not recombine the shares to unlock the key")
+		Error("wrong_shares", ErrorResult, "The key recombined from the shares is not the correct key")
+		Error("no_key_set", ErrorResult, "No master key has been set")
+		Error("key_already_unlocked", ErrorResult, "The master key is already unlocked")
 		HTTP(func() {
 			POST("/key_management/share")
 			Response(StatusCreated)
@@ -102,10 +108,10 @@ var _ = Service("key_management", func() {
 			})
 			Required("index")
 		})
-		Error("no_key_set", String, "No master key has been set")
-		Error("internal_error", String, "Internal server error")
-		Error("key_already_unlocked", String, "The master key is already unlocked")
-		Error("wrong_index", String, "The index provided does not match any share")
+		Error("no_key_set", ErrorResult, "No master key has been set")
+		Error("internal_error", ErrorResult, "Internal server error")
+		Error("key_already_unlocked", ErrorResult, "The master key is already unlocked")
+		Error("wrong_index", ErrorResult, "The index provided does not match any share")
 		HTTP(func() {
 			DELETE("/key_management/share")
 			Response(StatusOK)

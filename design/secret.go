@@ -32,7 +32,7 @@ var SecretInfoType = Type("SecretInfo", func() {
 var _ = Service("secrets", func() {
 	Description("User service manages user accounts and authentication")
 
-	Error("secret_not_found", ErrorResult, "Token not found")
+	Error("secret_not_found", ErrorResult, "Secret not found")
 	Error("invalid_parameters", ErrorResult, "Invalid token path")
 	Error("unauthorized", ErrorResult, "Unauthorized access")
 	Error("internal_error", String, "Internal server error")

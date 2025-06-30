@@ -108,6 +108,268 @@ type CreateMasterKeyInternalErrorResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// CreateMasterKeyKeyAlreadyExistsResponseBody is the type of the
+// "key_management" service "create_master_key" endpoint HTTP response body for
+// the "key_already_exists" error.
+type CreateMasterKeyKeyAlreadyExistsResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetKeyStatusNoKeySetResponseBody is the type of the "key_management" service
+// "get_key_status" endpoint HTTP response body for the "no_key_set" error.
+type GetKeyStatusNoKeySetResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetKeyStatusInternalErrorResponseBody is the type of the "key_management"
+// service "get_key_status" endpoint HTTP response body for the
+// "internal_error" error.
+type GetKeyStatusInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AddShareInvalidParametersResponseBody is the type of the "key_management"
+// service "add_share" endpoint HTTP response body for the "invalid_parameters"
+// error.
+type AddShareInvalidParametersResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AddShareCouldNotRecombineResponseBody is the type of the "key_management"
+// service "add_share" endpoint HTTP response body for the
+// "could_not_recombine" error.
+type AddShareCouldNotRecombineResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AddShareWrongSharesResponseBody is the type of the "key_management" service
+// "add_share" endpoint HTTP response body for the "wrong_shares" error.
+type AddShareWrongSharesResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AddShareInternalErrorResponseBody is the type of the "key_management"
+// service "add_share" endpoint HTTP response body for the "internal_error"
+// error.
+type AddShareInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AddShareTooManySharesResponseBody is the type of the "key_management"
+// service "add_share" endpoint HTTP response body for the "too_many_shares"
+// error.
+type AddShareTooManySharesResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AddShareKeyAlreadyUnlockedResponseBody is the type of the "key_management"
+// service "add_share" endpoint HTTP response body for the
+// "key_already_unlocked" error.
+type AddShareKeyAlreadyUnlockedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AddShareNoKeySetResponseBody is the type of the "key_management" service
+// "add_share" endpoint HTTP response body for the "no_key_set" error.
+type AddShareNoKeySetResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteShareNoKeySetResponseBody is the type of the "key_management" service
+// "delete_share" endpoint HTTP response body for the "no_key_set" error.
+type DeleteShareNoKeySetResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteShareInternalErrorResponseBody is the type of the "key_management"
+// service "delete_share" endpoint HTTP response body for the "internal_error"
+// error.
+type DeleteShareInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteShareKeyAlreadyUnlockedResponseBody is the type of the
+// "key_management" service "delete_share" endpoint HTTP response body for the
+// "key_already_unlocked" error.
+type DeleteShareKeyAlreadyUnlockedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteShareWrongIndexResponseBody is the type of the "key_management"
+// service "delete_share" endpoint HTTP response body for the "wrong_index"
+// error.
+type DeleteShareWrongIndexResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // NewCreateMasterKeyResponseBody builds the HTTP response body from the result
 // of the "create_master_key" endpoint of the "key_management" service.
 func NewCreateMasterKeyResponseBody(res *keymanagement.CreateMasterKeyResult) *CreateMasterKeyResponseBody {
@@ -165,6 +427,204 @@ func NewCreateMasterKeyInvalidParametersResponseBody(res *goa.ServiceError) *Cre
 // service.
 func NewCreateMasterKeyInternalErrorResponseBody(res *goa.ServiceError) *CreateMasterKeyInternalErrorResponseBody {
 	body := &CreateMasterKeyInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCreateMasterKeyKeyAlreadyExistsResponseBody builds the HTTP response body
+// from the result of the "create_master_key" endpoint of the "key_management"
+// service.
+func NewCreateMasterKeyKeyAlreadyExistsResponseBody(res *goa.ServiceError) *CreateMasterKeyKeyAlreadyExistsResponseBody {
+	body := &CreateMasterKeyKeyAlreadyExistsResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetKeyStatusNoKeySetResponseBody builds the HTTP response body from the
+// result of the "get_key_status" endpoint of the "key_management" service.
+func NewGetKeyStatusNoKeySetResponseBody(res *goa.ServiceError) *GetKeyStatusNoKeySetResponseBody {
+	body := &GetKeyStatusNoKeySetResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetKeyStatusInternalErrorResponseBody builds the HTTP response body from
+// the result of the "get_key_status" endpoint of the "key_management" service.
+func NewGetKeyStatusInternalErrorResponseBody(res *goa.ServiceError) *GetKeyStatusInternalErrorResponseBody {
+	body := &GetKeyStatusInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAddShareInvalidParametersResponseBody builds the HTTP response body from
+// the result of the "add_share" endpoint of the "key_management" service.
+func NewAddShareInvalidParametersResponseBody(res *goa.ServiceError) *AddShareInvalidParametersResponseBody {
+	body := &AddShareInvalidParametersResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAddShareCouldNotRecombineResponseBody builds the HTTP response body from
+// the result of the "add_share" endpoint of the "key_management" service.
+func NewAddShareCouldNotRecombineResponseBody(res *goa.ServiceError) *AddShareCouldNotRecombineResponseBody {
+	body := &AddShareCouldNotRecombineResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAddShareWrongSharesResponseBody builds the HTTP response body from the
+// result of the "add_share" endpoint of the "key_management" service.
+func NewAddShareWrongSharesResponseBody(res *goa.ServiceError) *AddShareWrongSharesResponseBody {
+	body := &AddShareWrongSharesResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAddShareInternalErrorResponseBody builds the HTTP response body from the
+// result of the "add_share" endpoint of the "key_management" service.
+func NewAddShareInternalErrorResponseBody(res *goa.ServiceError) *AddShareInternalErrorResponseBody {
+	body := &AddShareInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAddShareTooManySharesResponseBody builds the HTTP response body from the
+// result of the "add_share" endpoint of the "key_management" service.
+func NewAddShareTooManySharesResponseBody(res *goa.ServiceError) *AddShareTooManySharesResponseBody {
+	body := &AddShareTooManySharesResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAddShareKeyAlreadyUnlockedResponseBody builds the HTTP response body from
+// the result of the "add_share" endpoint of the "key_management" service.
+func NewAddShareKeyAlreadyUnlockedResponseBody(res *goa.ServiceError) *AddShareKeyAlreadyUnlockedResponseBody {
+	body := &AddShareKeyAlreadyUnlockedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAddShareNoKeySetResponseBody builds the HTTP response body from the
+// result of the "add_share" endpoint of the "key_management" service.
+func NewAddShareNoKeySetResponseBody(res *goa.ServiceError) *AddShareNoKeySetResponseBody {
+	body := &AddShareNoKeySetResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteShareNoKeySetResponseBody builds the HTTP response body from the
+// result of the "delete_share" endpoint of the "key_management" service.
+func NewDeleteShareNoKeySetResponseBody(res *goa.ServiceError) *DeleteShareNoKeySetResponseBody {
+	body := &DeleteShareNoKeySetResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteShareInternalErrorResponseBody builds the HTTP response body from
+// the result of the "delete_share" endpoint of the "key_management" service.
+func NewDeleteShareInternalErrorResponseBody(res *goa.ServiceError) *DeleteShareInternalErrorResponseBody {
+	body := &DeleteShareInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteShareKeyAlreadyUnlockedResponseBody builds the HTTP response body
+// from the result of the "delete_share" endpoint of the "key_management"
+// service.
+func NewDeleteShareKeyAlreadyUnlockedResponseBody(res *goa.ServiceError) *DeleteShareKeyAlreadyUnlockedResponseBody {
+	body := &DeleteShareKeyAlreadyUnlockedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteShareWrongIndexResponseBody builds the HTTP response body from the
+// result of the "delete_share" endpoint of the "key_management" service.
+func NewDeleteShareWrongIndexResponseBody(res *goa.ServiceError) *DeleteShareWrongIndexResponseBody {
+	body := &DeleteShareWrongIndexResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,

@@ -96,10 +96,15 @@ func EncodeCreateMasterKeyError(encoder func(context.Context, http.ResponseWrite
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
 		case "key_already_exists":
-			var res keymanagement.KeyAlreadyExists
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewCreateMasterKeyKeyAlreadyExistsResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusConflict)
 			return enc.Encode(body)
@@ -131,21 +136,31 @@ func EncodeGetKeyStatusError(encoder func(context.Context, http.ResponseWriter) 
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
-		case "internal_error":
-			var res keymanagement.InternalError
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			body := res
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
 		case "no_key_set":
-			var res keymanagement.NoKeySet
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewGetKeyStatusNoKeySetResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "internal_error":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewGetKeyStatusInternalErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -204,59 +219,94 @@ func EncodeAddShareError(encoder func(context.Context, http.ResponseWriter) goah
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
-		case "could_not_recombine":
-			var res keymanagement.CouldNotRecombine
+		case "invalid_parameters":
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewAddShareInvalidParametersResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
-		case "invalid_parameters":
-			var res keymanagement.InvalidParameters
+		case "could_not_recombine":
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewAddShareCouldNotRecombineResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		case "wrong_shares":
-			var res keymanagement.WrongShares
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewAddShareWrongSharesResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
 		case "internal_error":
-			var res keymanagement.InternalError
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewAddShareInternalErrorResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
-		case "key_already_unlocked":
-			var res keymanagement.KeyAlreadyUnlocked
+		case "too_many_shares":
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewAddShareTooManySharesResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusConflict)
 			return enc.Encode(body)
-		case "too_many_shares":
-			var res keymanagement.TooManyShares
+		case "key_already_unlocked":
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewAddShareKeyAlreadyUnlockedResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusConflict)
 			return enc.Encode(body)
 		case "no_key_set":
-			var res keymanagement.NoKeySet
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewAddShareNoKeySetResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusNotFound)
 			return enc.Encode(body)
@@ -314,35 +364,55 @@ func EncodeDeleteShareError(encoder func(context.Context, http.ResponseWriter) g
 			return encodeError(ctx, w, v)
 		}
 		switch en.GoaErrorName() {
-		case "internal_error":
-			var res keymanagement.InternalError
+		case "no_key_set":
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewDeleteShareNoKeySetResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "internal_error":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewDeleteShareInternalErrorResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
 		case "key_already_unlocked":
-			var res keymanagement.KeyAlreadyUnlocked
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewDeleteShareKeyAlreadyUnlockedResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusConflict)
 			return enc.Encode(body)
-		case "no_key_set":
-			var res keymanagement.NoKeySet
-			errors.As(v, &res)
-			enc := encoder(ctx, w)
-			body := res
-			w.Header().Set("goa-error", res.GoaErrorName())
-			w.WriteHeader(http.StatusNotFound)
-			return enc.Encode(body)
 		case "wrong_index":
-			var res keymanagement.WrongIndex
+			var res *goa.ServiceError
 			errors.As(v, &res)
 			enc := encoder(ctx, w)
-			body := res
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewDeleteShareWrongIndexResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)

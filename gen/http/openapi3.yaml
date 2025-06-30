@@ -34,9 +34,9 @@ paths:
                             example:
                                 admin_username: admin
                                 shares:
-                                    - Repudiandae blanditiis id cupiditate unde eos.
-                                    - Sit ratione.
-                                    - Et ut magnam labore molestiae.
+                                    - EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0
+                                    - EXAMPLEB5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU1
+                                    - EXAMPLEC5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU2
                 "400":
                     description: 'invalid_parameters: Invalid parameters provided'
                     content:
@@ -44,13 +44,11 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Error'
                 "409":
-                    description: 'key_already_exists: Conflict response.'
+                    description: 'key_already_exists: A master key already exists'
                     content:
-                        application/json:
+                        application/vnd.goa.error:
                             schema:
-                                type: string
-                                example: Dolorem sed incidunt id dolore sed.
-                            example: Natus voluptas aut sunt dolorem et.
+                                $ref: '#/components/schemas/Error'
                 "500":
                     description: 'internal_error: Internal server error'
                     content:
@@ -76,37 +74,29 @@ paths:
                 "200":
                     description: OK response.
                 "400":
-                    description: 'wrong_index: Bad Request response.'
+                    description: 'wrong_index: The index provided does not match any share'
                     content:
-                        application/json:
+                        application/vnd.goa.error:
                             schema:
-                                type: string
-                                example: Commodi rerum quo excepturi.
-                            example: Ab voluptatibus tenetur et totam quam velit.
+                                $ref: '#/components/schemas/Error'
                 "404":
-                    description: 'no_key_set: Not Found response.'
+                    description: 'no_key_set: No master key has been set'
                     content:
-                        application/json:
+                        application/vnd.goa.error:
                             schema:
-                                type: string
-                                example: Asperiores architecto similique quia illo eos quasi.
-                            example: Neque dolores porro est cupiditate.
+                                $ref: '#/components/schemas/Error'
                 "409":
-                    description: 'key_already_unlocked: Conflict response.'
+                    description: 'key_already_unlocked: The master key is already unlocked'
                     content:
-                        application/json:
+                        application/vnd.goa.error:
                             schema:
-                                type: string
-                                example: Doloremque possimus.
-                            example: Non in et modi in rerum.
+                                $ref: '#/components/schemas/Error'
                 "500":
-                    description: 'internal_error: Internal Server Error response.'
+                    description: 'internal_error: Internal server error'
                     content:
-                        application/json:
+                        application/vnd.goa.error:
                             schema:
-                                type: string
-                                example: Dolorem fuga cupiditate alias quis voluptatibus dignissimos.
-                            example: Quidem amet laborum.
+                                $ref: '#/components/schemas/Error'
         post:
             tags:
                 - key_management
@@ -129,40 +119,32 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/AddShareResponseBody'
                             example:
-                                index: 6028725072138950673
-                                unlocked: true
+                                index: 7753947917785333926
+                                unlocked: false
                 "400":
-                    description: 'wrong_shares: Bad Request response.'
+                    description: 'wrong_shares: The key recombined from the shares is not the correct key'
                     content:
-                        application/json:
+                        application/vnd.goa.error:
                             schema:
-                                type: string
-                                example: Officiis magni veniam.
-                            example: Consectetur repudiandae qui.
+                                $ref: '#/components/schemas/Error'
                 "404":
-                    description: 'no_key_set: Not Found response.'
+                    description: 'no_key_set: No master key has been set'
                     content:
-                        application/json:
+                        application/vnd.goa.error:
                             schema:
-                                type: string
-                                example: Facilis est.
-                            example: Omnis consequatur et numquam.
+                                $ref: '#/components/schemas/Error'
                 "409":
-                    description: 'key_already_unlocked: Conflict response.'
+                    description: 'key_already_unlocked: The master key is already unlocked'
                     content:
-                        application/json:
+                        application/vnd.goa.error:
                             schema:
-                                type: string
-                                example: Et quo eveniet deleniti praesentium.
-                            example: Eveniet exercitationem dicta.
+                                $ref: '#/components/schemas/Error'
                 "500":
-                    description: 'internal_error: Internal Server Error response.'
+                    description: 'internal_error: Internal server error'
                     content:
-                        application/json:
+                        application/vnd.goa.error:
                             schema:
-                                type: string
-                                example: Aspernatur rerum autem rerum omnis.
-                            example: Incidunt accusantium asperiores.
+                                $ref: '#/components/schemas/Error'
     /key_management/status:
         get:
             tags:
@@ -178,26 +160,22 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/GetKeyStatusResponseBody'
                             example:
-                                current_shares: 2121356811434194624
-                                is_locked: false
-                                min_shares: 1735927297062114850
-                                total_shares: 2782797484439169934
+                                current_shares: 5411008854894163662
+                                is_locked: true
+                                min_shares: 5707755744778900525
+                                total_shares: 546215688661578890
                 "404":
-                    description: 'no_key_set: Not Found response.'
+                    description: 'no_key_set: No master key has been set'
                     content:
-                        application/json:
+                        application/vnd.goa.error:
                             schema:
-                                type: string
-                                example: Rem dolor ab qui harum distinctio facilis.
-                            example: Quidem aut asperiores eum ullam soluta dicta.
+                                $ref: '#/components/schemas/Error'
                 "500":
-                    description: 'internal_error: Internal Server Error response.'
+                    description: 'internal_error: Internal server error'
                     content:
-                        application/json:
+                        application/vnd.goa.error:
                             schema:
-                                type: string
-                                example: Amet et aut excepturi dolorum.
-                            example: Sapiente nobis laudantium qui amet rerum.
+                                $ref: '#/components/schemas/Error'
     /secrets/${path}:
         get:
             tags:
@@ -222,18 +200,18 @@ paths:
                                 $ref: '#/components/schemas/SecretInfo'
                             example:
                                 authorized_members:
-                                    - created_at: Voluptas numquam aut et sed voluptatum.
-                                      updated_at: Reprehenderit est et culpa voluptatem.
-                                      username: Sunt eos in ut.
-                                    - created_at: Voluptas numquam aut et sed voluptatum.
-                                      updated_at: Reprehenderit est et culpa voluptatem.
-                                      username: Sunt eos in ut.
-                                    - created_at: Voluptas numquam aut et sed voluptatum.
-                                      updated_at: Reprehenderit est et culpa voluptatem.
-                                      username: Sunt eos in ut.
-                                    - created_at: Voluptas numquam aut et sed voluptatum.
-                                      updated_at: Reprehenderit est et culpa voluptatem.
-                                      username: Sunt eos in ut.
+                                    - created_at: Officia tempora sed eum aspernatur sint ut.
+                                      updated_at: Excepturi deleniti.
+                                      username: Neque dolores libero temporibus omnis.
+                                    - created_at: Officia tempora sed eum aspernatur sint ut.
+                                      updated_at: Excepturi deleniti.
+                                      username: Neque dolores libero temporibus omnis.
+                                    - created_at: Officia tempora sed eum aspernatur sint ut.
+                                      updated_at: Excepturi deleniti.
+                                      username: Neque dolores libero temporibus omnis.
+                                    - created_at: Officia tempora sed eum aspernatur sint ut.
+                                      updated_at: Excepturi deleniti.
+                                      username: Neque dolores libero temporibus omnis.
                                 authorized_roles:
                                     - id: 1
                                       name: admin
@@ -241,9 +219,9 @@ paths:
                                       name: admin
                                 created_at: "2025-06-30T12:00:00Z"
                                 owner:
-                                    created_at: Voluptas numquam aut et sed voluptatum.
-                                    updated_at: Reprehenderit est et culpa voluptatem.
-                                    username: Sunt eos in ut.
+                                    created_at: Officia tempora sed eum aspernatur sint ut.
+                                    updated_at: Excepturi deleniti.
+                                    username: Neque dolores libero temporibus omnis.
                                 path: customers/google/api_key
                                 updated_at: "2025-06-30T15:00:00Z"
                 "400":
@@ -270,8 +248,8 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Maiores at et ut occaecati harum maiores.
-                            example: Molestiae rem quia vitae quasi sit quia.
+                                example: Dolorem omnis sed et qui et quis.
+                            example: Consequatur illum totam officiis.
     /secrets/${path}/value:
         get:
             tags:
@@ -321,8 +299,8 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Ducimus eum qui est.
-                            example: Id dolor sed.
+                                example: Eligendi aut quae vel occaecati.
+                            example: Fugiat ut.
     /users:
         get:
             tags:
@@ -340,22 +318,28 @@ paths:
                                 items:
                                     $ref: '#/components/schemas/User'
                                 example:
-                                    - created_at: Dolores aperiam excepturi quisquam.
-                                      updated_at: Eos sapiente.
-                                      username: Voluptatem voluptatibus qui.
-                                    - created_at: Dolores aperiam excepturi quisquam.
-                                      updated_at: Eos sapiente.
-                                      username: Voluptatem voluptatibus qui.
+                                    - created_at: Minima fugiat.
+                                      updated_at: Iste dolores nesciunt occaecati neque.
+                                      username: Sint doloremque autem voluptate.
+                                    - created_at: Minima fugiat.
+                                      updated_at: Iste dolores nesciunt occaecati neque.
+                                      username: Sint doloremque autem voluptate.
+                                    - created_at: Minima fugiat.
+                                      updated_at: Iste dolores nesciunt occaecati neque.
+                                      username: Sint doloremque autem voluptate.
+                                    - created_at: Minima fugiat.
+                                      updated_at: Iste dolores nesciunt occaecati neque.
+                                      username: Sint doloremque autem voluptate.
                             example:
-                                - created_at: Dolores aperiam excepturi quisquam.
-                                  updated_at: Eos sapiente.
-                                  username: Voluptatem voluptatibus qui.
-                                - created_at: Dolores aperiam excepturi quisquam.
-                                  updated_at: Eos sapiente.
-                                  username: Voluptatem voluptatibus qui.
-                                - created_at: Dolores aperiam excepturi quisquam.
-                                  updated_at: Eos sapiente.
-                                  username: Voluptatem voluptatibus qui.
+                                - created_at: Minima fugiat.
+                                  updated_at: Iste dolores nesciunt occaecati neque.
+                                  username: Sint doloremque autem voluptate.
+                                - created_at: Minima fugiat.
+                                  updated_at: Iste dolores nesciunt occaecati neque.
+                                  username: Sint doloremque autem voluptate.
+                                - created_at: Minima fugiat.
+                                  updated_at: Iste dolores nesciunt occaecati neque.
+                                  username: Sint doloremque autem voluptate.
                 "401":
                     description: 'unauthorized: Unauthorized access'
                     content:
@@ -368,8 +352,8 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Nobis libero.
-                            example: Magnam dolores rem.
+                                example: Est laborum ut vel non nam magnam.
+                            example: Dignissimos veniam voluptatem.
         post:
             tags:
                 - users
@@ -393,8 +377,8 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/CreateUserResponseBody'
                             example:
-                                id: 3112833509307211266
-                                username: Fuga in numquam voluptatem est.
+                                id: 8291559849741048554
+                                username: Ratione autem sunt.
                 "400":
                     description: 'invalid_parameters: Invalid input'
                     content:
@@ -413,8 +397,8 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Commodi rerum.
-                            example: Tempora in quo.
+                                example: Laboriosam natus.
+                            example: Inventore nostrum minima et.
     /users/{username}:
         delete:
             tags:
@@ -489,8 +473,8 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/AuthUserResponseBody'
                             example:
-                                token: Laboriosam sunt nostrum assumenda.
-                                username: Ratione eos voluptates sunt quia.
+                                token: Eum possimus.
+                                username: Maxime ut dignissimos rerum fugiat minima.
                 "400":
                     description: 'invalid_parameters: Invalid input'
                     content:
@@ -509,8 +493,8 @@ paths:
                         application/json:
                             schema:
                                 type: string
-                                example: Quos est sit.
-                            example: Cupiditate est pariatur eaque.
+                                example: Accusantium suscipit ipsum laborum.
+                            example: Et atque.
 components:
     schemas:
         AddShareRequestBody:
@@ -530,14 +514,14 @@ components:
                 index:
                     type: integer
                     description: The index of the share added
-                    example: 5981173631579426674
+                    example: 621065245466305673
                     format: int64
                 unlocked:
                     type: boolean
                     description: Whether the master key has been unlocked
-                    example: true
+                    example: false
             example:
-                index: 1441501921438188569
+                index: 8213763797349902532
                 unlocked: false
             required:
                 - index
@@ -565,14 +549,14 @@ components:
                 token:
                     type: string
                     description: JWT or session token
-                    example: Maxime odit eligendi quae adipisci.
+                    example: Eius maxime doloribus.
                 username:
                     type: string
                     description: The username of the authenticated user
-                    example: Aperiam atque quas ut quidem ex hic.
+                    example: Ipsa ad est quidem corporis officia.
             example:
-                token: Et quia sed ducimus.
-                username: Ipsam quam modi at ipsum.
+                token: Omnis quia et repellat natus quidem impedit.
+                username: Molestiae non voluptatem qui.
         CreateMasterKeyRequestBody:
             type: object
             properties:
@@ -615,18 +599,18 @@ components:
                     type: array
                     items:
                         type: string
-                        example: Minima nam voluptatem maiores.
+                        example: Et nisi eos beatae et eligendi.
                     description: The generated key shares
                     example:
-                        - Eum excepturi deserunt omnis aliquam ipsam.
-                        - Officia earum totam esse quaerat velit.
-                        - Sint porro.
+                        - EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0
+                        - EXAMPLEB5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU1
+                        - EXAMPLEC5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU2
             example:
                 admin_username: admin
                 shares:
-                    - Et corrupti culpa minus velit.
-                    - Est sit dignissimos.
-                    - Sint voluptas aspernatur.
+                    - EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0
+                    - EXAMPLEB5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU1
+                    - EXAMPLEC5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU2
         CreateUserRequestBody:
             type: object
             properties:
@@ -651,15 +635,15 @@ components:
                 id:
                     type: integer
                     description: Unique identifier for the user
-                    example: 3149686305813338998
+                    example: 2087716876176659606
                     format: int64
                 username:
                     type: string
                     description: The username of the created user
-                    example: Aut quis.
+                    example: Eius et.
             example:
-                id: 1676119493923677123
-                username: Et expedita.
+                id: 7285269608645810010
+                username: Eos quis occaecati enim dolore est.
         DeleteShareRequestBody:
             type: object
             properties:
@@ -694,19 +678,19 @@ components:
                 temporary:
                     type: boolean
                     description: Is the error temporary?
-                    example: false
+                    example: true
                 timeout:
                     type: boolean
                     description: Is the error a timeout?
-                    example: false
+                    example: true
             description: Invalid parameters provided
             example:
-                fault: true
+                fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: true
-                timeout: true
+                timeout: false
             required:
                 - name
                 - id
@@ -720,27 +704,27 @@ components:
                 current_shares:
                     type: integer
                     description: Number of shares currently held
-                    example: 7926837356895559462
+                    example: 430423582300926420
                     format: int64
                 is_locked:
                     type: boolean
                     description: Whether the key is currently locked
-                    example: false
+                    example: true
                 min_shares:
                     type: integer
                     description: Minimum number of shares required
-                    example: 3875426494026184978
+                    example: 6962341104403820352
                     format: int64
                 total_shares:
                     type: integer
                     description: Total number of shares
-                    example: 2792794677446550089
+                    example: 2079977238461356123
                     format: int64
             example:
-                current_shares: 516397163871956071
+                current_shares: 1644195364213616864
                 is_locked: true
-                min_shares: 5856351231608225095
-                total_shares: 7638314582708536260
+                min_shares: 8284446627080064475
+                total_shares: 4643154167060793781
             required:
                 - is_locked
                 - current_shares
@@ -796,18 +780,12 @@ components:
                         $ref: '#/components/schemas/User'
                     description: Members authorized to access the secret
                     example:
-                        - created_at: Pariatur fuga.
-                          updated_at: Ipsam doloribus laboriosam repudiandae.
-                          username: Laborum eligendi et dolorum corporis nihil.
-                        - created_at: Pariatur fuga.
-                          updated_at: Ipsam doloribus laboriosam repudiandae.
-                          username: Laborum eligendi et dolorum corporis nihil.
-                        - created_at: Pariatur fuga.
-                          updated_at: Ipsam doloribus laboriosam repudiandae.
-                          username: Laborum eligendi et dolorum corporis nihil.
-                        - created_at: Pariatur fuga.
-                          updated_at: Ipsam doloribus laboriosam repudiandae.
-                          username: Laborum eligendi et dolorum corporis nihil.
+                        - created_at: Asperiores et.
+                          updated_at: Libero optio earum.
+                          username: Impedit quis aut non aut vel.
+                        - created_at: Asperiores et.
+                          updated_at: Libero optio earum.
+                          username: Impedit quis aut non aut vel.
                 authorized_roles:
                     type: array
                     items:
@@ -834,15 +812,15 @@ components:
                     example: "2025-06-30T15:00:00Z"
             example:
                 authorized_members:
-                    - created_at: Pariatur fuga.
-                      updated_at: Ipsam doloribus laboriosam repudiandae.
-                      username: Laborum eligendi et dolorum corporis nihil.
-                    - created_at: Pariatur fuga.
-                      updated_at: Ipsam doloribus laboriosam repudiandae.
-                      username: Laborum eligendi et dolorum corporis nihil.
-                    - created_at: Pariatur fuga.
-                      updated_at: Ipsam doloribus laboriosam repudiandae.
-                      username: Laborum eligendi et dolorum corporis nihil.
+                    - created_at: Asperiores et.
+                      updated_at: Libero optio earum.
+                      username: Impedit quis aut non aut vel.
+                    - created_at: Asperiores et.
+                      updated_at: Libero optio earum.
+                      username: Impedit quis aut non aut vel.
+                    - created_at: Asperiores et.
+                      updated_at: Libero optio earum.
+                      username: Impedit quis aut non aut vel.
                 authorized_roles:
                     - id: 1
                       name: admin
@@ -854,9 +832,9 @@ components:
                       name: admin
                 created_at: "2025-06-30T12:00:00Z"
                 owner:
-                    created_at: Pariatur fuga.
-                    updated_at: Ipsam doloribus laboriosam repudiandae.
-                    username: Laborum eligendi et dolorum corporis nihil.
+                    created_at: Asperiores et.
+                    updated_at: Libero optio earum.
+                    username: Impedit quis aut non aut vel.
                 path: customers/google/api_key
                 updated_at: "2025-06-30T15:00:00Z"
         User:
@@ -865,19 +843,19 @@ components:
                 created_at:
                     type: string
                     description: User creation timestamp
-                    example: Doloribus fugiat ut qui consequatur illum totam.
+                    example: Sunt eum necessitatibus perspiciatis consequatur aperiam nemo.
                 updated_at:
                     type: string
                     description: User last update timestamp
-                    example: Inventore inventore nostrum.
+                    example: Rerum quidem expedita optio.
                 username:
                     type: string
                     description: The username
-                    example: Repudiandae accusantium suscipit ipsum.
+                    example: Ratione esse dolores aut quia.
             example:
-                created_at: Dignissimos veniam voluptatem.
-                updated_at: Et atque.
-                username: Et qui.
+                created_at: Explicabo sed sed accusantium.
+                updated_at: Repudiandae et.
+                username: Quia et similique nihil iste et.
             required:
                 - username
                 - created_at
