@@ -62,15 +62,15 @@ type GetSecretValueResult struct {
 
 type RoleType struct {
 	// Unique identifier for the role
-	ID *int
+	ID int
 	// Name of the role
-	Name *string
+	Name string
 }
 
 // The secret's information
 type SecretInfo struct {
 	// The original path of the secret
-	Path *string
+	Path string
 	// The owner of the secret
 	Owner *User
 	// Members authorized to access the secret
@@ -78,9 +78,9 @@ type SecretInfo struct {
 	// Roles authorized to access the secret
 	AuthorizedRoles []*RoleType
 	// Creation timestamp of the secret
-	CreatedAt *string
+	CreatedAt string
 	// Last update timestamp of the secret
-	UpdatedAt *string
+	UpdatedAt string
 }
 
 type User struct {

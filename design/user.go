@@ -5,9 +5,16 @@ import (
 )
 
 var UserType = Type("User", func() {
-	Attribute("username", String, "The username")
-	Attribute("created_at", String, "User creation timestamp")
-	Attribute("updated_at", String, "User last update timestamp")
+	Attribute("username", String, "The username", func() {
+		Example("alice")
+		MinLength(3)
+	})
+	Attribute("created_at", String, "User creation timestamp", func() {
+		Example("2025-06-30T12:00:00Z")
+	})
+	Attribute("updated_at", String, "User last update timestamp", func() {
+		Example("2025-06-30T15:00:00Z")
+	})
 	Required("username", "created_at", "updated_at")
 })
 
@@ -27,8 +34,12 @@ var _ = Service("users", func() {
 			Required("username", "password")
 		})
 		Result(func() {
-			Attribute("username", String, "The username of the created user")
-			Attribute("id", Int, "Unique identifier for the user")
+			Attribute("username", String, "The username of the created user", func() {
+				Example("alice")
+			})
+			Attribute("id", Int, "Unique identifier for the user", func() {
+				Example(2)
+			})
 		})
 		Error("username_taken", ErrorResult, "Username already exists")
 		Error("invalid_parameters", ErrorResult, "Invalid input")
@@ -95,8 +106,12 @@ var _ = Service("users", func() {
 			Required("username", "password")
 		})
 		Result(func() {
-			Attribute("username", String, "The username of the authenticated user")
-			Attribute("token", String, "JWT or session token")
+			Attribute("username", String, "The username of the authenticated user", func() {
+				Example("alice")
+			})
+			Attribute("token", String, "JWT or session token", func() {
+				Example("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+			})
 		})
 		Error("unauthorized", ErrorResult, "Invalid username or password")
 		Error("invalid_parameters", ErrorResult, "Invalid input")

@@ -239,9 +239,6 @@ func EncodeGetSecretError(encoder func(context.Context, http.ResponseWriter) goa
 // marshalSecretsUserToUserResponseBody builds a value of type
 // *UserResponseBody from a value of type *secrets.User.
 func marshalSecretsUserToUserResponseBody(v *secrets.User) *UserResponseBody {
-	if v == nil {
-		return nil
-	}
 	res := &UserResponseBody{
 		Username:  v.Username,
 		CreatedAt: v.CreatedAt,
@@ -254,9 +251,6 @@ func marshalSecretsUserToUserResponseBody(v *secrets.User) *UserResponseBody {
 // marshalSecretsRoleTypeToRoleTypeResponseBody builds a value of type
 // *RoleTypeResponseBody from a value of type *secrets.RoleType.
 func marshalSecretsRoleTypeToRoleTypeResponseBody(v *secrets.RoleType) *RoleTypeResponseBody {
-	if v == nil {
-		return nil
-	}
 	res := &RoleTypeResponseBody{
 		ID:   v.ID,
 		Name: v.Name,

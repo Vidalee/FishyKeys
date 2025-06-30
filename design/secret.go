@@ -11,6 +11,8 @@ var RoleType = Type("RoleType", func() {
 	Attribute("name", String, "Name of the role", func() {
 		Example("admin")
 	})
+
+	Required("id", "name")
 })
 
 var SecretInfoType = Type("SecretInfo", func() {
@@ -27,6 +29,8 @@ var SecretInfoType = Type("SecretInfo", func() {
 	Attribute("updated_at", String, "Last update timestamp of the secret", func() {
 		Example("2025-06-30T15:00:00Z")
 	})
+
+	Required("path", "owner", "authorized_members", "authorized_roles", "created_at", "updated_at")
 })
 
 var _ = Service("secrets", func() {

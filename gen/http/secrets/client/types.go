@@ -8,6 +8,8 @@
 package client
 
 import (
+	"unicode/utf8"
+
 	secrets "github.com/Vidalee/FishyKeys/gen/secrets"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -310,24 +312,18 @@ func NewGetSecretValueInternalError(body *GetSecretValueInternalErrorResponseBod
 // result from a HTTP "OK" response.
 func NewGetSecretSecretInfoOK(body *GetSecretResponseBody) *secrets.SecretInfo {
 	v := &secrets.SecretInfo{
-		Path:      body.Path,
-		CreatedAt: body.CreatedAt,
-		UpdatedAt: body.UpdatedAt,
+		Path:      *body.Path,
+		CreatedAt: *body.CreatedAt,
+		UpdatedAt: *body.UpdatedAt,
 	}
-	if body.Owner != nil {
-		v.Owner = unmarshalUserResponseBodyToSecretsUser(body.Owner)
+	v.Owner = unmarshalUserResponseBodyToSecretsUser(body.Owner)
+	v.AuthorizedMembers = make([]*secrets.User, len(body.AuthorizedMembers))
+	for i, val := range body.AuthorizedMembers {
+		v.AuthorizedMembers[i] = unmarshalUserResponseBodyToSecretsUser(val)
 	}
-	if body.AuthorizedMembers != nil {
-		v.AuthorizedMembers = make([]*secrets.User, len(body.AuthorizedMembers))
-		for i, val := range body.AuthorizedMembers {
-			v.AuthorizedMembers[i] = unmarshalUserResponseBodyToSecretsUser(val)
-		}
-	}
-	if body.AuthorizedRoles != nil {
-		v.AuthorizedRoles = make([]*secrets.RoleType, len(body.AuthorizedRoles))
-		for i, val := range body.AuthorizedRoles {
-			v.AuthorizedRoles[i] = unmarshalRoleTypeResponseBodyToSecretsRoleType(val)
-		}
+	v.AuthorizedRoles = make([]*secrets.RoleType, len(body.AuthorizedRoles))
+	for i, val := range body.AuthorizedRoles {
+		v.AuthorizedRoles[i] = unmarshalRoleTypeResponseBodyToSecretsRoleType(val)
 	}
 
 	return v
@@ -396,6 +392,24 @@ func NewGetSecretInternalError(body *GetSecretInternalErrorResponseBody) *goa.Se
 // ValidateGetSecretResponseBody runs the validations defined on Get
 // SecretResponseBody
 func ValidateGetSecretResponseBody(body *GetSecretResponseBody) (err error) {
+	if body.Path == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("path", "body"))
+	}
+	if body.Owner == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("owner", "body"))
+	}
+	if body.AuthorizedMembers == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("authorized_members", "body"))
+	}
+	if body.AuthorizedRoles == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("authorized_roles", "body"))
+	}
+	if body.CreatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("created_at", "body"))
+	}
+	if body.UpdatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updated_at", "body"))
+	}
 	if body.Owner != nil {
 		if err2 := ValidateUserResponseBody(body.Owner); err2 != nil {
 			err = goa.MergeErrors(err, err2)
@@ -404,6 +418,13 @@ func ValidateGetSecretResponseBody(body *GetSecretResponseBody) (err error) {
 	for _, e := range body.AuthorizedMembers {
 		if e != nil {
 			if err2 := ValidateUserResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	for _, e := range body.AuthorizedRoles {
+		if e != nil {
+			if err2 := ValidateRoleTypeResponseBody(e); err2 != nil {
 				err = goa.MergeErrors(err, err2)
 			}
 		}
@@ -613,6 +634,23 @@ func ValidateUserResponseBody(body *UserResponseBody) (err error) {
 	}
 	if body.UpdatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("updated_at", "body"))
+	}
+	if body.Username != nil {
+		if utf8.RuneCountInString(*body.Username) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.username", *body.Username, utf8.RuneCountInString(*body.Username), 3, true))
+		}
+	}
+	return
+}
+
+// ValidateRoleTypeResponseBody runs the validations defined on
+// RoleTypeResponseBody
+func ValidateRoleTypeResponseBody(body *RoleTypeResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
 	return
 }

@@ -41,17 +41,17 @@ type GetSecretValueResponseBody struct {
 // endpoint HTTP response body.
 type GetSecretResponseBody struct {
 	// The original path of the secret
-	Path *string `form:"path,omitempty" json:"path,omitempty" xml:"path,omitempty"`
+	Path string `form:"path" json:"path" xml:"path"`
 	// The owner of the secret
-	Owner *UserResponseBody `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
+	Owner *UserResponseBody `form:"owner" json:"owner" xml:"owner"`
 	// Members authorized to access the secret
-	AuthorizedMembers []*UserResponseBody `form:"authorized_members,omitempty" json:"authorized_members,omitempty" xml:"authorized_members,omitempty"`
+	AuthorizedMembers []*UserResponseBody `form:"authorized_members" json:"authorized_members" xml:"authorized_members"`
 	// Roles authorized to access the secret
-	AuthorizedRoles []*RoleTypeResponseBody `form:"authorized_roles,omitempty" json:"authorized_roles,omitempty" xml:"authorized_roles,omitempty"`
+	AuthorizedRoles []*RoleTypeResponseBody `form:"authorized_roles" json:"authorized_roles" xml:"authorized_roles"`
 	// Creation timestamp of the secret
-	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	CreatedAt string `form:"created_at" json:"created_at" xml:"created_at"`
 	// Last update timestamp of the secret
-	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+	UpdatedAt string `form:"updated_at" json:"updated_at" xml:"updated_at"`
 }
 
 // GetSecretValueSecretNotFoundResponseBody is the type of the "secrets"
@@ -214,9 +214,9 @@ type UserResponseBody struct {
 // RoleTypeResponseBody is used to define fields on response body types.
 type RoleTypeResponseBody struct {
 	// Unique identifier for the role
-	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	ID int `form:"id" json:"id" xml:"id"`
 	// Name of the role
-	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Name string `form:"name" json:"name" xml:"name"`
 }
 
 // NewGetSecretValueResponseBody builds the HTTP response body from the result
@@ -245,12 +245,16 @@ func NewGetSecretResponseBody(res *secrets.SecretInfo) *GetSecretResponseBody {
 		for i, val := range res.AuthorizedMembers {
 			body.AuthorizedMembers[i] = marshalSecretsUserToUserResponseBody(val)
 		}
+	} else {
+		body.AuthorizedMembers = []*UserResponseBody{}
 	}
 	if res.AuthorizedRoles != nil {
 		body.AuthorizedRoles = make([]*RoleTypeResponseBody, len(res.AuthorizedRoles))
 		for i, val := range res.AuthorizedRoles {
 			body.AuthorizedRoles[i] = marshalSecretsRoleTypeToRoleTypeResponseBody(val)
 		}
+	} else {
+		body.AuthorizedRoles = []*RoleTypeResponseBody{}
 	}
 	return body
 }

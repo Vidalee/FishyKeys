@@ -283,9 +283,6 @@ func DecodeGetSecretResponse(decoder func(*http.Response) goahttp.Decoder, resto
 // unmarshalUserResponseBodyToSecretsUser builds a value of type *secrets.User
 // from a value of type *UserResponseBody.
 func unmarshalUserResponseBodyToSecretsUser(v *UserResponseBody) *secrets.User {
-	if v == nil {
-		return nil
-	}
 	res := &secrets.User{
 		Username:  *v.Username,
 		CreatedAt: *v.CreatedAt,
@@ -298,12 +295,9 @@ func unmarshalUserResponseBodyToSecretsUser(v *UserResponseBody) *secrets.User {
 // unmarshalRoleTypeResponseBodyToSecretsRoleType builds a value of type
 // *secrets.RoleType from a value of type *RoleTypeResponseBody.
 func unmarshalRoleTypeResponseBodyToSecretsRoleType(v *RoleTypeResponseBody) *secrets.RoleType {
-	if v == nil {
-		return nil
-	}
 	res := &secrets.RoleType{
-		ID:   v.ID,
-		Name: v.Name,
+		ID:   *v.ID,
+		Name: *v.Name,
 	}
 
 	return res

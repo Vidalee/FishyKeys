@@ -183,7 +183,7 @@
                   "$ref": "#/components/schemas/AddShareResponseBody"
                 },
                 "example": {
-                  "index": 7753947917785333926,
+                  "index": 6106076951395180224,
                   "unlocked": false
                 }
               }
@@ -249,10 +249,10 @@
                   "$ref": "#/components/schemas/GetKeyStatusResponseBody"
                 },
                 "example": {
-                  "current_shares": 5411008854894163662,
+                  "current_shares": 3097709587391736332,
                   "is_locked": true,
-                  "min_shares": 5707755744778900525,
-                  "total_shares": 546215688661578890
+                  "min_shares": 2038305493491334832,
+                  "total_shares": 8155372107292265134
                 }
               }
             }
@@ -312,26 +312,27 @@
                 "example": {
                   "authorized_members": [
                     {
-                      "created_at": "Consequatur neque dolores libero.",
-                      "updated_at": "Omnis sed officia.",
-                      "username": "Vitae deleniti cum incidunt aut."
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "username": "alice"
                     },
                     {
-                      "created_at": "Consequatur neque dolores libero.",
-                      "updated_at": "Omnis sed officia.",
-                      "username": "Vitae deleniti cum incidunt aut."
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "username": "alice"
                     },
                     {
-                      "created_at": "Consequatur neque dolores libero.",
-                      "updated_at": "Omnis sed officia.",
-                      "username": "Vitae deleniti cum incidunt aut."
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "username": "alice"
+                    },
+                    {
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "username": "alice"
                     }
                   ],
                   "authorized_roles": [
-                    {
-                      "id": 1,
-                      "name": "admin"
-                    },
                     {
                       "id": 1,
                       "name": "admin"
@@ -347,9 +348,9 @@
                   ],
                   "created_at": "2025-06-30T12:00:00Z",
                   "owner": {
-                    "created_at": "Consequatur neque dolores libero.",
-                    "updated_at": "Omnis sed officia.",
-                    "username": "Vitae deleniti cum incidunt aut."
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "updated_at": "2025-06-30T15:00:00Z",
+                    "username": "alice"
                   },
                   "path": "customers/google/api_key",
                   "updated_at": "2025-06-30T15:00:00Z"
@@ -499,37 +500,37 @@
                   },
                   "example": [
                     {
-                      "created_at": "Maxime voluptas qui quia possimus.",
-                      "updated_at": "Magnam quia consequatur rem beatae a maxime.",
-                      "username": "Vitae quia enim ut."
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "username": "alice"
                     },
                     {
-                      "created_at": "Maxime voluptas qui quia possimus.",
-                      "updated_at": "Magnam quia consequatur rem beatae a maxime.",
-                      "username": "Vitae quia enim ut."
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "username": "alice"
+                    },
+                    {
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "username": "alice"
                     }
                   ]
                 },
                 "example": [
                   {
-                    "created_at": "Maxime voluptas qui quia possimus.",
-                    "updated_at": "Magnam quia consequatur rem beatae a maxime.",
-                    "username": "Vitae quia enim ut."
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "updated_at": "2025-06-30T15:00:00Z",
+                    "username": "alice"
                   },
                   {
-                    "created_at": "Maxime voluptas qui quia possimus.",
-                    "updated_at": "Magnam quia consequatur rem beatae a maxime.",
-                    "username": "Vitae quia enim ut."
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "updated_at": "2025-06-30T15:00:00Z",
+                    "username": "alice"
                   },
                   {
-                    "created_at": "Maxime voluptas qui quia possimus.",
-                    "updated_at": "Magnam quia consequatur rem beatae a maxime.",
-                    "username": "Vitae quia enim ut."
-                  },
-                  {
-                    "created_at": "Maxime voluptas qui quia possimus.",
-                    "updated_at": "Magnam quia consequatur rem beatae a maxime.",
-                    "username": "Vitae quia enim ut."
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "updated_at": "2025-06-30T15:00:00Z",
+                    "username": "alice"
                   }
                 ]
               }
@@ -587,8 +588,8 @@
                   "$ref": "#/components/schemas/CreateUserResponseBody"
                 },
                 "example": {
-                  "id": 5890167680709064409,
-                  "username": "Repellendus possimus est porro pariatur sunt unde."
+                  "id": 2,
+                  "username": "alice"
                 }
               }
             }
@@ -657,8 +658,8 @@
                   "$ref": "#/components/schemas/AuthUserResponseBody"
                 },
                 "example": {
-                  "token": "Magnam earum qui.",
-                  "username": "Omnis numquam voluptatem quae."
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "username": "alice"
                 }
               }
             }
@@ -800,18 +801,18 @@
           "index": {
             "type": "integer",
             "description": "The index of the share added",
-            "example": 3204362017974806603,
+            "example": 2408691397380551738,
             "format": "int64"
           },
           "unlocked": {
             "type": "boolean",
             "description": "Whether the master key has been unlocked",
-            "example": true
+            "example": false
           }
         },
         "example": {
-          "index": 7362036207563285969,
-          "unlocked": false
+          "index": 663677953846532974,
+          "unlocked": true
         },
         "required": [
           "index",
@@ -847,17 +848,17 @@
           "token": {
             "type": "string",
             "description": "JWT or session token",
-            "example": "Natus rerum optio est laborum."
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
           },
           "username": {
             "type": "string",
             "description": "The username of the authenticated user",
-            "example": "Est temporibus nam."
+            "example": "alice"
           }
         },
         "example": {
-          "token": "Est quidem corporis officia natus eius maxime.",
-          "username": "Vel non nam magnam beatae ipsa."
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "username": "alice"
         }
       },
       "CreateMasterKeyRequestBody": {
@@ -911,7 +912,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "example": "Consequatur voluptas nesciunt ipsam eos ut."
+              "example": "Et est ratione eos voluptates sunt."
             },
             "description": "The generated key shares",
             "example": [
@@ -960,18 +961,18 @@
           "id": {
             "type": "integer",
             "description": "Unique identifier for the user",
-            "example": 7490492448984177102,
+            "example": 2,
             "format": "int64"
           },
           "username": {
             "type": "string",
             "description": "The username of the created user",
-            "example": "Dolorem omnis sed et qui et quis."
+            "example": "alice"
           }
         },
         "example": {
-          "id": 945154162230229594,
-          "username": "Et dignissimos vel eos quis."
+          "id": 2,
+          "username": "alice"
         }
       },
       "DeleteShareRequestBody": {
@@ -997,7 +998,7 @@
           "fault": {
             "type": "boolean",
             "description": "Is the error a server-side fault?",
-            "example": true
+            "example": false
           },
           "id": {
             "type": "string",
@@ -1017,22 +1018,22 @@
           "temporary": {
             "type": "boolean",
             "description": "Is the error temporary?",
-            "example": true
+            "example": false
           },
           "timeout": {
             "type": "boolean",
             "description": "Is the error a timeout?",
-            "example": true
+            "example": false
           }
         },
         "description": "Invalid parameters provided",
         "example": {
-          "fault": true,
+          "fault": false,
           "id": "123abc",
           "message": "parameter 'p' must be an integer",
           "name": "bad_request",
-          "temporary": false,
-          "timeout": true
+          "temporary": true,
+          "timeout": false
         },
         "required": [
           "name",
@@ -1049,32 +1050,32 @@
           "current_shares": {
             "type": "integer",
             "description": "Number of shares currently held",
-            "example": 4643154167060793781,
+            "example": 9111640621121392524,
             "format": "int64"
           },
           "is_locked": {
             "type": "boolean",
             "description": "Whether the key is currently locked",
-            "example": false
+            "example": true
           },
           "min_shares": {
             "type": "integer",
             "description": "Minimum number of shares required",
-            "example": 621065245466305673,
+            "example": 8659804384061367481,
             "format": "int64"
           },
           "total_shares": {
             "type": "integer",
             "description": "Total number of shares",
-            "example": 8417692435225884723,
+            "example": 2720557380947325775,
             "format": "int64"
           }
         },
         "example": {
-          "current_shares": 4464562592945801279,
-          "is_locked": true,
-          "min_shares": 8268351129892585503,
-          "total_shares": 1447020087131900204
+          "current_shares": 7654720682403575984,
+          "is_locked": false,
+          "min_shares": 7699206183915413262,
+          "total_shares": 5643609010790841694
         },
         "required": [
           "is_locked",
@@ -1137,7 +1138,11 @@
         "example": {
           "id": 1,
           "name": "admin"
-        }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
       },
       "SecretInfo": {
         "type": "object",
@@ -1150,24 +1155,24 @@
             "description": "Members authorized to access the secret",
             "example": [
               {
-                "created_at": "Asperiores et.",
-                "updated_at": "Libero optio earum.",
-                "username": "Impedit quis aut non aut vel."
+                "created_at": "2025-06-30T12:00:00Z",
+                "updated_at": "2025-06-30T15:00:00Z",
+                "username": "alice"
               },
               {
-                "created_at": "Asperiores et.",
-                "updated_at": "Libero optio earum.",
-                "username": "Impedit quis aut non aut vel."
+                "created_at": "2025-06-30T12:00:00Z",
+                "updated_at": "2025-06-30T15:00:00Z",
+                "username": "alice"
               },
               {
-                "created_at": "Asperiores et.",
-                "updated_at": "Libero optio earum.",
-                "username": "Impedit quis aut non aut vel."
+                "created_at": "2025-06-30T12:00:00Z",
+                "updated_at": "2025-06-30T15:00:00Z",
+                "username": "alice"
               },
               {
-                "created_at": "Asperiores et.",
-                "updated_at": "Libero optio earum.",
-                "username": "Impedit quis aut non aut vel."
+                "created_at": "2025-06-30T12:00:00Z",
+                "updated_at": "2025-06-30T15:00:00Z",
+                "username": "alice"
               }
             ]
           },
@@ -1178,14 +1183,6 @@
             },
             "description": "Roles authorized to access the secret",
             "example": [
-              {
-                "id": 1,
-                "name": "admin"
-              },
-              {
-                "id": 1,
-                "name": "admin"
-              },
               {
                 "id": 1,
                 "name": "admin"
@@ -1218,17 +1215,31 @@
         "example": {
           "authorized_members": [
             {
-              "created_at": "Asperiores et.",
-              "updated_at": "Libero optio earum.",
-              "username": "Impedit quis aut non aut vel."
+              "created_at": "2025-06-30T12:00:00Z",
+              "updated_at": "2025-06-30T15:00:00Z",
+              "username": "alice"
             },
             {
-              "created_at": "Asperiores et.",
-              "updated_at": "Libero optio earum.",
-              "username": "Impedit quis aut non aut vel."
+              "created_at": "2025-06-30T12:00:00Z",
+              "updated_at": "2025-06-30T15:00:00Z",
+              "username": "alice"
+            },
+            {
+              "created_at": "2025-06-30T12:00:00Z",
+              "updated_at": "2025-06-30T15:00:00Z",
+              "username": "alice"
+            },
+            {
+              "created_at": "2025-06-30T12:00:00Z",
+              "updated_at": "2025-06-30T15:00:00Z",
+              "username": "alice"
             }
           ],
           "authorized_roles": [
+            {
+              "id": 1,
+              "name": "admin"
+            },
             {
               "id": 1,
               "name": "admin"
@@ -1240,13 +1251,21 @@
           ],
           "created_at": "2025-06-30T12:00:00Z",
           "owner": {
-            "created_at": "Asperiores et.",
-            "updated_at": "Libero optio earum.",
-            "username": "Impedit quis aut non aut vel."
+            "created_at": "2025-06-30T12:00:00Z",
+            "updated_at": "2025-06-30T15:00:00Z",
+            "username": "alice"
           },
           "path": "customers/google/api_key",
           "updated_at": "2025-06-30T15:00:00Z"
-        }
+        },
+        "required": [
+          "path",
+          "owner",
+          "authorized_members",
+          "authorized_roles",
+          "created_at",
+          "updated_at"
+        ]
       },
       "User": {
         "type": "object",
@@ -1254,23 +1273,24 @@
           "created_at": {
             "type": "string",
             "description": "User creation timestamp",
-            "example": "Rerum quidem expedita optio."
+            "example": "2025-06-30T12:00:00Z"
           },
           "updated_at": {
             "type": "string",
             "description": "User last update timestamp",
-            "example": "Quia et similique nihil iste et."
+            "example": "2025-06-30T15:00:00Z"
           },
           "username": {
             "type": "string",
             "description": "The username",
-            "example": "Sunt eum necessitatibus perspiciatis consequatur aperiam nemo."
+            "example": "alice",
+            "minLength": 3
           }
         },
         "example": {
-          "created_at": "Repudiandae et.",
-          "updated_at": "Quasi eveniet cupiditate eos et.",
-          "username": "Explicabo sed sed accusantium."
+          "created_at": "2025-06-30T12:00:00Z",
+          "updated_at": "2025-06-30T15:00:00Z",
+          "username": "alice"
         },
         "required": [
           "username",

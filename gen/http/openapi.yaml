@@ -173,6 +173,13 @@ paths:
                     description: OK response.
                     schema:
                         $ref: '#/definitions/SecretInfo'
+                        required:
+                          - path
+                          - owner
+                          - authorized_members
+                          - authorized_roles
+                          - created_at
+                          - updated_at
                 "400":
                     description: Bad Request response.
                     schema:
@@ -395,7 +402,7 @@ definitions:
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
+      temporary: false
       timeout: false
     required:
       - name
@@ -427,18 +434,18 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: Internal server error (default view)
     example:
       fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
+      temporary: true
       timeout: true
     required:
       - name
@@ -470,14 +477,14 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
         example: false
     description: Invalid parameters provided (default view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
@@ -517,15 +524,15 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: The master key is already unlocked (default view)
     example:
       fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
-      timeout: true
+      temporary: true
+      timeout: false
     required:
       - name
       - id
@@ -540,7 +547,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -556,19 +563,19 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: false
+        example: true
     description: No master key has been set (default view)
     example:
       fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
-      timeout: false
+      temporary: false
+      timeout: true
     required:
       - name
       - id
@@ -595,15 +602,15 @@ definitions:
             index:
                 type: integer
                 description: The index of the share added
-                example: 5859372199767779077
+                example: 8511100201042038653
                 format: int64
             unlocked:
                 type: boolean
                 description: Whether the master key has been unlocked
-                example: true
+                example: false
         example:
-          index: 8663381663982202727
-          unlocked: true
+          index: 597775104731941952
+          unlocked: false
         required:
             - index
             - unlocked
@@ -634,14 +641,14 @@ definitions:
             timeout:
               type: boolean
               description: Is the error a timeout?
-              example: true
+              example: false
         description: The maximum number of shares has been reached (default view)
         example:
           fault: true
           id: 123abc
           message: parameter 'p' must be an integer
           name: bad_request
-          temporary: false
+          temporary: true
           timeout: true
         required:
           - name
@@ -677,14 +684,14 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
     description: The key recombined from the shares is not the correct key (default view)
     example:
       fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
+      temporary: true
       timeout: true
     required:
       - name
@@ -700,7 +707,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -720,15 +727,15 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: false
+        example: true
         description: Internal server error (default view)
         example:
           fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-          temporary: true
-          timeout: true
+          temporary: false
+          timeout: false
         required:
             - name
             - id
@@ -759,14 +766,14 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: true
+                example: false
         description: Invalid parameters provided (default view)
         example:
-          fault: true
+          fault: false
           id: 123abc
           message: parameter 'p' must be an integer
           name: bad_request
@@ -786,7 +793,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -802,19 +809,19 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: A master key already exists (default view)
         example:
-          fault: false
+          fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
-            timeout: false
+          temporary: false
+          timeout: true
         required:
             - name
             - id
@@ -866,7 +873,7 @@ definitions:
                 type: array
                 items:
                     type: string
-                    example: Dignissimos rerum fugiat minima.
+                    example: Reprehenderit suscipit vero illo ipsa quas repellendus.
                 description: The generated key shares
                 example:
                   - EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0
@@ -901,14 +908,14 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
         example: true
     description: Internal server error (default view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
@@ -951,12 +958,12 @@ definitions:
         example: true
     description: The master key is already unlocked (default view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
-      timeout: true
+      temporary: false
+      timeout: false
     required:
       - name
       - id
@@ -971,7 +978,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -991,7 +998,7 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: false
+        example: true
     description: No master key has been set (default view)
     example:
       fault: false
@@ -1027,7 +1034,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -1043,19 +1050,19 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
         example: true
     description: The index provided does not match any share (default view)
     example:
-      fault: true
+      fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: false
+      timeout: true
     required:
       - name
       - id
@@ -1070,7 +1077,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: true
+        example: false
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -1093,12 +1100,12 @@ definitions:
         example: false
     description: Internal server error (default view)
     example:
-      fault: false
+      fault: true
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
-      timeout: false
+      temporary: false
+      timeout: true
     required:
       - name
       - id
@@ -1133,14 +1140,14 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: No master key has been set (default view)
     example:
       fault: false
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: true
+      temporary: false
       timeout: true
     required:
       - name
@@ -1156,7 +1163,7 @@ definitions:
             current_shares:
                 type: integer
                 description: Number of shares currently held
-                example: 8175962201306448131
+                example: 8293731777214508030
                 format: int64
             is_locked:
                 type: boolean
@@ -1165,18 +1172,18 @@ definitions:
             min_shares:
                 type: integer
                 description: Minimum number of shares required
-                example: 2728629326659507495
+                example: 4143397777298688514
                 format: int64
             total_shares:
                 type: integer
                 description: Total number of shares
-                example: 2517612931499419778
+                example: 5427232348742845779
                 format: int64
         example:
-          current_shares: 5044844287103871732
-          is_locked: false
-          min_shares: 8302490413128731676
-          total_shares: 3451053826313131509
+          current_shares: 8649445380996469635
+          is_locked: true
+          min_shares: 6801017689579716168
+          total_shares: 8014289428398433464
         required:
             - is_locked
             - current_shares
@@ -1198,6 +1205,9 @@ definitions:
         example:
             id: 1
             name: admin
+        required:
+          - id
+          - name
     SecretInfo:
         title: SecretInfo
         type: object
@@ -1208,23 +1218,21 @@ definitions:
                     $ref: '#/definitions/User'
                 description: Members authorized to access the secret
                 example:
-                  - created_at: Consequatur neque dolores libero.
-                    updated_at: Omnis sed officia.
-                    username: Vitae deleniti cum incidunt aut.
-                  - created_at: Consequatur neque dolores libero.
-                    updated_at: Omnis sed officia.
-                    username: Vitae deleniti cum incidunt aut.
-                  - created_at: Consequatur neque dolores libero.
-                    updated_at: Omnis sed officia.
-                    username: Vitae deleniti cum incidunt aut.
+                  - created_at: "2025-06-30T12:00:00Z"
+                    updated_at: "2025-06-30T15:00:00Z"
+                    username: alice
+                  - created_at: "2025-06-30T12:00:00Z"
+                    updated_at: "2025-06-30T15:00:00Z"
+                    username: alice
+                  - created_at: "2025-06-30T12:00:00Z"
+                    updated_at: "2025-06-30T15:00:00Z"
+                    username: alice
             authorized_roles:
                 type: array
                 items:
                     $ref: '#/definitions/RoleType'
                 description: Roles authorized to access the secret
                 example:
-                  - id: 1
-                    name: admin
                     - id: 1
                       name: admin
                     - id: 1
@@ -1248,30 +1256,35 @@ definitions:
         description: The secret's information
         example:
             authorized_members:
-              - created_at: Consequatur neque dolores libero.
-                updated_at: Omnis sed officia.
-                username: Vitae deleniti cum incidunt aut.
-              - created_at: Consequatur neque dolores libero.
-                updated_at: Omnis sed officia.
-                username: Vitae deleniti cum incidunt aut.
-              - created_at: Consequatur neque dolores libero.
-                updated_at: Omnis sed officia.
-                username: Vitae deleniti cum incidunt aut.
-              - created_at: Consequatur neque dolores libero.
-                updated_at: Omnis sed officia.
-                username: Vitae deleniti cum incidunt aut.
+              - created_at: "2025-06-30T12:00:00Z"
+                updated_at: "2025-06-30T15:00:00Z"
+                username: alice
+              - created_at: "2025-06-30T12:00:00Z"
+                updated_at: "2025-06-30T15:00:00Z"
+                username: alice
             authorized_roles:
+              - id: 1
+                name: admin
+              - id: 1
+                name: admin
                 - id: 1
                   name: admin
                 - id: 1
                   name: admin
             created_at: "2025-06-30T12:00:00Z"
             owner:
-              created_at: Consequatur neque dolores libero.
-              updated_at: Omnis sed officia.
-              username: Vitae deleniti cum incidunt aut.
+              created_at: "2025-06-30T12:00:00Z"
+              updated_at: "2025-06-30T15:00:00Z"
+              username: alice
             path: customers/google/api_key
             updated_at: "2025-06-30T15:00:00Z"
+        required:
+          - path
+          - owner
+          - authorized_members
+          - authorized_roles
+          - created_at
+          - updated_at
   SecretsGetSecretInternalErrorResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
@@ -1295,7 +1308,7 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: true
+                example: false
             timeout:
                 type: boolean
                 description: Is the error a timeout?
@@ -1307,7 +1320,7 @@ definitions:
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: true
-            timeout: true
+          timeout: false
         required:
             - name
             - id
@@ -1322,7 +1335,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -1338,7 +1351,7 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
@@ -1349,8 +1362,8 @@ definitions:
       id: 123abc
       message: parameter 'p' must be an integer
       name: bad_request
-      temporary: false
-      timeout: true
+      temporary: true
+      timeout: false
     required:
       - name
             - id
@@ -1378,7 +1391,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -1398,15 +1411,15 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: Secret not found (default view)
         example:
-          fault: false
+          fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: false
-          timeout: false
+          timeout: true
         required:
             - name
             - id
@@ -1444,11 +1457,11 @@ definitions:
                 example: false
         description: Unauthorized access (default view)
         example:
-            fault: true
+          fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
+          temporary: false
             timeout: true
         required:
             - name
@@ -1480,11 +1493,11 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: true
+        example: false
     description: Internal server error (default view)
     example:
       fault: true
@@ -1507,7 +1520,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: false
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -1530,7 +1543,7 @@ definitions:
                 example: false
         description: Invalid token path (default view)
         example:
-          fault: true
+          fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
@@ -1598,14 +1611,14 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: Secret not found (default view)
         example:
-          fault: true
+          fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
+          temporary: true
           timeout: true
         required:
             - name
@@ -1644,7 +1657,7 @@ definitions:
                 example: true
         description: Unauthorized access (default view)
         example:
-            fault: true
+          fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
@@ -1664,19 +1677,20 @@ definitions:
             created_at:
                 type: string
                 description: User creation timestamp
-                example: Et quis aliquam.
+                example: "2025-06-30T12:00:00Z"
             updated_at:
                 type: string
                 description: User last update timestamp
-                example: Sequi accusantium fugit sed.
+                example: "2025-06-30T15:00:00Z"
             username:
                 type: string
                 description: The username
-                example: Culpa rerum eos cumque.
+                example: alice
+                minLength: 3
         example:
-          created_at: Quo aut eum et.
-          updated_at: Ipsam culpa.
-          username: Occaecati nesciunt eos commodi.
+          created_at: "2025-06-30T12:00:00Z"
+          updated_at: "2025-06-30T15:00:00Z"
+          username: alice
         required:
             - username
             - created_at
@@ -1688,7 +1702,7 @@ definitions:
       fault:
         type: boolean
         description: Is the error a server-side fault?
-        example: false
+        example: true
       id:
         type: string
         description: ID is a unique identifier for this particular occurrence of the problem.
@@ -1708,7 +1722,7 @@ definitions:
       timeout:
         type: boolean
         description: Is the error a timeout?
-        example: false
+        example: true
     description: Internal server error (default view)
     example:
       fault: true
@@ -1731,7 +1745,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: false
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -1747,19 +1761,19 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: true
+                example: false
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: Invalid input (default view)
         example:
-          fault: false
+          fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
           temporary: false
-            timeout: false
+          timeout: true
         required:
             - name
             - id
@@ -1792,14 +1806,14 @@ definitions:
             token:
                 type: string
                 description: JWT or session token
-                example: Quis vel reiciendis distinctio sint.
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
             username:
                 type: string
                 description: The username of the authenticated user
-                example: Est pariatur dolorem laborum ratione minima maxime.
+                example: alice
         example:
-          token: Consequatur sint asperiores natus.
-          username: Debitis voluptatum non ducimus natus nisi.
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+          username: alice
     UsersAuthUserUnauthorizedResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
@@ -1827,14 +1841,14 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: Invalid username or password (default view)
         example:
             fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
+            temporary: false
             timeout: false
         required:
             - name
@@ -1866,7 +1880,7 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: true
+        example: false
       timeout:
         type: boolean
         description: Is the error a timeout?
@@ -1878,7 +1892,7 @@ definitions:
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: true
+      timeout: false
     required:
       - name
             - id
@@ -1921,7 +1935,7 @@ definitions:
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: true
-          timeout: true
+          timeout: false
         required:
             - name
             - id
@@ -1955,15 +1969,15 @@ definitions:
             id:
                 type: integer
                 description: Unique identifier for the user
-                example: 3102119388426258781
+                example: 2
                 format: int64
             username:
                 type: string
                 description: The username of the created user
-                example: Optio reiciendis dolore animi deleniti aut nisi.
+                example: alice
         example:
-          id: 6465654726740394934
-          username: Inventore cum qui excepturi doloribus minus ullam.
+          id: 2
+          username: alice
     UsersCreateUserUsernameTakenResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
@@ -1987,19 +2001,19 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: true
+                example: false
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: Username already exists (default view)
         example:
-          fault: false
+          fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: true
-          timeout: false
+          temporary: false
+          timeout: true
         required:
             - name
             - id
@@ -2014,7 +2028,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: false
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -2030,19 +2044,19 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: true
+                example: false
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: Forbidden access (default view)
         example:
-            fault: false
+          fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: true
-            timeout: true
+          timeout: false
         required:
             - name
             - id
@@ -2057,7 +2071,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -2073,18 +2087,18 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: true
+                example: false
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: true
+                example: false
         description: Internal server error (default view)
         example:
-          fault: false
+          fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-          temporary: false
+          temporary: true
             timeout: false
         required:
             - name
@@ -2100,7 +2114,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -2123,12 +2137,12 @@ definitions:
                 example: true
         description: Invalid input (default view)
         example:
-          fault: false
+          fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
-          timeout: false
+          temporary: true
+          timeout: true
         required:
             - name
             - id
@@ -2166,12 +2180,12 @@ definitions:
                 example: true
         description: Unauthorized access (default view)
         example:
-            fault: true
+          fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: true
-            timeout: false
+          timeout: true
         required:
             - name
             - id
@@ -2186,7 +2200,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: false
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -2202,7 +2216,7 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
@@ -2213,7 +2227,7 @@ definitions:
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-          temporary: true
+          temporary: false
           timeout: true
         required:
             - name
@@ -2245,7 +2259,7 @@ definitions:
       temporary:
         type: boolean
         description: Is the error temporary?
-        example: false
+        example: true
       timeout:
         type: boolean
         description: Is the error a timeout?
@@ -2257,7 +2271,7 @@ definitions:
       message: parameter 'p' must be an integer
       name: bad_request
       temporary: true
-      timeout: false
+      timeout: true
     required:
       - name
             - id
@@ -2292,14 +2306,14 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: Unauthorized access (default view)
         example:
           fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-          temporary: false
+          temporary: true
           timeout: false
         required:
             - name
