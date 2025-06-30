@@ -46,10 +46,9 @@
                 "example": {
                   "admin_username": "admin",
                   "shares": [
-                    "Ratione sint et.",
-                    "Magnam labore molestiae culpa iste adipisci et.",
-                    "Consequatur a illum voluptas fuga voluptates sequi.",
-                    "Rerum recusandae sequi quis ipsum."
+                    "Repudiandae blanditiis id cupiditate unde eos.",
+                    "Sit ratione.",
+                    "Et ut magnam labore molestiae."
                   ]
                 }
               }
@@ -71,9 +70,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Maxime doloribus."
+                  "example": "Dolorem sed incidunt id dolore sed."
                 },
-                "example": "Quidem voluptatibus ducimus."
+                "example": "Natus voluptas aut sunt dolorem et."
               }
             }
           },
@@ -121,9 +120,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Asperiores dolorem sed incidunt id."
+                  "example": "Commodi rerum quo excepturi."
                 },
-                "example": "Hic placeat maxime."
+                "example": "Ab voluptatibus tenetur et totam quam velit."
               }
             }
           },
@@ -133,9 +132,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Voluptas est et corrupti culpa minus."
+                  "example": "Asperiores architecto similique quia illo eos quasi."
                 },
-                "example": "Est et expedita doloremque architecto commodi rerum."
+                "example": "Neque dolores porro est cupiditate."
               }
             }
           },
@@ -145,9 +144,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Voluptas aspernatur quia cupiditate sint molestiae adipisci."
+                  "example": "Doloremque possimus."
                 },
-                "example": "Atque quas ut quidem."
+                "example": "Non in et modi in rerum."
               }
             }
           },
@@ -157,9 +156,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Eos est sit dignissimos ex."
+                  "example": "Dolorem fuga cupiditate alias quis voluptatibus dignissimos."
                 },
-                "example": "Nam nobis libero repudiandae."
+                "example": "Quidem amet laborum."
               }
             }
           }
@@ -194,8 +193,8 @@
                   "$ref": "#/components/schemas/AddShareResponseBody"
                 },
                 "example": {
-                  "index": 267635011030857677,
-                  "unlocked": false
+                  "index": 6028725072138950673,
+                  "unlocked": true
                 }
               }
             }
@@ -206,9 +205,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Nostrum minima et qui."
+                  "example": "Officiis magni veniam."
                 },
-                "example": "Ducimus eum qui est."
+                "example": "Consectetur repudiandae qui."
               }
             }
           },
@@ -218,9 +217,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Ut officia earum totam esse."
+                  "example": "Facilis est."
                 },
-                "example": "Maiores at et ut occaecati harum maiores."
+                "example": "Omnis consequatur et numquam."
               }
             }
           },
@@ -230,9 +229,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Et atque."
+                  "example": "Et quo eveniet deleniti praesentium."
                 },
-                "example": "Aut quis."
+                "example": "Eveniet exercitationem dicta."
               }
             }
           },
@@ -242,9 +241,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Dignissimos veniam voluptatem."
+                  "example": "Aspernatur rerum autem rerum omnis."
                 },
-                "example": "Dolorem fuga cupiditate alias quis voluptatibus dignissimos."
+                "example": "Incidunt accusantium asperiores."
               }
             }
           }
@@ -268,10 +267,10 @@
                   "$ref": "#/components/schemas/GetKeyStatusResponseBody"
                 },
                 "example": {
-                  "current_shares": 7654723300438466742,
-                  "is_locked": true,
-                  "min_shares": 53511470712771686,
-                  "total_shares": 2105022433223144494
+                  "current_shares": 2121356811434194624,
+                  "is_locked": false,
+                  "min_shares": 1735927297062114850,
+                  "total_shares": 2782797484439169934
                 }
               }
             }
@@ -282,9 +281,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Repellat natus quidem impedit repudiandae accusantium."
+                  "example": "Rem dolor ab qui harum distinctio facilis."
                 },
-                "example": "Perspiciatis repellendus facilis est."
+                "example": "Quidem aut asperiores eum ullam soluta dicta."
               }
             }
           },
@@ -294,9 +293,209 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Ipsum laborum doloribus fugiat ut qui consequatur."
+                  "example": "Amet et aut excepturi dolorum."
                 },
-                "example": "Rerum ab et aliquam."
+                "example": "Sapiente nobis laudantium qui amet rerum."
+              }
+            }
+          }
+        }
+      }
+    },
+    "/secrets/${path}": {
+      "get": {
+        "tags": [
+          "secrets"
+        ],
+        "summary": "get secret secrets",
+        "description": "Retrieve a secret's information",
+        "operationId": "secrets#get secret",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetSecretValueRequestBody"
+              },
+              "example": {
+                "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ=="
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecretInfo"
+                },
+                "example": {
+                  "authorized_members": [
+                    {
+                      "created_at": "Voluptas numquam aut et sed voluptatum.",
+                      "updated_at": "Reprehenderit est et culpa voluptatem.",
+                      "username": "Sunt eos in ut."
+                    },
+                    {
+                      "created_at": "Voluptas numquam aut et sed voluptatum.",
+                      "updated_at": "Reprehenderit est et culpa voluptatem.",
+                      "username": "Sunt eos in ut."
+                    },
+                    {
+                      "created_at": "Voluptas numquam aut et sed voluptatum.",
+                      "updated_at": "Reprehenderit est et culpa voluptatem.",
+                      "username": "Sunt eos in ut."
+                    },
+                    {
+                      "created_at": "Voluptas numquam aut et sed voluptatum.",
+                      "updated_at": "Reprehenderit est et culpa voluptatem.",
+                      "username": "Sunt eos in ut."
+                    }
+                  ],
+                  "authorized_roles": [
+                    {
+                      "id": 1,
+                      "name": "admin"
+                    },
+                    {
+                      "id": 1,
+                      "name": "admin"
+                    }
+                  ],
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "owner": {
+                    "created_at": "Voluptas numquam aut et sed voluptatum.",
+                    "updated_at": "Reprehenderit est et culpa voluptatem.",
+                    "username": "Sunt eos in ut."
+                  },
+                  "path": "customers/google/api_key",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_parameters: Invalid token path",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized: Unauthorized access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "secret_not_found: Token not found",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error: Internal Server Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "Maiores at et ut occaecati harum maiores."
+                },
+                "example": "Molestiae rem quia vitae quasi sit quia."
+              }
+            }
+          }
+        }
+      }
+    },
+    "/secrets/${path}/value": {
+      "get": {
+        "tags": [
+          "secrets"
+        ],
+        "summary": "get secret value secrets",
+        "description": "Retrieve a secret value",
+        "operationId": "secrets#get secret value",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetSecretValueRequestBody"
+              },
+              "example": {
+                "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ=="
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetSecretValueResponseBody"
+                },
+                "example": {
+                  "path": "customers/google/api_key",
+                  "value": "SECRET_API_KEY"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_parameters: Invalid token path",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized: Unauthorized access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "secret_not_found: Token not found",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error: Internal Server Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "Ducimus eum qui est."
+                },
+                "example": "Id dolor sed."
               }
             }
           }
@@ -323,47 +522,32 @@
                   },
                   "example": [
                     {
-                      "created_at": "Necessitatibus dicta optio.",
-                      "updated_at": "Eos ducimus repudiandae et distinctio.",
-                      "username": "Culpa voluptatem impedit tempore et quod."
+                      "created_at": "Dolores aperiam excepturi quisquam.",
+                      "updated_at": "Eos sapiente.",
+                      "username": "Voluptatem voluptatibus qui."
                     },
                     {
-                      "created_at": "Necessitatibus dicta optio.",
-                      "updated_at": "Eos ducimus repudiandae et distinctio.",
-                      "username": "Culpa voluptatem impedit tempore et quod."
-                    },
-                    {
-                      "created_at": "Necessitatibus dicta optio.",
-                      "updated_at": "Eos ducimus repudiandae et distinctio.",
-                      "username": "Culpa voluptatem impedit tempore et quod."
-                    },
-                    {
-                      "created_at": "Necessitatibus dicta optio.",
-                      "updated_at": "Eos ducimus repudiandae et distinctio.",
-                      "username": "Culpa voluptatem impedit tempore et quod."
+                      "created_at": "Dolores aperiam excepturi quisquam.",
+                      "updated_at": "Eos sapiente.",
+                      "username": "Voluptatem voluptatibus qui."
                     }
                   ]
                 },
                 "example": [
                   {
-                    "created_at": "Necessitatibus dicta optio.",
-                    "updated_at": "Eos ducimus repudiandae et distinctio.",
-                    "username": "Culpa voluptatem impedit tempore et quod."
+                    "created_at": "Dolores aperiam excepturi quisquam.",
+                    "updated_at": "Eos sapiente.",
+                    "username": "Voluptatem voluptatibus qui."
                   },
                   {
-                    "created_at": "Necessitatibus dicta optio.",
-                    "updated_at": "Eos ducimus repudiandae et distinctio.",
-                    "username": "Culpa voluptatem impedit tempore et quod."
+                    "created_at": "Dolores aperiam excepturi quisquam.",
+                    "updated_at": "Eos sapiente.",
+                    "username": "Voluptatem voluptatibus qui."
                   },
                   {
-                    "created_at": "Necessitatibus dicta optio.",
-                    "updated_at": "Eos ducimus repudiandae et distinctio.",
-                    "username": "Culpa voluptatem impedit tempore et quod."
-                  },
-                  {
-                    "created_at": "Necessitatibus dicta optio.",
-                    "updated_at": "Eos ducimus repudiandae et distinctio.",
-                    "username": "Culpa voluptatem impedit tempore et quod."
+                    "created_at": "Dolores aperiam excepturi quisquam.",
+                    "updated_at": "Eos sapiente.",
+                    "username": "Voluptatem voluptatibus qui."
                   }
                 ]
               }
@@ -385,9 +569,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Cumque amet et."
+                  "example": "Nobis libero."
                 },
-                "example": "Modi at ipsum sapiente et quia sed."
+                "example": "Magnam dolores rem."
               }
             }
           }
@@ -423,8 +607,8 @@
                   "$ref": "#/components/schemas/CreateUserResponseBody"
                 },
                 "example": {
-                  "id": 6752325125503319315,
-                  "username": "Dignissimos libero ea nobis praesentium non."
+                  "id": 3112833509307211266,
+                  "username": "Fuga in numquam voluptatem est."
                 }
               }
             }
@@ -455,9 +639,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "In rem dolor ab qui harum."
+                  "example": "Commodi rerum."
                 },
-                "example": "Eligendi quae adipisci occaecati."
+                "example": "Tempora in quo."
               }
             }
           }
@@ -495,8 +679,8 @@
                   "$ref": "#/components/schemas/AuthUserResponseBody"
                 },
                 "example": {
-                  "token": "Eos sapiente.",
-                  "username": "Dolores aperiam excepturi quisquam."
+                  "token": "Laboriosam sunt nostrum assumenda.",
+                  "username": "Ratione eos voluptates sunt quia."
                 }
               }
             }
@@ -527,9 +711,9 @@
               "application/json": {
                 "schema": {
                   "type": "string",
-                  "example": "Et eveniet."
+                  "example": "Quos est sit."
                 },
-                "example": "Mollitia quos."
+                "example": "Cupiditate est pariatur eaque."
               }
             }
           }
@@ -640,7 +824,7 @@
           "index": {
             "type": "integer",
             "description": "The index of the share added",
-            "example": 2801840417263867146,
+            "example": 5981173631579426674,
             "format": "int64"
           },
           "unlocked": {
@@ -650,8 +834,8 @@
           }
         },
         "example": {
-          "index": 15565662336377959,
-          "unlocked": true
+          "index": 1441501921438188569,
+          "unlocked": false
         },
         "required": [
           "index",
@@ -687,17 +871,17 @@
           "token": {
             "type": "string",
             "description": "JWT or session token",
-            "example": "Magni veniam occaecati."
+            "example": "Maxime odit eligendi quae adipisci."
           },
           "username": {
             "type": "string",
             "description": "The username of the authenticated user",
-            "example": "Excepturi dolorum sed consequatur eos doloribus sit."
+            "example": "Aperiam atque quas ut quidem ex hic."
           }
         },
         "example": {
-          "token": "Quo eveniet deleniti praesentium ex eum.",
-          "username": "Rerum autem rerum omnis reiciendis."
+          "token": "Et quia sed ducimus.",
+          "username": "Ipsam quam modi at ipsum."
         }
       },
       "CreateMasterKeyRequestBody": {
@@ -751,20 +935,22 @@
             "type": "array",
             "items": {
               "type": "string",
-              "example": "Sed et qui et quis eaque."
+              "example": "Minima nam voluptatem maiores."
             },
             "description": "The generated key shares",
             "example": [
-              "Dignissimos vel.",
-              "Quis occaecati enim dolore est temporibus."
+              "Eum excepturi deserunt omnis aliquam ipsam.",
+              "Officia earum totam esse quaerat velit.",
+              "Sint porro."
             ]
           }
         },
         "example": {
           "admin_username": "admin",
           "shares": [
-            "Natus rerum optio est laborum.",
-            "Vel non nam magnam beatae ipsa."
+            "Et corrupti culpa minus velit.",
+            "Est sit dignissimos.",
+            "Sint voluptas aspernatur."
           ]
         }
       },
@@ -798,18 +984,18 @@
           "id": {
             "type": "integer",
             "description": "Unique identifier for the user",
-            "example": 3875426494026184978,
+            "example": 3149686305813338998,
             "format": "int64"
           },
           "username": {
             "type": "string",
             "description": "The username of the created user",
-            "example": "Sed dolor itaque."
+            "example": "Aut quis."
           }
         },
         "example": {
-          "id": 5856351231608225095,
-          "username": "Est autem."
+          "id": 1676119493923677123,
+          "username": "Et expedita."
         }
       },
       "DeleteShareRequestBody": {
@@ -835,7 +1021,7 @@
           "fault": {
             "type": "boolean",
             "description": "Is the error a server-side fault?",
-            "example": false
+            "example": true
           },
           "id": {
             "type": "string",
@@ -855,12 +1041,12 @@
           "temporary": {
             "type": "boolean",
             "description": "Is the error temporary?",
-            "example": true
+            "example": false
           },
           "timeout": {
             "type": "boolean",
             "description": "Is the error a timeout?",
-            "example": true
+            "example": false
           }
         },
         "description": "Invalid parameters provided",
@@ -887,32 +1073,32 @@
           "current_shares": {
             "type": "integer",
             "description": "Number of shares currently held",
-            "example": 459929980538903974,
+            "example": 7926837356895559462,
             "format": "int64"
           },
           "is_locked": {
             "type": "boolean",
             "description": "Whether the key is currently locked",
-            "example": true
+            "example": false
           },
           "min_shares": {
             "type": "integer",
             "description": "Minimum number of shares required",
-            "example": 8586128447272736307,
+            "example": 3875426494026184978,
             "format": "int64"
           },
           "total_shares": {
             "type": "integer",
             "description": "Total number of shares",
-            "example": 8517354054290568962,
+            "example": 2792794677446550089,
             "format": "int64"
           }
         },
         "example": {
-          "current_shares": 776755407977139347,
+          "current_shares": 516397163871956071,
           "is_locked": true,
-          "min_shares": 7572532649990936888,
-          "total_shares": 921494360688620238
+          "min_shares": 5856351231608225095,
+          "total_shares": 7638314582708536260
         },
         "required": [
           "is_locked",
@@ -921,29 +1107,199 @@
           "total_shares"
         ]
       },
+      "GetSecretValueRequestBody": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Base64 encoded secret's path",
+            "example": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==",
+            "minLength": 2
+          }
+        },
+        "example": {
+          "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ=="
+        },
+        "required": [
+          "path"
+        ]
+      },
+      "GetSecretValueResponseBody": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "The original path of the secret",
+            "example": "customers/google/api_key"
+          },
+          "value": {
+            "type": "string",
+            "description": "The secret value",
+            "example": "SECRET_API_KEY"
+          }
+        },
+        "example": {
+          "path": "customers/google/api_key",
+          "value": "SECRET_API_KEY"
+        }
+      },
+      "RoleType": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier for the role",
+            "example": 1,
+            "format": "int64"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the role",
+            "example": "admin"
+          }
+        },
+        "example": {
+          "id": 1,
+          "name": "admin"
+        }
+      },
+      "SecretInfo": {
+        "type": "object",
+        "properties": {
+          "authorized_members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            },
+            "description": "Members authorized to access the secret",
+            "example": [
+              {
+                "created_at": "Pariatur fuga.",
+                "updated_at": "Ipsam doloribus laboriosam repudiandae.",
+                "username": "Laborum eligendi et dolorum corporis nihil."
+              },
+              {
+                "created_at": "Pariatur fuga.",
+                "updated_at": "Ipsam doloribus laboriosam repudiandae.",
+                "username": "Laborum eligendi et dolorum corporis nihil."
+              },
+              {
+                "created_at": "Pariatur fuga.",
+                "updated_at": "Ipsam doloribus laboriosam repudiandae.",
+                "username": "Laborum eligendi et dolorum corporis nihil."
+              },
+              {
+                "created_at": "Pariatur fuga.",
+                "updated_at": "Ipsam doloribus laboriosam repudiandae.",
+                "username": "Laborum eligendi et dolorum corporis nihil."
+              }
+            ]
+          },
+          "authorized_roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleType"
+            },
+            "description": "Roles authorized to access the secret",
+            "example": [
+              {
+                "id": 1,
+                "name": "admin"
+              },
+              {
+                "id": 1,
+                "name": "admin"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp of the secret",
+            "example": "2025-06-30T12:00:00Z"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/User"
+          },
+          "path": {
+            "type": "string",
+            "description": "The original path of the secret",
+            "example": "customers/google/api_key"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last update timestamp of the secret",
+            "example": "2025-06-30T15:00:00Z"
+          }
+        },
+        "example": {
+          "authorized_members": [
+            {
+              "created_at": "Pariatur fuga.",
+              "updated_at": "Ipsam doloribus laboriosam repudiandae.",
+              "username": "Laborum eligendi et dolorum corporis nihil."
+            },
+            {
+              "created_at": "Pariatur fuga.",
+              "updated_at": "Ipsam doloribus laboriosam repudiandae.",
+              "username": "Laborum eligendi et dolorum corporis nihil."
+            },
+            {
+              "created_at": "Pariatur fuga.",
+              "updated_at": "Ipsam doloribus laboriosam repudiandae.",
+              "username": "Laborum eligendi et dolorum corporis nihil."
+            }
+          ],
+          "authorized_roles": [
+            {
+              "id": 1,
+              "name": "admin"
+            },
+            {
+              "id": 1,
+              "name": "admin"
+            },
+            {
+              "id": 1,
+              "name": "admin"
+            },
+            {
+              "id": 1,
+              "name": "admin"
+            }
+          ],
+          "created_at": "2025-06-30T12:00:00Z",
+          "owner": {
+            "created_at": "Pariatur fuga.",
+            "updated_at": "Ipsam doloribus laboriosam repudiandae.",
+            "username": "Laborum eligendi et dolorum corporis nihil."
+          },
+          "path": "customers/google/api_key",
+          "updated_at": "2025-06-30T15:00:00Z"
+        }
+      },
       "User": {
         "type": "object",
         "properties": {
           "created_at": {
             "type": "string",
             "description": "User creation timestamp",
-            "example": "Eligendi consequatur voluptas."
+            "example": "Doloribus fugiat ut qui consequatur illum totam."
           },
           "updated_at": {
             "type": "string",
             "description": "User last update timestamp",
-            "example": "Ipsam eos ut repellendus sunt."
+            "example": "Inventore inventore nostrum."
           },
           "username": {
             "type": "string",
             "description": "The username",
-            "example": "Eveniet cupiditate eos et nisi eos beatae."
+            "example": "Repudiandae accusantium suscipit ipsum."
           }
         },
         "example": {
-          "created_at": "Voluptatem ad amet sint est.",
-          "updated_at": "Aut quae vel occaecati voluptate dolorem.",
-          "username": "Qui sint sapiente architecto."
+          "created_at": "Dignissimos veniam voluptatem.",
+          "updated_at": "Et atque.",
+          "username": "Et qui."
         },
         "required": [
           "username",
@@ -957,6 +1313,10 @@
     {
       "name": "key_management",
       "description": "The FishyKeys server handles master key operations"
+    },
+    {
+      "name": "secrets",
+      "description": "User service manages user accounts and authentication"
     },
     {
       "name": "users",

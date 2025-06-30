@@ -153,6 +153,82 @@ paths:
                         type: string
             schemes:
                 - http
+    /secrets/${path}:
+        get:
+            tags:
+                - secrets
+            summary: get secret secrets
+            description: Retrieve a secret's information
+            operationId: secrets#get secret
+            parameters:
+                - name: Get SecretRequestBody
+                  in: body
+                  required: true
+                  schema:
+                      $ref: '#/definitions/SecretsGetSecretRequestBody'
+                      required:
+                          - path
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        $ref: '#/definitions/SecretInfo'
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        $ref: '#/definitions/SecretsGetSecretInvalidParametersResponseBody'
+                "401":
+                    description: Unauthorized response.
+                    schema:
+                        $ref: '#/definitions/SecretsGetSecretUnauthorizedResponseBody'
+                "404":
+                    description: Not Found response.
+                    schema:
+                        $ref: '#/definitions/SecretsGetSecretSecretNotFoundResponseBody'
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
+            schemes:
+                - http
+    /secrets/${path}/value:
+        get:
+            tags:
+                - secrets
+            summary: get secret value secrets
+            description: Retrieve a secret value
+            operationId: secrets#get secret value
+            parameters:
+                - name: Get Secret ValueRequestBody
+                  in: body
+                  required: true
+                  schema:
+                      $ref: '#/definitions/SecretsGetSecretValueRequestBody'
+                      required:
+                          - path
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        $ref: '#/definitions/SecretsGetSecretValueResponseBody'
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        $ref: '#/definitions/SecretsGetSecretValueInvalidParametersResponseBody'
+                "401":
+                    description: Unauthorized response.
+                    schema:
+                        $ref: '#/definitions/SecretsGetSecretValueUnauthorizedResponseBody'
+                "404":
+                    description: Not Found response.
+                    schema:
+                        $ref: '#/definitions/SecretsGetSecretValueSecretNotFoundResponseBody'
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        type: string
+            schemes:
+                - http
     /users:
         get:
             tags:
@@ -168,9 +244,9 @@ paths:
                         items:
                             $ref: '#/definitions/User'
                 "401":
-                  description: Unauthorized response.
-                  schema:
-                    $ref: '#/definitions/UsersListUsersUnauthorizedResponseBody'
+                    description: Unauthorized response.
+                    schema:
+                        $ref: '#/definitions/UsersListUsersUnauthorizedResponseBody'
                 "500":
                     description: Internal Server Error response.
                     schema:
@@ -228,17 +304,17 @@ paths:
                 "200":
                     description: OK response.
                 "400":
-                  description: Bad Request response.
-                  schema:
-                    $ref: '#/definitions/UsersDeleteUserInvalidParametersResponseBody'
+                    description: Bad Request response.
+                    schema:
+                        $ref: '#/definitions/UsersDeleteUserInvalidParametersResponseBody'
                 "401":
-                  description: Unauthorized response.
-                  schema:
-                    $ref: '#/definitions/UsersDeleteUserUnauthorizedResponseBody'
+                    description: Unauthorized response.
+                    schema:
+                        $ref: '#/definitions/UsersDeleteUserUnauthorizedResponseBody'
                 "403":
-                  description: Forbidden response.
-                  schema:
-                    $ref: '#/definitions/UsersDeleteUserForbiddenResponseBody'
+                    description: Forbidden response.
+                    schema:
+                        $ref: '#/definitions/UsersDeleteUserForbiddenResponseBody'
                 "404":
                     description: Not Found response.
                     schema:
@@ -246,7 +322,7 @@ paths:
                 "500":
                     description: Internal Server Error response.
                     schema:
-                      $ref: '#/definitions/UsersDeleteUserInternalErrorResponseBody'
+                        $ref: '#/definitions/UsersDeleteUserInternalErrorResponseBody'
             schemes:
                 - http
     /users/auth:
@@ -304,15 +380,15 @@ definitions:
             index:
                 type: integer
                 description: The index of the share added
-                example: 6301691789677483758
+                example: 6409706751481372932
                 format: int64
             unlocked:
                 type: boolean
                 description: Whether the master key has been unlocked
-                example: true
+                example: false
         example:
-          index: 6465654726740394934
-            unlocked: true
+            index: 6169314233791394279
+            unlocked: false
         required:
             - index
             - unlocked
@@ -339,7 +415,7 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
@@ -366,7 +442,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -389,12 +465,12 @@ definitions:
                 example: true
         description: Invalid parameters provided (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: true
-            timeout: true
+            timeout: false
         required:
             - name
             - id
@@ -446,18 +522,16 @@ definitions:
                 type: array
                 items:
                     type: string
-                    example: Quo aut eum et.
+                    example: Est inventore cum qui excepturi.
                 description: The generated key shares
                 example:
-                  - Culpa rem mollitia et est.
-                  - Eos voluptates.
-                  - Quia autem laboriosam.
-                  - Nostrum assumenda optio.
+                    - Ullam vel dolorum exercitationem consequuntur non quos.
+                    - Debitis placeat dignissimos.
         example:
             admin_username: admin
             shares:
-              - Architecto sint.
-              - Quos doloribus repellendus.
+                - Et maxime impedit necessitatibus.
+                - Accusamus perferendis.
     KeyManagementDeleteShareRequestBody:
         title: KeyManagementDeleteShareRequestBody
         type: object
@@ -478,7 +552,7 @@ definitions:
             current_shares:
                 type: integer
                 description: Number of shares currently held
-                example: 3102119388426258781
+                example: 529220007119854575
                 format: int64
             is_locked:
                 type: boolean
@@ -487,48 +561,167 @@ definitions:
             min_shares:
                 type: integer
                 description: Minimum number of shares required
-                example: 7771142693048255194
+                example: 6772079528695378523
                 format: int64
             total_shares:
                 type: integer
                 description: Total number of shares
-                example: 9122517568489913946
+                example: 1300446162783111436
                 format: int64
         example:
-          current_shares: 432813050019778879
-          is_locked: true
-          min_shares: 2145518412877319612
-          total_shares: 5372148105612043479
+            current_shares: 5885736550970909816
+            is_locked: true
+            min_shares: 6082693792273107902
+            total_shares: 9050998196324050230
         required:
             - is_locked
             - current_shares
             - min_shares
             - total_shares
-    User:
-        title: User
+    RoleType:
+        title: RoleType
         type: object
         properties:
+            id:
+                type: integer
+                description: Unique identifier for the role
+                example: 1
+                format: int64
+            name:
+                type: string
+                description: Name of the role
+                example: admin
+        example:
+            id: 1
+            name: admin
+    SecretInfo:
+        title: SecretInfo
+        type: object
+        properties:
+            authorized_members:
+                type: array
+                items:
+                    $ref: '#/definitions/User'
+                description: Members authorized to access the secret
+                example:
+                    - created_at: Voluptas numquam aut et sed voluptatum.
+                      updated_at: Reprehenderit est et culpa voluptatem.
+                      username: Sunt eos in ut.
+                    - created_at: Voluptas numquam aut et sed voluptatum.
+                      updated_at: Reprehenderit est et culpa voluptatem.
+                      username: Sunt eos in ut.
+            authorized_roles:
+                type: array
+                items:
+                    $ref: '#/definitions/RoleType'
+                description: Roles authorized to access the secret
+                example:
+                    - id: 1
+                      name: admin
+                    - id: 1
+                      name: admin
+                    - id: 1
+                      name: admin
             created_at:
                 type: string
-                description: User creation timestamp
-                example: Et nihil qui nulla hic.
+                description: Creation timestamp of the secret
+                example: "2025-06-30T12:00:00Z"
+            owner:
+                $ref: '#/definitions/User'
+            path:
+                type: string
+                description: The original path of the secret
+                example: customers/google/api_key
             updated_at:
                 type: string
-                description: User last update timestamp
-                example: Esse in.
-            username:
-                type: string
-                description: The username
-                example: Et qui odio minima consequatur et tenetur.
+                description: Last update timestamp of the secret
+                example: "2025-06-30T15:00:00Z"
+        description: The secret's information
         example:
-          created_at: Tenetur maxime quasi veniam autem temporibus.
-          updated_at: Cum ipsum tenetur blanditiis est pariatur.
-          username: Sint asperiores repudiandae deleniti sit rerum eveniet.
+            authorized_members:
+                - created_at: Voluptas numquam aut et sed voluptatum.
+                  updated_at: Reprehenderit est et culpa voluptatem.
+                  username: Sunt eos in ut.
+                - created_at: Voluptas numquam aut et sed voluptatum.
+                  updated_at: Reprehenderit est et culpa voluptatem.
+                  username: Sunt eos in ut.
+                - created_at: Voluptas numquam aut et sed voluptatum.
+                  updated_at: Reprehenderit est et culpa voluptatem.
+                  username: Sunt eos in ut.
+                - created_at: Voluptas numquam aut et sed voluptatum.
+                  updated_at: Reprehenderit est et culpa voluptatem.
+                  username: Sunt eos in ut.
+            authorized_roles:
+                - id: 1
+                  name: admin
+                - id: 1
+                  name: admin
+                - id: 1
+                  name: admin
+            created_at: "2025-06-30T12:00:00Z"
+            owner:
+                created_at: Voluptas numquam aut et sed voluptatum.
+                updated_at: Reprehenderit est et culpa voluptatem.
+                username: Sunt eos in ut.
+            path: customers/google/api_key
+            updated_at: "2025-06-30T15:00:00Z"
+    SecretsGetSecretInvalidParametersResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: Invalid token path (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: true
         required:
-            - username
-            - created_at
-            - updated_at
-    UsersAuthUserInvalidParametersResponseBody:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    SecretsGetSecretRequestBody:
+        title: SecretsGetSecretRequestBody
+        type: object
+        properties:
+            path:
+                type: string
+                description: Base64 encoded secret's path
+                example: L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==
+                minLength: 2
+        example:
+            path: L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==
+        required:
+            - path
+    SecretsGetSecretSecretNotFoundResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
         properties:
@@ -551,19 +744,286 @@ definitions:
             temporary:
                 type: boolean
                 description: Is the error temporary?
-                example: false
+                example: true
             timeout:
                 type: boolean
                 description: Is the error a timeout?
                 example: false
-        description: Invalid input (default view)
+        description: Token not found (default view)
         example:
-          fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-          temporary: false
+            temporary: false
             timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    SecretsGetSecretUnauthorizedResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: Unauthorized access (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    SecretsGetSecretValueInvalidParametersResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: false
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: Invalid token path (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    SecretsGetSecretValueRequestBody:
+        title: SecretsGetSecretValueRequestBody
+        type: object
+        properties:
+            path:
+                type: string
+                description: Base64 encoded secret's path
+                example: L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==
+                minLength: 2
+        example:
+            path: L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==
+        required:
+            - path
+    SecretsGetSecretValueResponseBody:
+        title: SecretsGetSecretValueResponseBody
+        type: object
+        properties:
+            path:
+                type: string
+                description: The original path of the secret
+                example: customers/google/api_key
+            value:
+                type: string
+                description: The secret value
+                example: SECRET_API_KEY
+        example:
+            path: customers/google/api_key
+            value: SECRET_API_KEY
+    SecretsGetSecretValueSecretNotFoundResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: Token not found (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    SecretsGetSecretValueUnauthorizedResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: Unauthorized access (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    User:
+        title: User
+        type: object
+        properties:
+            created_at:
+                type: string
+                description: User creation timestamp
+                example: Quis vel reiciendis distinctio sint.
+            updated_at:
+                type: string
+                description: User last update timestamp
+                example: Debitis voluptatum non ducimus natus nisi.
+            username:
+                type: string
+                description: The username
+                example: Est pariatur dolorem laborum ratione minima maxime.
+        example:
+            created_at: Laborum illo impedit debitis quia.
+            updated_at: Autem ut necessitatibus dolor earum aut.
+            username: Consequatur sint asperiores natus.
+        required:
+            - username
+            - created_at
+            - updated_at
+    UsersAuthUserInvalidParametersResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: Invalid input (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: false
         required:
             - name
             - id
@@ -596,14 +1056,14 @@ definitions:
             token:
                 type: string
                 description: JWT or session token
-                example: Eum necessitatibus perspiciatis.
+                example: Est laborum ut vel non nam magnam.
             username:
                 type: string
                 description: The username of the authenticated user
-                example: Esse dolores aut quia ea.
+                example: Dolore est temporibus nam laboriosam natus rerum.
         example:
-          token: Qui quia et similique.
-          username: Aperiam nemo et rerum quidem expedita.
+            token: Eius maxime doloribus.
+            username: Ipsa ad est quidem corporis officia.
     UsersAuthUserUnauthorizedResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
@@ -611,7 +1071,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -634,12 +1094,12 @@ definitions:
                 example: true
         description: Invalid username or password (default view)
         example:
-          fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-          temporary: false
-          timeout: true
+            temporary: true
+            timeout: true
         required:
             - name
             - id
@@ -654,7 +1114,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: false
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -682,7 +1142,7 @@ definitions:
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: true
-            timeout: false
+            timeout: true
         required:
             - name
             - id
@@ -716,15 +1176,15 @@ definitions:
             id:
                 type: integer
                 description: Unique identifier for the user
-                example: 7645663036194808677
+                example: 3327879190062902293
                 format: int64
             username:
                 type: string
                 description: The username of the created user
-                example: Consequuntur non quos.
+                example: Iste et animi explicabo sed.
         example:
-          id: 3985364364835542493
-          username: Placeat dignissimos error minus.
+            id: 4219795490900341216
+            username: Commodi repudiandae et molestias quasi.
     UsersCreateUserUsernameTakenResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
@@ -734,90 +1194,90 @@ definitions:
                 description: Is the error a server-side fault?
                 example: true
             id:
-              type: string
-              description: ID is a unique identifier for this particular occurrence of the problem.
-              example: 123abc
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
             message:
-              type: string
-              description: Message is a human-readable explanation specific to this occurrence of the problem.
-              example: parameter 'p' must be an integer
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
             name:
-              type: string
-              description: Name is the name of this class of errors.
-              example: bad_request
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
             temporary:
-              type: boolean
-              description: Is the error temporary?
-              example: true
+                type: boolean
+                description: Is the error temporary?
+                example: true
             timeout:
-              type: boolean
-              description: Is the error a timeout?
-              example: true
+                type: boolean
+                description: Is the error a timeout?
+                example: true
         description: Username already exists (default view)
         example:
-          fault: false
-          id: 123abc
-          message: parameter 'p' must be an integer
-          name: bad_request
-          temporary: true
-          timeout: true
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: false
         required:
-          - name
-          - id
-          - message
-          - temporary
-          - timeout
-          - fault
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
     UsersDeleteUserForbiddenResponseBody:
-      title: 'Mediatype identifier: application/vnd.goa.error; view=default'
-      type: object
-      properties:
-        fault:
-          type: boolean
-          description: Is the error a server-side fault?
-          example: true
-        id:
-          type: string
-          description: ID is a unique identifier for this particular occurrence of the problem.
-          example: 123abc
-        message:
-          type: string
-          description: Message is a human-readable explanation specific to this occurrence of the problem.
-          example: parameter 'p' must be an integer
-        name:
-          type: string
-          description: Name is the name of this class of errors.
-          example: bad_request
-        temporary:
-          type: boolean
-          description: Is the error temporary?
-          example: false
-        timeout:
-          type: boolean
-          description: Is the error a timeout?
-          example: true
-      description: Forbidden access (default view)
-      example:
-        fault: true
-        id: 123abc
-        message: parameter 'p' must be an integer
-        name: bad_request
-        temporary: false
-        timeout: false
-      required:
-        - name
-        - id
-        - message
-        - temporary
-        - timeout
-        - fault
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: false
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: Forbidden access (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
     UsersDeleteUserInternalErrorResponseBody:
-      title: 'Mediatype identifier: application/vnd.goa.error; view=default'
-      type: object
-      properties:
-        fault:
-          type: boolean
-          description: Is the error a server-side fault?
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
                 example: false
             id:
                 type: string
@@ -839,52 +1299,9 @@ definitions:
                 type: boolean
                 description: Is the error a timeout?
                 example: false
-      description: Internal server error (default view)
-      example:
-        fault: false
-        id: 123abc
-        message: parameter 'p' must be an integer
-        name: bad_request
-        temporary: true
-        timeout: false
-      required:
-        - name
-        - id
-        - message
-        - temporary
-        - timeout
-        - fault
-    UsersDeleteUserInvalidParametersResponseBody:
-      title: 'Mediatype identifier: application/vnd.goa.error; view=default'
-      type: object
-      properties:
-        fault:
-          type: boolean
-          description: Is the error a server-side fault?
-          example: false
-        id:
-          type: string
-          description: ID is a unique identifier for this particular occurrence of the problem.
-          example: 123abc
-        message:
-          type: string
-          description: Message is a human-readable explanation specific to this occurrence of the problem.
-          example: parameter 'p' must be an integer
-        name:
-          type: string
-          description: Name is the name of this class of errors.
-          example: bad_request
-        temporary:
-          type: boolean
-          description: Is the error temporary?
-          example: false
-        timeout:
-          type: boolean
-          description: Is the error a timeout?
-          example: true
-      description: Invalid input (default view)
+        description: Internal server error (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
@@ -897,45 +1314,88 @@ definitions:
             - temporary
             - timeout
             - fault
+    UsersDeleteUserInvalidParametersResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: Invalid input (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
     UsersDeleteUserUnauthorizedResponseBody:
-      title: 'Mediatype identifier: application/vnd.goa.error; view=default'
-      type: object
-      properties:
-        fault:
-          type: boolean
-          description: Is the error a server-side fault?
-          example: false
-        id:
-          type: string
-          description: ID is a unique identifier for this particular occurrence of the problem.
-          example: 123abc
-        message:
-          type: string
-          description: Message is a human-readable explanation specific to this occurrence of the problem.
-          example: parameter 'p' must be an integer
-        name:
-          type: string
-          description: Name is the name of this class of errors.
-          example: bad_request
-        temporary:
-          type: boolean
-          description: Is the error temporary?
-          example: false
-        timeout:
-          type: boolean
-          description: Is the error a timeout?
-          example: false
-      description: Unauthorized access (default view)
-      example:
-        fault: true
-        id: 123abc
-        message: parameter 'p' must be an integer
-        name: bad_request
-        temporary: false
-        timeout: false
-      required:
-        - name
-        - id
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: false
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: Unauthorized access (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
+            timeout: false
+        required:
+            - name
+            - id
             - message
             - temporary
             - timeout
@@ -949,49 +1409,6 @@ definitions:
                 description: Is the error a server-side fault?
                 example: false
             id:
-              type: string
-              description: ID is a unique identifier for this particular occurrence of the problem.
-              example: 123abc
-            message:
-              type: string
-              description: Message is a human-readable explanation specific to this occurrence of the problem.
-              example: parameter 'p' must be an integer
-            name:
-              type: string
-              description: Name is the name of this class of errors.
-              example: bad_request
-            temporary:
-              type: boolean
-              description: Is the error temporary?
-              example: true
-            timeout:
-              type: boolean
-              description: Is the error a timeout?
-              example: false
-        description: User not found (default view)
-        example:
-          fault: true
-          id: 123abc
-          message: parameter 'p' must be an integer
-          name: bad_request
-          temporary: true
-          timeout: true
-        required:
-          - name
-          - id
-          - message
-          - temporary
-          - timeout
-          - fault
-    UsersListUsersUnauthorizedResponseBody:
-      title: 'Mediatype identifier: application/vnd.goa.error; view=default'
-      type: object
-      properties:
-        fault:
-          type: boolean
-          description: Is the error a server-side fault?
-                example: true
-            id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
                 example: 123abc
@@ -1010,14 +1427,57 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
-      description: Unauthorized access (default view)
+                example: true
+        description: User not found (default view)
         example:
             fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: false
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    UsersListUsersUnauthorizedResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: Unauthorized access (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: true
             timeout: true
         required:
             - name

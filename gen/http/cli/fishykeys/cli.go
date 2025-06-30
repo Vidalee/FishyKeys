@@ -14,6 +14,7 @@ import (
 	"os"
 
 	keymanagementc "github.com/Vidalee/FishyKeys/gen/http/key_management/client"
+	secretsc "github.com/Vidalee/FishyKeys/gen/http/secrets/client"
 	usersc "github.com/Vidalee/FishyKeys/gen/http/users/client"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -24,6 +25,7 @@ import (
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
 	return `key-management (create-master-key|get-key-status|add-share|delete-share)
+secrets (get-secret-value|get-secret)
 users (create-user|list-users|delete-user|auth-user)
 `
 }
@@ -35,6 +37,9 @@ func UsageExamples() string {
       "admin_username": "admin",
       "min_shares": 3,
       "total_shares": 5
+   }'` + "\n" +
+		os.Args[0] + ` secrets get-secret-value --body '{
+      "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ=="
    }'` + "\n" +
 		os.Args[0] + ` users create-user --body '{
       "password": "s3cr3t",
@@ -66,6 +71,14 @@ func ParseEndpoint(
 		keyManagementDeleteShareFlags    = flag.NewFlagSet("delete-share", flag.ExitOnError)
 		keyManagementDeleteShareBodyFlag = keyManagementDeleteShareFlags.String("body", "REQUIRED", "")
 
+		secretsFlags = flag.NewFlagSet("secrets", flag.ContinueOnError)
+
+		secretsGetSecretValueFlags    = flag.NewFlagSet("get-secret-value", flag.ExitOnError)
+		secretsGetSecretValueBodyFlag = secretsGetSecretValueFlags.String("body", "REQUIRED", "")
+
+		secretsGetSecretFlags    = flag.NewFlagSet("get-secret", flag.ExitOnError)
+		secretsGetSecretBodyFlag = secretsGetSecretFlags.String("body", "REQUIRED", "")
+
 		usersFlags = flag.NewFlagSet("users", flag.ContinueOnError)
 
 		usersCreateUserFlags    = flag.NewFlagSet("create-user", flag.ExitOnError)
@@ -84,6 +97,10 @@ func ParseEndpoint(
 	keyManagementGetKeyStatusFlags.Usage = keyManagementGetKeyStatusUsage
 	keyManagementAddShareFlags.Usage = keyManagementAddShareUsage
 	keyManagementDeleteShareFlags.Usage = keyManagementDeleteShareUsage
+
+	secretsFlags.Usage = secretsUsage
+	secretsGetSecretValueFlags.Usage = secretsGetSecretValueUsage
+	secretsGetSecretFlags.Usage = secretsGetSecretUsage
 
 	usersFlags.Usage = usersUsage
 	usersCreateUserFlags.Usage = usersCreateUserUsage
@@ -108,6 +125,8 @@ func ParseEndpoint(
 		switch svcn {
 		case "key-management":
 			svcf = keyManagementFlags
+		case "secrets":
+			svcf = secretsFlags
 		case "users":
 			svcf = usersFlags
 		default:
@@ -138,6 +157,16 @@ func ParseEndpoint(
 
 			case "delete-share":
 				epf = keyManagementDeleteShareFlags
+
+			}
+
+		case "secrets":
+			switch epn {
+			case "get-secret-value":
+				epf = secretsGetSecretValueFlags
+
+			case "get-secret":
+				epf = secretsGetSecretFlags
 
 			}
 
@@ -191,6 +220,16 @@ func ParseEndpoint(
 			case "delete-share":
 				endpoint = c.DeleteShare()
 				data, err = keymanagementc.BuildDeleteSharePayload(*keyManagementDeleteShareBodyFlag)
+			}
+		case "secrets":
+			c := secretsc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "get-secret-value":
+				endpoint = c.GetSecretValue()
+				data, err = secretsc.BuildGetSecretValuePayload(*secretsGetSecretValueBodyFlag)
+			case "get-secret":
+				endpoint = c.GetSecret()
+				data, err = secretsc.BuildGetSecretPayload(*secretsGetSecretBodyFlag)
 			}
 		case "users":
 			c := usersc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -281,6 +320,46 @@ Delete a share from the key management system
 Example:
     %[1]s key-management delete-share --body '{
       "index": 1
+   }'
+`, os.Args[0])
+}
+
+// secretsUsage displays the usage of the secrets command and its subcommands.
+func secretsUsage() {
+	fmt.Fprintf(os.Stderr, `User service manages user accounts and authentication
+Usage:
+    %[1]s [globalflags] secrets COMMAND [flags]
+
+COMMAND:
+    get-secret-value: Retrieve a secret value
+    get-secret: Retrieve a secret's information
+
+Additional help:
+    %[1]s secrets COMMAND --help
+`, os.Args[0])
+}
+func secretsGetSecretValueUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] secrets get-secret-value -body JSON
+
+Retrieve a secret value
+    -body JSON: 
+
+Example:
+    %[1]s secrets get-secret-value --body '{
+      "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ=="
+   }'
+`, os.Args[0])
+}
+
+func secretsGetSecretUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] secrets get-secret -body JSON
+
+Retrieve a secret's information
+    -body JSON: 
+
+Example:
+    %[1]s secrets get-secret --body '{
+      "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ=="
    }'
 `, os.Args[0])
 }
