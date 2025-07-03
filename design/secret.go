@@ -36,9 +36,9 @@ var SecretInfoType = Type("SecretInfo", func() {
 var _ = Service("secrets", func() {
 	Description("User service manages user accounts and authentication")
 
-	Error("secret_not_found", ErrorResult, "Secret not found")
 	Error("invalid_parameters", ErrorResult, "Invalid token path")
 	Error("unauthorized", ErrorResult, "Unauthorized access")
+	Error("forbidden", ErrorResult, "Forbidden access")
 	Error("internal_error", ErrorResult, "Internal server error")
 
 	Method("get secret value", func() {
@@ -60,12 +60,14 @@ var _ = Service("secrets", func() {
 				Example("customers/google/api_key")
 			})
 		})
+		Error("secret_not_found", ErrorResult, "Secret not found")
 		HTTP(func() {
-			GET("/secrets/${path}/value")
+			GET("/secrets/{path}/value")
 			Response(StatusOK)
 			Response("secret_not_found", StatusNotFound)
 			Response("invalid_parameters", StatusBadRequest)
 			Response("unauthorized", StatusUnauthorized)
+			Response("forbidden", StatusForbidden)
 			Response("internal_error", StatusInternalServerError)
 		})
 	})
@@ -82,12 +84,40 @@ var _ = Service("secrets", func() {
 			Required("path")
 		})
 		Result(SecretInfoType, "The secret's information")
+		Error("secret_not_found", ErrorResult, "Secret not found")
 		HTTP(func() {
-			GET("/secrets/${path}")
+			GET("/secrets/{path}")
 			Response(StatusOK)
 			Response("secret_not_found", StatusNotFound)
 			Response("invalid_parameters", StatusBadRequest)
 			Response("unauthorized", StatusUnauthorized)
+			Response("forbidden", StatusForbidden)
+			Response("internal_error", StatusInternalServerError)
+		})
+	})
+
+	Method("create secret", func() {
+		ServerInterceptor(Authentified)
+
+		Description("Create a secret")
+		Payload(func() {
+			Attribute("path", String, "Base64 encoded secret's path", func() {
+				Example("L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==")
+				MinLength(2)
+			})
+			Attribute("value", String, "The secret value", func() {
+				Example("SECRET_API_KEY123")
+			})
+			Attribute("authorized_members", ArrayOf(Int), "Members IDs authorized to access the secret")
+			Attribute("authorized_roles", ArrayOf(Int), "Role IDs authorized to access the secret")
+			Required("path", "value", "authorized_members", "authorized_roles")
+		})
+		HTTP(func() {
+			POST("/secrets")
+			Response(StatusCreated)
+			Response("invalid_parameters", StatusBadRequest)
+			Response("unauthorized", StatusUnauthorized)
+			Response("forbidden", StatusForbidden)
 			Response("internal_error", StatusInternalServerError)
 		})
 	})

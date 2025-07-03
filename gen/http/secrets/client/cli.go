@@ -18,37 +18,59 @@ import (
 
 // BuildGetSecretValuePayload builds the payload for the secrets get secret
 // value endpoint from CLI flags.
-func BuildGetSecretValuePayload(secretsGetSecretValueBody string) (*secrets.GetSecretValuePayload, error) {
+func BuildGetSecretValuePayload(secretsGetSecretValuePath string) (*secrets.GetSecretValuePayload, error) {
 	var err error
-	var body GetSecretValueRequestBody
+	var path string
 	{
-		err = json.Unmarshal([]byte(secretsGetSecretValueBody), &body)
-		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"path\": \"L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==\"\n   }'")
-		}
-		if utf8.RuneCountInString(body.Path) < 2 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.path", body.Path, utf8.RuneCountInString(body.Path), 2, true))
+		path = secretsGetSecretValuePath
+		if utf8.RuneCountInString(path) < 2 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("path", path, utf8.RuneCountInString(path), 2, true))
 		}
 		if err != nil {
 			return nil, err
 		}
 	}
-	v := &secrets.GetSecretValuePayload{
-		Path: body.Path,
-	}
+	v := &secrets.GetSecretValuePayload{}
+	v.Path = path
 
 	return v, nil
 }
 
 // BuildGetSecretPayload builds the payload for the secrets get secret endpoint
 // from CLI flags.
-func BuildGetSecretPayload(secretsGetSecretBody string) (*secrets.GetSecretPayload, error) {
+func BuildGetSecretPayload(secretsGetSecretPath string) (*secrets.GetSecretPayload, error) {
 	var err error
-	var body GetSecretRequestBody
+	var path string
 	{
-		err = json.Unmarshal([]byte(secretsGetSecretBody), &body)
+		path = secretsGetSecretPath
+		if utf8.RuneCountInString(path) < 2 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("path", path, utf8.RuneCountInString(path), 2, true))
+		}
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"path\": \"L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==\"\n   }'")
+			return nil, err
+		}
+	}
+	v := &secrets.GetSecretPayload{}
+	v.Path = path
+
+	return v, nil
+}
+
+// BuildCreateSecretPayload builds the payload for the secrets create secret
+// endpoint from CLI flags.
+func BuildCreateSecretPayload(secretsCreateSecretBody string) (*secrets.CreateSecretPayload, error) {
+	var err error
+	var body CreateSecretRequestBody
+	{
+		err = json.Unmarshal([]byte(secretsCreateSecretBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"authorized_members\": [\n         5091348230372323765,\n         633220121447532707,\n         2121356811434194624\n      ],\n      \"authorized_roles\": [\n         2782797484439169934,\n         2748161521337895987,\n         5585384301853113595\n      ],\n      \"path\": \"L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==\",\n      \"value\": \"SECRET_API_KEY123\"\n   }'")
+		}
+		if body.AuthorizedMembers == nil {
+			err = goa.MergeErrors(err, goa.MissingFieldError("authorized_members", "body"))
+		}
+		if body.AuthorizedRoles == nil {
+			err = goa.MergeErrors(err, goa.MissingFieldError("authorized_roles", "body"))
 		}
 		if utf8.RuneCountInString(body.Path) < 2 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.path", body.Path, utf8.RuneCountInString(body.Path), 2, true))
@@ -57,8 +79,25 @@ func BuildGetSecretPayload(secretsGetSecretBody string) (*secrets.GetSecretPaylo
 			return nil, err
 		}
 	}
-	v := &secrets.GetSecretPayload{
-		Path: body.Path,
+	v := &secrets.CreateSecretPayload{
+		Path:  body.Path,
+		Value: body.Value,
+	}
+	if body.AuthorizedMembers != nil {
+		v.AuthorizedMembers = make([]int, len(body.AuthorizedMembers))
+		for i, val := range body.AuthorizedMembers {
+			v.AuthorizedMembers[i] = val
+		}
+	} else {
+		v.AuthorizedMembers = []int{}
+	}
+	if body.AuthorizedRoles != nil {
+		v.AuthorizedRoles = make([]int, len(body.AuthorizedRoles))
+		for i, val := range body.AuthorizedRoles {
+			v.AuthorizedRoles[i] = val
+		}
+	} else {
+		v.AuthorizedRoles = []int{}
 	}
 
 	return v, nil

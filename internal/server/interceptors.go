@@ -3,18 +3,19 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/Vidalee/FishyKeys/gen/secrets"
 	"github.com/Vidalee/FishyKeys/gen/users"
 	"github.com/Vidalee/FishyKeys/repository"
 	"github.com/Vidalee/FishyKeys/service"
 	goa "goa.design/goa/v3/pkg"
 )
 
-type ServerInterceptors struct {
+type ServerUsersInterceptors struct {
 	rolesRepository     repository.RolesRepository
 	userRolesRepository repository.UserRolesRepository
 }
 
-func (i *ServerInterceptors) Authentified(ctx context.Context, info *users.AuthentifiedInfo, next goa.Endpoint) (any, error) {
+func (i *ServerUsersInterceptors) Authentified(ctx context.Context, info *users.AuthentifiedInfo, next goa.Endpoint) (any, error) {
 	token := ctx.Value("token")
 	if token == nil {
 		return nil, users.MakeUnauthorized(fmt.Errorf("you need to be authenticated to access this endpoint"))
@@ -22,7 +23,7 @@ func (i *ServerInterceptors) Authentified(ctx context.Context, info *users.Authe
 	return next(ctx, info.RawPayload())
 }
 
-func (i *ServerInterceptors) IsAdmin(ctx context.Context, info *users.IsAdminInfo, next goa.Endpoint) (any, error) {
+func (i *ServerUsersInterceptors) IsAdmin(ctx context.Context, info *users.IsAdminInfo, next goa.Endpoint) (any, error) {
 	token := ctx.Value("token")
 	if token == nil {
 		return nil, users.MakeUnauthorized(fmt.Errorf("you need to be authenticated to access this endpoint"))
@@ -50,4 +51,17 @@ func (i *ServerInterceptors) IsAdmin(ctx context.Context, info *users.IsAdminInf
 	}
 
 	return nil, users.MakeForbidden(fmt.Errorf("you need to be an admin to access this endpoint"))
+}
+
+type ServerSecretsInterceptors struct {
+	rolesRepository     repository.RolesRepository
+	userRolesRepository repository.UserRolesRepository
+}
+
+func (i *ServerSecretsInterceptors) Authentified(ctx context.Context, info *secrets.AuthentifiedInfo, next goa.Endpoint) (any, error) {
+	token := ctx.Value("token")
+	if token == nil {
+		return nil, secrets.MakeUnauthorized(fmt.Errorf("you need to be authenticated to access this endpoint"))
+	}
+	return next(ctx, info.RawPayload())
 }

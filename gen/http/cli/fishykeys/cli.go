@@ -25,7 +25,7 @@ import (
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
 	return `key-management (create-master-key|get-key-status|add-share|delete-share)
-secrets (get-secret-value|get-secret)
+secrets (get-secret-value|get-secret|create-secret)
 users (create-user|list-users|delete-user|auth-user)
 `
 }
@@ -38,9 +38,7 @@ func UsageExamples() string {
       "min_shares": 3,
       "total_shares": 5
    }'` + "\n" +
-		os.Args[0] + ` secrets get-secret-value --body '{
-      "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ=="
-   }'` + "\n" +
+		os.Args[0] + ` secrets get-secret-value --path "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ=="` + "\n" +
 		os.Args[0] + ` users create-user --body '{
       "password": "s3cr3t",
       "username": "alice"
@@ -74,10 +72,13 @@ func ParseEndpoint(
 		secretsFlags = flag.NewFlagSet("secrets", flag.ContinueOnError)
 
 		secretsGetSecretValueFlags    = flag.NewFlagSet("get-secret-value", flag.ExitOnError)
-		secretsGetSecretValueBodyFlag = secretsGetSecretValueFlags.String("body", "REQUIRED", "")
+		secretsGetSecretValuePathFlag = secretsGetSecretValueFlags.String("path", "REQUIRED", "Base64 encoded secret's path")
 
 		secretsGetSecretFlags    = flag.NewFlagSet("get-secret", flag.ExitOnError)
-		secretsGetSecretBodyFlag = secretsGetSecretFlags.String("body", "REQUIRED", "")
+		secretsGetSecretPathFlag = secretsGetSecretFlags.String("path", "REQUIRED", "Base64 encoded secret's path")
+
+		secretsCreateSecretFlags    = flag.NewFlagSet("create-secret", flag.ExitOnError)
+		secretsCreateSecretBodyFlag = secretsCreateSecretFlags.String("body", "REQUIRED", "")
 
 		usersFlags = flag.NewFlagSet("users", flag.ContinueOnError)
 
@@ -101,6 +102,7 @@ func ParseEndpoint(
 	secretsFlags.Usage = secretsUsage
 	secretsGetSecretValueFlags.Usage = secretsGetSecretValueUsage
 	secretsGetSecretFlags.Usage = secretsGetSecretUsage
+	secretsCreateSecretFlags.Usage = secretsCreateSecretUsage
 
 	usersFlags.Usage = usersUsage
 	usersCreateUserFlags.Usage = usersCreateUserUsage
@@ -168,6 +170,9 @@ func ParseEndpoint(
 			case "get-secret":
 				epf = secretsGetSecretFlags
 
+			case "create-secret":
+				epf = secretsCreateSecretFlags
+
 			}
 
 		case "users":
@@ -226,10 +231,13 @@ func ParseEndpoint(
 			switch epn {
 			case "get-secret-value":
 				endpoint = c.GetSecretValue()
-				data, err = secretsc.BuildGetSecretValuePayload(*secretsGetSecretValueBodyFlag)
+				data, err = secretsc.BuildGetSecretValuePayload(*secretsGetSecretValuePathFlag)
 			case "get-secret":
 				endpoint = c.GetSecret()
-				data, err = secretsc.BuildGetSecretPayload(*secretsGetSecretBodyFlag)
+				data, err = secretsc.BuildGetSecretPayload(*secretsGetSecretPathFlag)
+			case "create-secret":
+				endpoint = c.CreateSecret()
+				data, err = secretsc.BuildCreateSecretPayload(*secretsCreateSecretBodyFlag)
 			}
 		case "users":
 			c := usersc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -333,33 +341,54 @@ Usage:
 COMMAND:
     get-secret-value: Retrieve a secret value
     get-secret: Retrieve a secret's information
+    create-secret: Create a secret
 
 Additional help:
     %[1]s secrets COMMAND --help
 `, os.Args[0])
 }
 func secretsGetSecretValueUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] secrets get-secret-value -body JSON
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] secrets get-secret-value -path STRING
 
 Retrieve a secret value
-    -body JSON: 
+    -path STRING: Base64 encoded secret's path
 
 Example:
-    %[1]s secrets get-secret-value --body '{
-      "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ=="
-   }'
+    %[1]s secrets get-secret-value --path "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ=="
 `, os.Args[0])
 }
 
 func secretsGetSecretUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] secrets get-secret -body JSON
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] secrets get-secret -path STRING
 
 Retrieve a secret's information
+    -path STRING: Base64 encoded secret's path
+
+Example:
+    %[1]s secrets get-secret --path "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ=="
+`, os.Args[0])
+}
+
+func secretsCreateSecretUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] secrets create-secret -body JSON
+
+Create a secret
     -body JSON: 
 
 Example:
-    %[1]s secrets get-secret --body '{
-      "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ=="
+    %[1]s secrets create-secret --body '{
+      "authorized_members": [
+         5091348230372323765,
+         633220121447532707,
+         2121356811434194624
+      ],
+      "authorized_roles": [
+         2782797484439169934,
+         2748161521337895987,
+         5585384301853113595
+      ],
+      "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==",
+      "value": "SECRET_API_KEY123"
    }'
 `, os.Args[0])
 }

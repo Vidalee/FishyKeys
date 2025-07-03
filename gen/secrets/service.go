@@ -19,6 +19,8 @@ type Service interface {
 	GetSecretValue(context.Context, *GetSecretValuePayload) (res *GetSecretValueResult, err error)
 	// Retrieve a secret's information
 	GetSecret(context.Context, *GetSecretPayload) (res *SecretInfo, err error)
+	// Create a secret
+	CreateSecret(context.Context, *CreateSecretPayload) (err error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -35,7 +37,20 @@ const ServiceName = "secrets"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [2]string{"get secret value", "get secret"}
+var MethodNames = [3]string{"get secret value", "get secret", "create secret"}
+
+// CreateSecretPayload is the payload type of the secrets service create secret
+// method.
+type CreateSecretPayload struct {
+	// Base64 encoded secret's path
+	Path string
+	// The secret value
+	Value string
+	// Members IDs authorized to access the secret
+	AuthorizedMembers []int
+	// Role IDs authorized to access the secret
+	AuthorizedRoles []int
+}
 
 // GetSecretPayload is the payload type of the secrets service get secret
 // method.
@@ -92,11 +107,6 @@ type User struct {
 	UpdatedAt string
 }
 
-// MakeSecretNotFound builds a goa.ServiceError from an error.
-func MakeSecretNotFound(err error) *goa.ServiceError {
-	return goa.NewServiceError(err, "secret_not_found", false, false, false)
-}
-
 // MakeInvalidParameters builds a goa.ServiceError from an error.
 func MakeInvalidParameters(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "invalid_parameters", false, false, false)
@@ -107,7 +117,17 @@ func MakeUnauthorized(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "unauthorized", false, false, false)
 }
 
+// MakeForbidden builds a goa.ServiceError from an error.
+func MakeForbidden(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "forbidden", false, false, false)
+}
+
 // MakeInternalError builds a goa.ServiceError from an error.
 func MakeInternalError(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "internal_error", false, false, false)
+}
+
+// MakeSecretNotFound builds a goa.ServiceError from an error.
+func MakeSecretNotFound(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "secret_not_found", false, false, false)
 }

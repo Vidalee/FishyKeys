@@ -17,13 +17,15 @@ import (
 type Client struct {
 	GetSecretValueEndpoint goa.Endpoint
 	GetSecretEndpoint      goa.Endpoint
+	CreateSecretEndpoint   goa.Endpoint
 }
 
 // NewClient initializes a "secrets" service client given the endpoints.
-func NewClient(getSecretValue, getSecret goa.Endpoint) *Client {
+func NewClient(getSecretValue, getSecret, createSecret goa.Endpoint) *Client {
 	return &Client{
 		GetSecretValueEndpoint: getSecretValue,
 		GetSecretEndpoint:      getSecret,
+		CreateSecretEndpoint:   createSecret,
 	}
 }
 
@@ -33,6 +35,7 @@ func NewClient(getSecretValue, getSecret goa.Endpoint) *Client {
 //   - "secret_not_found" (type *goa.ServiceError): Secret not found
 //   - "invalid_parameters" (type *goa.ServiceError): Invalid token path
 //   - "unauthorized" (type *goa.ServiceError): Unauthorized access
+//   - "forbidden" (type *goa.ServiceError): Forbidden access
 //   - "internal_error" (type *goa.ServiceError): Internal server error
 //   - error: internal error
 func (c *Client) GetSecretValue(ctx context.Context, p *GetSecretValuePayload) (res *GetSecretValueResult, err error) {
@@ -49,6 +52,7 @@ func (c *Client) GetSecretValue(ctx context.Context, p *GetSecretValuePayload) (
 //   - "secret_not_found" (type *goa.ServiceError): Secret not found
 //   - "invalid_parameters" (type *goa.ServiceError): Invalid token path
 //   - "unauthorized" (type *goa.ServiceError): Unauthorized access
+//   - "forbidden" (type *goa.ServiceError): Forbidden access
 //   - "internal_error" (type *goa.ServiceError): Internal server error
 //   - error: internal error
 func (c *Client) GetSecret(ctx context.Context, p *GetSecretPayload) (res *SecretInfo, err error) {
@@ -58,4 +62,16 @@ func (c *Client) GetSecret(ctx context.Context, p *GetSecretPayload) (res *Secre
 		return
 	}
 	return ires.(*SecretInfo), nil
+}
+
+// CreateSecret calls the "create secret" endpoint of the "secrets" service.
+// CreateSecret may return the following errors:
+//   - "invalid_parameters" (type *goa.ServiceError): Invalid token path
+//   - "unauthorized" (type *goa.ServiceError): Unauthorized access
+//   - "forbidden" (type *goa.ServiceError): Forbidden access
+//   - "internal_error" (type *goa.ServiceError): Internal server error
+//   - error: internal error
+func (c *Client) CreateSecret(ctx context.Context, p *CreateSecretPayload) (err error) {
+	_, err = c.CreateSecretEndpoint(ctx, p)
+	return
 }

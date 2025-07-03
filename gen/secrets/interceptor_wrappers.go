@@ -40,3 +40,17 @@ func wrapGetSecretAuthentified(endpoint goa.Endpoint, i ServerInterceptors) goa.
 		return i.Authentified(ctx, info, endpoint)
 	}
 }
+
+// wrapAuthentifiedCreateSecret applies the Authentified server interceptor to
+// endpoints.
+func wrapCreateSecretAuthentified(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		info := &AuthentifiedInfo{
+			service:    "secrets",
+			method:     "CreateSecret",
+			callType:   goa.InterceptorUnary,
+			rawPayload: req,
+		}
+		return i.Authentified(ctx, info, endpoint)
+	}
+}

@@ -12,6 +12,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"unicode/utf8"
 
 	secrets "github.com/Vidalee/FishyKeys/gen/secrets"
 	goahttp "goa.design/goa/v3/http"
@@ -35,25 +36,19 @@ func EncodeGetSecretValueResponse(encoder func(context.Context, http.ResponseWri
 func DecodeGetSecretValueRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
 	return func(r *http.Request) (any, error) {
 		var (
-			body GetSecretValueRequestBody
+			path string
 			err  error
+
+			params = mux.Vars(r)
 		)
-		err = decoder(r).Decode(&body)
-		if err != nil {
-			if err == io.EOF {
-				return nil, goa.MissingPayloadError()
-			}
-			var gerr *goa.ServiceError
-			if errors.As(err, &gerr) {
-				return nil, gerr
-			}
-			return nil, goa.DecodePayloadError(err.Error())
+		path = params["path"]
+		if utf8.RuneCountInString(path) < 2 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("path", path, utf8.RuneCountInString(path), 2, true))
 		}
-		err = ValidateGetSecretValueRequestBody(&body)
 		if err != nil {
 			return nil, err
 		}
-		payload := NewGetSecretValuePayload(&body)
+		payload := NewGetSecretValuePayload(path)
 
 		return payload, nil
 	}
@@ -108,6 +103,19 @@ func EncodeGetSecretValueError(encoder func(context.Context, http.ResponseWriter
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
+		case "forbidden":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewGetSecretValueForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
 		case "internal_error":
 			var res *goa.ServiceError
 			errors.As(v, &res)
@@ -144,25 +152,19 @@ func EncodeGetSecretResponse(encoder func(context.Context, http.ResponseWriter) 
 func DecodeGetSecretRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
 	return func(r *http.Request) (any, error) {
 		var (
-			body GetSecretRequestBody
+			path string
 			err  error
+
+			params = mux.Vars(r)
 		)
-		err = decoder(r).Decode(&body)
-		if err != nil {
-			if err == io.EOF {
-				return nil, goa.MissingPayloadError()
-			}
-			var gerr *goa.ServiceError
-			if errors.As(err, &gerr) {
-				return nil, gerr
-			}
-			return nil, goa.DecodePayloadError(err.Error())
+		path = params["path"]
+		if utf8.RuneCountInString(path) < 2 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("path", path, utf8.RuneCountInString(path), 2, true))
 		}
-		err = ValidateGetSecretRequestBody(&body)
 		if err != nil {
 			return nil, err
 		}
-		payload := NewGetSecretPayload(&body)
+		payload := NewGetSecretPayload(path)
 
 		return payload, nil
 	}
@@ -217,6 +219,19 @@ func EncodeGetSecretError(encoder func(context.Context, http.ResponseWriter) goa
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
+		case "forbidden":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewGetSecretForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
 		case "internal_error":
 			var res *goa.ServiceError
 			errors.As(v, &res)
@@ -226,6 +241,112 @@ func EncodeGetSecretError(encoder func(context.Context, http.ResponseWriter) goa
 				body = formatter(ctx, res)
 			} else {
 				body = NewGetSecretInternalErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeCreateSecretResponse returns an encoder for responses returned by the
+// secrets create secret endpoint.
+func EncodeCreateSecretResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+	return func(ctx context.Context, w http.ResponseWriter, v any) error {
+		w.WriteHeader(http.StatusCreated)
+		return nil
+	}
+}
+
+// DecodeCreateSecretRequest returns a decoder for requests sent to the secrets
+// create secret endpoint.
+func DecodeCreateSecretRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
+	return func(r *http.Request) (any, error) {
+		var (
+			body CreateSecretRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			var gerr *goa.ServiceError
+			if errors.As(err, &gerr) {
+				return nil, gerr
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateCreateSecretRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewCreateSecretPayload(&body)
+
+		return payload, nil
+	}
+}
+
+// EncodeCreateSecretError returns an encoder for errors returned by the create
+// secret secrets endpoint.
+func EncodeCreateSecretError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en goa.GoaErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.GoaErrorName() {
+		case "invalid_parameters":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewCreateSecretInvalidParametersResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "unauthorized":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewCreateSecretUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		case "forbidden":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewCreateSecretForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "internal_error":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewCreateSecretInternalErrorResponseBody(res)
 			}
 			w.Header().Set("goa-error", res.GoaErrorName())
 			w.WriteHeader(http.StatusInternalServerError)

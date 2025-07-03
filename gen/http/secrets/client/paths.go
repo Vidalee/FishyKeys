@@ -7,12 +7,21 @@
 
 package client
 
+import (
+	"fmt"
+)
+
 // GetSecretValueSecretsPath returns the URL path to the secrets service get secret value HTTP endpoint.
-func GetSecretValueSecretsPath() string {
-	return "/secrets/${path}/value"
+func GetSecretValueSecretsPath(path string) string {
+	return fmt.Sprintf("/secrets/%v/value", path)
 }
 
 // GetSecretSecretsPath returns the URL path to the secrets service get secret HTTP endpoint.
-func GetSecretSecretsPath() string {
-	return "/secrets/${path}"
+func GetSecretSecretsPath(path string) string {
+	return fmt.Sprintf("/secrets/%v", path)
+}
+
+// CreateSecretSecretsPath returns the URL path to the secrets service create secret HTTP endpoint.
+func CreateSecretSecretsPath() string {
+	return "/secrets"
 }

@@ -25,6 +25,10 @@ type Client struct {
 	// endpoint.
 	GetSecretDoer goahttp.Doer
 
+	// CreateSecret Doer is the HTTP client used to make requests to the create
+	// secret endpoint.
+	CreateSecretDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -50,6 +54,7 @@ func NewClient(
 	return &Client{
 		GetSecretValueDoer:  doer,
 		GetSecretDoer:       doer,
+		CreateSecretDoer:    doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -63,15 +68,10 @@ func NewClient(
 // service get secret value server.
 func (c *Client) GetSecretValue() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeGetSecretValueRequest(c.encoder)
 		decodeResponse = DecodeGetSecretValueResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {
 		req, err := c.BuildGetSecretValueRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		err = encodeRequest(req, v)
 		if err != nil {
 			return nil, err
 		}
@@ -87,7 +87,6 @@ func (c *Client) GetSecretValue() goa.Endpoint {
 // service get secret server.
 func (c *Client) GetSecret() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeGetSecretRequest(c.encoder)
 		decodeResponse = DecodeGetSecretResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v any) (any, error) {
@@ -95,13 +94,33 @@ func (c *Client) GetSecret() goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
+		resp, err := c.GetSecretDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("secrets", "get secret", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// CreateSecret returns an endpoint that makes HTTP requests to the secrets
+// service create secret server.
+func (c *Client) CreateSecret() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeCreateSecretRequest(c.encoder)
+		decodeResponse = DecodeCreateSecretResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildCreateSecretRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
 		err = encodeRequest(req, v)
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.GetSecretDoer.Do(req)
+		resp, err := c.CreateSecretDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("secrets", "get secret", err)
+			return nil, goahttp.ErrRequestError("secrets", "create secret", err)
 		}
 		return decodeResponse(resp)
 	}

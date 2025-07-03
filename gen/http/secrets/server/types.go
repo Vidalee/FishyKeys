@@ -14,18 +14,17 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// GetSecretValueRequestBody is the type of the "secrets" service "get secret
-// value" endpoint HTTP request body.
-type GetSecretValueRequestBody struct {
-	// Base64 encoded secret's path
-	Path *string `form:"path,omitempty" json:"path,omitempty" xml:"path,omitempty"`
-}
-
-// GetSecretRequestBody is the type of the "secrets" service "get secret"
+// CreateSecretRequestBody is the type of the "secrets" service "create secret"
 // endpoint HTTP request body.
-type GetSecretRequestBody struct {
+type CreateSecretRequestBody struct {
 	// Base64 encoded secret's path
 	Path *string `form:"path,omitempty" json:"path,omitempty" xml:"path,omitempty"`
+	// The secret value
+	Value *string `form:"value,omitempty" json:"value,omitempty" xml:"value,omitempty"`
+	// Members IDs authorized to access the secret
+	AuthorizedMembers []int `form:"authorized_members,omitempty" json:"authorized_members,omitempty" xml:"authorized_members,omitempty"`
+	// Role IDs authorized to access the secret
+	AuthorizedRoles []int `form:"authorized_roles,omitempty" json:"authorized_roles,omitempty" xml:"authorized_roles,omitempty"`
 }
 
 // GetSecretValueResponseBody is the type of the "secrets" service "get secret
@@ -95,6 +94,24 @@ type GetSecretValueInvalidParametersResponseBody struct {
 // GetSecretValueUnauthorizedResponseBody is the type of the "secrets" service
 // "get secret value" endpoint HTTP response body for the "unauthorized" error.
 type GetSecretValueUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetSecretValueForbiddenResponseBody is the type of the "secrets" service
+// "get secret value" endpoint HTTP response body for the "forbidden" error.
+type GetSecretValueForbiddenResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -183,9 +200,100 @@ type GetSecretUnauthorizedResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// GetSecretForbiddenResponseBody is the type of the "secrets" service "get
+// secret" endpoint HTTP response body for the "forbidden" error.
+type GetSecretForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // GetSecretInternalErrorResponseBody is the type of the "secrets" service "get
 // secret" endpoint HTTP response body for the "internal_error" error.
 type GetSecretInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CreateSecretInvalidParametersResponseBody is the type of the "secrets"
+// service "create secret" endpoint HTTP response body for the
+// "invalid_parameters" error.
+type CreateSecretInvalidParametersResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CreateSecretUnauthorizedResponseBody is the type of the "secrets" service
+// "create secret" endpoint HTTP response body for the "unauthorized" error.
+type CreateSecretUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CreateSecretForbiddenResponseBody is the type of the "secrets" service
+// "create secret" endpoint HTTP response body for the "forbidden" error.
+type CreateSecretForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CreateSecretInternalErrorResponseBody is the type of the "secrets" service
+// "create secret" endpoint HTTP response body for the "internal_error" error.
+type CreateSecretInternalErrorResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -301,6 +409,20 @@ func NewGetSecretValueUnauthorizedResponseBody(res *goa.ServiceError) *GetSecret
 	return body
 }
 
+// NewGetSecretValueForbiddenResponseBody builds the HTTP response body from
+// the result of the "get secret value" endpoint of the "secrets" service.
+func NewGetSecretValueForbiddenResponseBody(res *goa.ServiceError) *GetSecretValueForbiddenResponseBody {
+	body := &GetSecretValueForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewGetSecretValueInternalErrorResponseBody builds the HTTP response body
 // from the result of the "get secret value" endpoint of the "secrets" service.
 func NewGetSecretValueInternalErrorResponseBody(res *goa.ServiceError) *GetSecretValueInternalErrorResponseBody {
@@ -357,6 +479,20 @@ func NewGetSecretUnauthorizedResponseBody(res *goa.ServiceError) *GetSecretUnaut
 	return body
 }
 
+// NewGetSecretForbiddenResponseBody builds the HTTP response body from the
+// result of the "get secret" endpoint of the "secrets" service.
+func NewGetSecretForbiddenResponseBody(res *goa.ServiceError) *GetSecretForbiddenResponseBody {
+	body := &GetSecretForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewGetSecretInternalErrorResponseBody builds the HTTP response body from the
 // result of the "get secret" endpoint of the "secrets" service.
 func NewGetSecretInternalErrorResponseBody(res *goa.ServiceError) *GetSecretInternalErrorResponseBody {
@@ -371,44 +507,112 @@ func NewGetSecretInternalErrorResponseBody(res *goa.ServiceError) *GetSecretInte
 	return body
 }
 
+// NewCreateSecretInvalidParametersResponseBody builds the HTTP response body
+// from the result of the "create secret" endpoint of the "secrets" service.
+func NewCreateSecretInvalidParametersResponseBody(res *goa.ServiceError) *CreateSecretInvalidParametersResponseBody {
+	body := &CreateSecretInvalidParametersResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCreateSecretUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "create secret" endpoint of the "secrets" service.
+func NewCreateSecretUnauthorizedResponseBody(res *goa.ServiceError) *CreateSecretUnauthorizedResponseBody {
+	body := &CreateSecretUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCreateSecretForbiddenResponseBody builds the HTTP response body from the
+// result of the "create secret" endpoint of the "secrets" service.
+func NewCreateSecretForbiddenResponseBody(res *goa.ServiceError) *CreateSecretForbiddenResponseBody {
+	body := &CreateSecretForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCreateSecretInternalErrorResponseBody builds the HTTP response body from
+// the result of the "create secret" endpoint of the "secrets" service.
+func NewCreateSecretInternalErrorResponseBody(res *goa.ServiceError) *CreateSecretInternalErrorResponseBody {
+	body := &CreateSecretInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewGetSecretValuePayload builds a secrets service get secret value endpoint
 // payload.
-func NewGetSecretValuePayload(body *GetSecretValueRequestBody) *secrets.GetSecretValuePayload {
-	v := &secrets.GetSecretValuePayload{
-		Path: *body.Path,
-	}
+func NewGetSecretValuePayload(path string) *secrets.GetSecretValuePayload {
+	v := &secrets.GetSecretValuePayload{}
+	v.Path = path
 
 	return v
 }
 
 // NewGetSecretPayload builds a secrets service get secret endpoint payload.
-func NewGetSecretPayload(body *GetSecretRequestBody) *secrets.GetSecretPayload {
-	v := &secrets.GetSecretPayload{
-		Path: *body.Path,
+func NewGetSecretPayload(path string) *secrets.GetSecretPayload {
+	v := &secrets.GetSecretPayload{}
+	v.Path = path
+
+	return v
+}
+
+// NewCreateSecretPayload builds a secrets service create secret endpoint
+// payload.
+func NewCreateSecretPayload(body *CreateSecretRequestBody) *secrets.CreateSecretPayload {
+	v := &secrets.CreateSecretPayload{
+		Path:  *body.Path,
+		Value: *body.Value,
+	}
+	v.AuthorizedMembers = make([]int, len(body.AuthorizedMembers))
+	for i, val := range body.AuthorizedMembers {
+		v.AuthorizedMembers[i] = val
+	}
+	v.AuthorizedRoles = make([]int, len(body.AuthorizedRoles))
+	for i, val := range body.AuthorizedRoles {
+		v.AuthorizedRoles[i] = val
 	}
 
 	return v
 }
 
-// ValidateGetSecretValueRequestBody runs the validations defined on Get Secret
-// ValueRequestBody
-func ValidateGetSecretValueRequestBody(body *GetSecretValueRequestBody) (err error) {
-	if body.Path == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("path", "body"))
-	}
-	if body.Path != nil {
-		if utf8.RuneCountInString(*body.Path) < 2 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.path", *body.Path, utf8.RuneCountInString(*body.Path), 2, true))
-		}
-	}
-	return
-}
-
-// ValidateGetSecretRequestBody runs the validations defined on Get
+// ValidateCreateSecretRequestBody runs the validations defined on Create
 // SecretRequestBody
-func ValidateGetSecretRequestBody(body *GetSecretRequestBody) (err error) {
+func ValidateCreateSecretRequestBody(body *CreateSecretRequestBody) (err error) {
 	if body.Path == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("path", "body"))
+	}
+	if body.Value == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("value", "body"))
+	}
+	if body.AuthorizedMembers == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("authorized_members", "body"))
+	}
+	if body.AuthorizedRoles == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("authorized_roles", "body"))
 	}
 	if body.Path != nil {
 		if utf8.RuneCountInString(*body.Path) < 2 {

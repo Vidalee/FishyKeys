@@ -17,6 +17,7 @@ import (
 type Endpoints struct {
 	GetSecretValue goa.Endpoint
 	GetSecret      goa.Endpoint
+	CreateSecret   goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "secrets" service with endpoints.
@@ -24,9 +25,11 @@ func NewEndpoints(s Service, si ServerInterceptors) *Endpoints {
 	endpoints := &Endpoints{
 		GetSecretValue: NewGetSecretValueEndpoint(s),
 		GetSecret:      NewGetSecretEndpoint(s),
+		CreateSecret:   NewCreateSecretEndpoint(s),
 	}
 	endpoints.GetSecretValue = WrapGetSecretValueEndpoint(endpoints.GetSecretValue, si)
 	endpoints.GetSecret = WrapGetSecretEndpoint(endpoints.GetSecret, si)
+	endpoints.CreateSecret = WrapCreateSecretEndpoint(endpoints.CreateSecret, si)
 	return endpoints
 }
 
@@ -34,6 +37,7 @@ func NewEndpoints(s Service, si ServerInterceptors) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.GetSecretValue = m(e.GetSecretValue)
 	e.GetSecret = m(e.GetSecret)
+	e.CreateSecret = m(e.CreateSecret)
 }
 
 // NewGetSecretValueEndpoint returns an endpoint function that calls the method
@@ -51,5 +55,14 @@ func NewGetSecretEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*GetSecretPayload)
 		return s.GetSecret(ctx, p)
+	}
+}
+
+// NewCreateSecretEndpoint returns an endpoint function that calls the method
+// "create secret" of service "secrets".
+func NewCreateSecretEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*CreateSecretPayload)
+		return nil, s.CreateSecret(ctx, p)
 	}
 }
