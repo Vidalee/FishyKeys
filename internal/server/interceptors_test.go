@@ -18,7 +18,7 @@ import (
 )
 
 func TestServerInterceptors_Authentified(t *testing.T) {
-	interceptor := &ServerInterceptors{}
+	interceptor := &ServerUsersInterceptors{}
 
 	t.Run("should return unauthorized when token is missing", func(t *testing.T) {
 		ctx := context.Background()
@@ -70,7 +70,7 @@ func TestServerInterceptors_IsAdmin(t *testing.T) {
 	ctxWithToken := context.WithValue(context.Background(), "token", jwtClaims)
 
 	t.Run("should return unauthorized when token is missing", func(t *testing.T) {
-		interceptor := &ServerInterceptors{}
+		interceptor := &ServerUsersInterceptors{}
 
 		next := func(ctx context.Context, req any) (any, error) {
 			return "should not call", nil
@@ -94,7 +94,7 @@ func TestServerInterceptors_IsAdmin(t *testing.T) {
 		mockUserRoles := repositorymocks.NewMockUserRolesRepository(t)
 		mockUserRoles.On("GetUserRoleIDs", mock.Anything, 42).Return([]int{}, errors.New("db error"))
 
-		interceptor := &ServerInterceptors{userRolesRepository: mockUserRoles}
+		interceptor := &ServerUsersInterceptors{userRolesRepository: mockUserRoles}
 
 		next := func(ctx context.Context, req any) (any, error) {
 			return nil, nil
@@ -121,7 +121,7 @@ func TestServerInterceptors_IsAdmin(t *testing.T) {
 		mockUserRoles.On("GetUserRoleIDs", mock.Anything, 42).Return([]int{1, 2}, nil)
 		mockRoles.On("GetRolesByIDs", mock.Anything, []int{1, 2}).Return([]repository.Role{}, errors.New("db error"))
 
-		interceptor := &ServerInterceptors{
+		interceptor := &ServerUsersInterceptors{
 			userRolesRepository: mockUserRoles,
 			rolesRepository:     mockRoles,
 		}
@@ -151,7 +151,7 @@ func TestServerInterceptors_IsAdmin(t *testing.T) {
 		mockUserRoles.On("GetUserRoleIDs", mock.Anything, 42).Return([]int{}, nil)
 		mockRoles.On("GetRolesByIDs", mock.Anything, []int{}).Return([]repository.Role{}, nil)
 
-		interceptor := &ServerInterceptors{
+		interceptor := &ServerUsersInterceptors{
 			userRolesRepository: mockUserRoles,
 			rolesRepository:     mockRoles,
 		}
@@ -181,7 +181,7 @@ func TestServerInterceptors_IsAdmin(t *testing.T) {
 		mockUserRoles.On("GetUserRoleIDs", mock.Anything, 42).Return([]int{1}, nil)
 		mockRoles.On("GetRolesByIDs", mock.Anything, []int{1}).Return([]repository.Role{{ID: 1, Admin: false}}, nil)
 
-		interceptor := &ServerInterceptors{
+		interceptor := &ServerUsersInterceptors{
 			userRolesRepository: mockUserRoles,
 			rolesRepository:     mockRoles,
 		}
@@ -211,7 +211,7 @@ func TestServerInterceptors_IsAdmin(t *testing.T) {
 		mockUserRoles.On("GetUserRoleIDs", mock.Anything, 42).Return([]int{1}, nil)
 		mockRoles.On("GetRolesByIDs", mock.Anything, []int{1}).Return([]repository.Role{{ID: 1, Admin: true}}, nil)
 
-		interceptor := &ServerInterceptors{
+		interceptor := &ServerUsersInterceptors{
 			userRolesRepository: mockUserRoles,
 			rolesRepository:     mockRoles,
 		}
