@@ -108,8 +108,12 @@ var _ = Service("secrets", func() {
 			Attribute("value", String, "The secret value", func() {
 				Example("SECRET_API_KEY123")
 			})
-			Attribute("authorized_members", ArrayOf(Int), "Members IDs authorized to access the secret")
-			Attribute("authorized_roles", ArrayOf(Int), "Role IDs authorized to access the secret")
+			Attribute("authorized_members", ArrayOf(Int), "Members IDs authorized to access the secret", func() {
+				Example([]int{1, 2, 3})
+			})
+			Attribute("authorized_roles", ArrayOf(Int), "Role IDs authorized to access the secret", func() {
+				Example([]int{1, 2})
+			})
 			Required("path", "value", "authorized_members", "authorized_roles")
 		})
 		HTTP(func() {
