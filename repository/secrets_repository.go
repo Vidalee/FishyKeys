@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"github.com/jackc/pgx/v5"
 	"time"
 
 	"github.com/Vidalee/FishyKeys/internal/crypto"
@@ -36,6 +37,7 @@ type SecretsRepository interface {
 	GetSecretByPath(ctx context.Context, keyManager *crypto.KeyManager, path string) (*DecryptedSecret, error)
 	ListSecrets(ctx context.Context) ([]Secret, error)
 	DeleteSecret(ctx context.Context, path string) error
+	HasAccess(ctx context.Context, secretPath string, userID *int, roleIDs []int) (bool, error)
 }
 
 type secretsRepository struct {
@@ -148,4 +150,35 @@ func (r *secretsRepository) DeleteSecret(ctx context.Context, path string) error
 		return ErrSecretNotFound
 	}
 	return nil
+}
+
+func (r *secretsRepository) HasAccess(ctx context.Context, secretPath string, userID *int, roleIDs []int) (bool, error) {
+	if secretPath == "" {
+		return false, errors.New("secretPath must not be empty")
+	}
+	if userID == nil || roleIDs == nil {
+		return false, errors.New("must provide either userID and roleIDs (can be empty) for access check")
+	}
+
+	query := `
+SELECT 1
+FROM secrets_access sa
+JOIN secrets s ON sa.secret_id = s.id
+WHERE s.path = $1
+AND (
+    (sa.user_id = $2) OR
+    (sa.role_id = ANY($3))
+)
+LIMIT 1
+`
+
+	var exists int
+	err := r.pool.QueryRow(ctx, query, secretPath, *userID, roleIDs).Scan(&exists)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }

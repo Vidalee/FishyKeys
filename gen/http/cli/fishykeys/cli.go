@@ -378,14 +378,13 @@ Create a secret
 Example:
     %[1]s secrets create-secret --body '{
       "authorized_members": [
-         5091348230372323765,
-         633220121447532707,
-         2121356811434194624
+         1,
+         2,
+         3
       ],
       "authorized_roles": [
-         2782797484439169934,
-         2748161521337895987,
-         5585384301853113595
+         1,
+         2
       ],
       "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==",
       "value": "SECRET_API_KEY123"

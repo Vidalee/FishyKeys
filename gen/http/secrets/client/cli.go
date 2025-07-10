@@ -64,7 +64,7 @@ func BuildCreateSecretPayload(secretsCreateSecretBody string) (*secrets.CreateSe
 	{
 		err = json.Unmarshal([]byte(secretsCreateSecretBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"authorized_members\": [\n         5091348230372323765,\n         633220121447532707,\n         2121356811434194624\n      ],\n      \"authorized_roles\": [\n         2782797484439169934,\n         2748161521337895987,\n         5585384301853113595\n      ],\n      \"path\": \"L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==\",\n      \"value\": \"SECRET_API_KEY123\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"authorized_members\": [\n         1,\n         2,\n         3\n      ],\n      \"authorized_roles\": [\n         1,\n         2\n      ],\n      \"path\": \"L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==\",\n      \"value\": \"SECRET_API_KEY123\"\n   }'")
 		}
 		if body.AuthorizedMembers == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("authorized_members", "body"))

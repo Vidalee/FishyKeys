@@ -248,6 +248,84 @@ func (_c *MockSecretsRepository_GetSecretByPath_Call) RunAndReturn(run func(ctx 
 	return _c
 }
 
+// HasAccess provides a mock function for the type MockSecretsRepository
+func (_mock *MockSecretsRepository) HasAccess(ctx context.Context, secretPath string, userID *int, roleIDs []int) (bool, error) {
+	ret := _mock.Called(ctx, secretPath, userID, roleIDs)
+
+	if len(ret) == 0 {
+		panic("no return value specified for HasAccess")
+	}
+
+	var r0 bool
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, *int, []int) (bool, error)); ok {
+		return returnFunc(ctx, secretPath, userID, roleIDs)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, *int, []int) bool); ok {
+		r0 = returnFunc(ctx, secretPath, userID, roleIDs)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string, *int, []int) error); ok {
+		r1 = returnFunc(ctx, secretPath, userID, roleIDs)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockSecretsRepository_HasAccess_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HasAccess'
+type MockSecretsRepository_HasAccess_Call struct {
+	*mock.Call
+}
+
+// HasAccess is a helper method to define mock.On call
+//   - ctx context.Context
+//   - secretPath string
+//   - userID *int
+//   - roleIDs []int
+func (_e *MockSecretsRepository_Expecter) HasAccess(ctx interface{}, secretPath interface{}, userID interface{}, roleIDs interface{}) *MockSecretsRepository_HasAccess_Call {
+	return &MockSecretsRepository_HasAccess_Call{Call: _e.mock.On("HasAccess", ctx, secretPath, userID, roleIDs)}
+}
+
+func (_c *MockSecretsRepository_HasAccess_Call) Run(run func(ctx context.Context, secretPath string, userID *int, roleIDs []int)) *MockSecretsRepository_HasAccess_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		var arg2 *int
+		if args[2] != nil {
+			arg2 = args[2].(*int)
+		}
+		var arg3 []int
+		if args[3] != nil {
+			arg3 = args[3].([]int)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+			arg3,
+		)
+	})
+	return _c
+}
+
+func (_c *MockSecretsRepository_HasAccess_Call) Return(b bool, err error) *MockSecretsRepository_HasAccess_Call {
+	_c.Call.Return(b, err)
+	return _c
+}
+
+func (_c *MockSecretsRepository_HasAccess_Call) RunAndReturn(run func(ctx context.Context, secretPath string, userID *int, roleIDs []int) (bool, error)) *MockSecretsRepository_HasAccess_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListSecrets provides a mock function for the type MockSecretsRepository
 func (_mock *MockSecretsRepository) ListSecrets(ctx context.Context) ([]repository.Secret, error) {
 	ret := _mock.Called(ctx)
