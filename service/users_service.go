@@ -74,6 +74,10 @@ func (s *UsersService) AuthUser(ctx context.Context, payload *genusers.AuthUserP
 		return nil, genusers.MakeInvalidParameters(fmt.Errorf("username and password must be provided"))
 	}
 
+	if payload.Username == "system" {
+		return nil, genusers.MakeUnauthorized(fmt.Errorf("system user cannot be authenticated"))
+	}
+
 	user, err := s.usersRepository.GetUserByUsername(ctx, payload.Username)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserNotFound) {

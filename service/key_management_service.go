@@ -135,7 +135,20 @@ func (s *KeyManagementService) CreateMasterKey(ctx context.Context, payload *gen
 		}
 		return nil, genkey.MakeInternalError(fmt.Errorf("error generating JWT signing key: %w", err))
 	}
-	_, err = s.secretsRepository.CreateSecret(ctx, s.keyManager, "internal/jwt_signing_key", base64.StdEncoding.EncodeToString(jwtSigningKey))
+
+	systemUser, err := s.usersRepository.GetUserByUsername(ctx, "system")
+	if err != nil {
+		s.keyManager.RollbackToUninitialized()
+		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalSharesColumn, columnMinSharesColumn, columnMasterKeyChecksumColumn)
+
+		if delErr != nil {
+			return nil, genkey.MakeInternalError(fmt.Errorf(
+				"error retrieving system user: %v; rollback cleanup also failed: %w", err, delErr))
+		}
+		return nil, genkey.MakeInternalError(fmt.Errorf("error retrieving system user: %w", err))
+	}
+
+	_, err = s.secretsRepository.CreateSecret(ctx, s.keyManager, "internal/jwt_signing_key", systemUser.ID, base64.StdEncoding.EncodeToString(jwtSigningKey))
 	if err != nil {
 		s.keyManager.RollbackToUninitialized()
 		delErr := s.settingsRepository.DeleteSettings(ctx, columnTotalSharesColumn, columnMinSharesColumn, columnMasterKeyChecksumColumn)

@@ -40,8 +40,8 @@ func (_m *MockSecretsRepository) EXPECT() *MockSecretsRepository_Expecter {
 }
 
 // CreateSecret provides a mock function for the type MockSecretsRepository
-func (_mock *MockSecretsRepository) CreateSecret(ctx context.Context, keyManager *crypto.KeyManager, path string, value string) (int, error) {
-	ret := _mock.Called(ctx, keyManager, path, value)
+func (_mock *MockSecretsRepository) CreateSecret(ctx context.Context, keyManager *crypto.KeyManager, path string, ownerUserId int, value string) (int, error) {
+	ret := _mock.Called(ctx, keyManager, path, ownerUserId, value)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateSecret")
@@ -49,16 +49,16 @@ func (_mock *MockSecretsRepository) CreateSecret(ctx context.Context, keyManager
 
 	var r0 int
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *crypto.KeyManager, string, string) (int, error)); ok {
-		return returnFunc(ctx, keyManager, path, value)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *crypto.KeyManager, string, int, string) (int, error)); ok {
+		return returnFunc(ctx, keyManager, path, ownerUserId, value)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *crypto.KeyManager, string, string) int); ok {
-		r0 = returnFunc(ctx, keyManager, path, value)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *crypto.KeyManager, string, int, string) int); ok {
+		r0 = returnFunc(ctx, keyManager, path, ownerUserId, value)
 	} else {
 		r0 = ret.Get(0).(int)
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *crypto.KeyManager, string, string) error); ok {
-		r1 = returnFunc(ctx, keyManager, path, value)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *crypto.KeyManager, string, int, string) error); ok {
+		r1 = returnFunc(ctx, keyManager, path, ownerUserId, value)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -74,12 +74,13 @@ type MockSecretsRepository_CreateSecret_Call struct {
 //   - ctx context.Context
 //   - keyManager *crypto.KeyManager
 //   - path string
+//   - ownerUserId int
 //   - value string
-func (_e *MockSecretsRepository_Expecter) CreateSecret(ctx interface{}, keyManager interface{}, path interface{}, value interface{}) *MockSecretsRepository_CreateSecret_Call {
-	return &MockSecretsRepository_CreateSecret_Call{Call: _e.mock.On("CreateSecret", ctx, keyManager, path, value)}
+func (_e *MockSecretsRepository_Expecter) CreateSecret(ctx interface{}, keyManager interface{}, path interface{}, ownerUserId interface{}, value interface{}) *MockSecretsRepository_CreateSecret_Call {
+	return &MockSecretsRepository_CreateSecret_Call{Call: _e.mock.On("CreateSecret", ctx, keyManager, path, ownerUserId, value)}
 }
 
-func (_c *MockSecretsRepository_CreateSecret_Call) Run(run func(ctx context.Context, keyManager *crypto.KeyManager, path string, value string)) *MockSecretsRepository_CreateSecret_Call {
+func (_c *MockSecretsRepository_CreateSecret_Call) Run(run func(ctx context.Context, keyManager *crypto.KeyManager, path string, ownerUserId int, value string)) *MockSecretsRepository_CreateSecret_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -93,15 +94,20 @@ func (_c *MockSecretsRepository_CreateSecret_Call) Run(run func(ctx context.Cont
 		if args[2] != nil {
 			arg2 = args[2].(string)
 		}
-		var arg3 string
+		var arg3 int
 		if args[3] != nil {
-			arg3 = args[3].(string)
+			arg3 = args[3].(int)
+		}
+		var arg4 string
+		if args[4] != nil {
+			arg4 = args[4].(string)
 		}
 		run(
 			arg0,
 			arg1,
 			arg2,
 			arg3,
+			arg4,
 		)
 	})
 	return _c
@@ -112,7 +118,7 @@ func (_c *MockSecretsRepository_CreateSecret_Call) Return(n int, err error) *Moc
 	return _c
 }
 
-func (_c *MockSecretsRepository_CreateSecret_Call) RunAndReturn(run func(ctx context.Context, keyManager *crypto.KeyManager, path string, value string) (int, error)) *MockSecretsRepository_CreateSecret_Call {
+func (_c *MockSecretsRepository_CreateSecret_Call) RunAndReturn(run func(ctx context.Context, keyManager *crypto.KeyManager, path string, ownerUserId int, value string) (int, error)) *MockSecretsRepository_CreateSecret_Call {
 	_c.Call.Return(run)
 	return _c
 }

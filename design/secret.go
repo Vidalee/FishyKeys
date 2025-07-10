@@ -21,7 +21,7 @@ var SecretInfoType = Type("SecretInfo", func() {
 	})
 
 	Attribute("owner", UserType, "The owner of the secret")
-	Attribute("authorized_members", ArrayOf(UserType), "Members authorized to access the secret")
+	Attribute("authorized_users", ArrayOf(UserType), "Members authorized to access the secret")
 	Attribute("authorized_roles", ArrayOf(RoleType), "Roles authorized to access the secret")
 	Attribute("created_at", String, "Creation timestamp of the secret", func() {
 		Example("2025-06-30T12:00:00Z")
@@ -30,7 +30,7 @@ var SecretInfoType = Type("SecretInfo", func() {
 		Example("2025-06-30T15:00:00Z")
 	})
 
-	Required("path", "owner", "authorized_members", "authorized_roles", "created_at", "updated_at")
+	Required("path", "owner", "authorized_users", "authorized_roles", "created_at", "updated_at")
 })
 
 var _ = Service("secrets", func() {

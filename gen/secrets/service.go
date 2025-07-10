@@ -89,7 +89,7 @@ type SecretInfo struct {
 	// The owner of the secret
 	Owner *User
 	// Members authorized to access the secret
-	AuthorizedMembers []*User
+	AuthorizedUsers []*User
 	// Roles authorized to access the secret
 	AuthorizedRoles []*RoleType
 	// Creation timestamp of the secret
@@ -99,6 +99,8 @@ type SecretInfo struct {
 }
 
 type User struct {
+	// Unique identifier for the user
+	ID *int
 	// The username
 	Username string
 	// User creation timestamp

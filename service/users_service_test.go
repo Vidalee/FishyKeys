@@ -148,6 +148,14 @@ func TestUsersService_AuthUser(t *testing.T) {
 			expectedError:   false,
 		},
 		{
+			name:              "system user",
+			createUser:        false,
+			username:          "system",
+			passwordToEnter:   "deactivated_password",
+			expectedError:     true,
+			expectedErrorText: "system user cannot be authenticated",
+		},
+		{
 			name:              "wrong password",
 			createUser:        true,
 			username:          "username",
@@ -240,7 +248,8 @@ func TestUsersService_ListUsers(t *testing.T) {
 
 	users, err := service.ListUsers(ctx)
 	assert.NoError(t, err)
-	assert.Empty(t, users, "expected no users after clearing table")
+	// 1 since there is a system user
+	assert.Len(t, users, 1, "expected no users after clearing table")
 
 	testUsers := []genusers.CreateUserPayload{
 		{Username: "user1", Password: "password1"},
@@ -254,9 +263,13 @@ func TestUsersService_ListUsers(t *testing.T) {
 
 	users, err = service.ListUsers(ctx)
 	assert.NoError(t, err, "failed to list users")
-	assert.Len(t, users, len(testUsers), "expected to find all test users")
-	for i, user := range users {
-		assert.Equal(t, testUsers[i].Username, user.Username, "usernames should match")
+	// +1 since there is a system user
+	assert.Len(t, users, len(testUsers)+1, "expected to find all test users")
+
+	// Skip the system user at index 0
+	for i := 1; i < len(users); i++ {
+		user := users[i]
+		assert.Equal(t, testUsers[i-1].Username, user.Username, "usernames should match")
 	}
 }
 

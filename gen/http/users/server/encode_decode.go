@@ -374,6 +374,7 @@ func EncodeAuthUserError(encoder func(context.Context, http.ResponseWriter) goah
 // value of type *users.User.
 func marshalUsersUserToUserResponse(v *users.User) *UserResponse {
 	res := &UserResponse{
+		ID:        v.ID,
 		Username:  v.Username,
 		CreatedAt: v.CreatedAt,
 		UpdatedAt: v.UpdatedAt,

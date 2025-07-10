@@ -19,6 +19,7 @@ type Secret struct {
 	Path                   string
 	EncryptedEncryptionKey string
 	EncryptedValue         string
+	OwnerUserId            int
 	CreatedAt              time.Time
 	UpdatedAt              time.Time
 }
@@ -28,12 +29,15 @@ type DecryptedSecret struct {
 	Path                   string
 	DecryptedEncryptionKey string
 	DecryptedValue         string
+	OwnerUserId            int
+	AuthorizedUserIDs      []int
+	AuthorizedRoleIDs      []int
 	CreatedAt              time.Time
 	UpdatedAt              time.Time
 }
 
 type SecretsRepository interface {
-	CreateSecret(ctx context.Context, keyManager *crypto.KeyManager, path string, value string) (int, error)
+	CreateSecret(ctx context.Context, keyManager *crypto.KeyManager, path string, ownerUserId int, value string) (int, error)
 	GetSecretByPath(ctx context.Context, keyManager *crypto.KeyManager, path string) (*DecryptedSecret, error)
 	ListSecrets(ctx context.Context) ([]Secret, error)
 	DeleteSecret(ctx context.Context, path string) error
@@ -48,7 +52,7 @@ func NewSecretsRepository(pool *pgxpool.Pool) SecretsRepository {
 	return &secretsRepository{pool: pool}
 }
 
-func (r *secretsRepository) CreateSecret(ctx context.Context, keyManager *crypto.KeyManager, path string, value string) (int, error) {
+func (r *secretsRepository) CreateSecret(ctx context.Context, keyManager *crypto.KeyManager, path string, ownerUserId int, value string) (int, error) {
 	encryptionKey, err := crypto.GenerateSecret()
 	if err != nil {
 		return 0, err
@@ -65,17 +69,18 @@ func (r *secretsRepository) CreateSecret(ctx context.Context, keyManager *crypto
 	}
 
 	query := `
-INSERT INTO secrets (path, encrypted_encryption_key, encrypted_value, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $4)
+INSERT INTO secrets (path, encrypted_encryption_key, encrypted_value, owner_user_id, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $5)
 ON CONFLICT (path) DO UPDATE SET 
     encrypted_encryption_key = EXCLUDED.encrypted_encryption_key,
     encrypted_value = EXCLUDED.encrypted_value,
+    owner_user_id = EXCLUDED.owner_user_id,
     updated_at = EXCLUDED.updated_at
 RETURNING id
 `
 	var secretID int
 	now := time.Now().UTC()
-	err = r.pool.QueryRow(ctx, query, path, encryptedEncryptionKey, encryptedValue, now).Scan(&secretID)
+	err = r.pool.QueryRow(ctx, query, path, encryptedEncryptionKey, encryptedValue, ownerUserId, now).Scan(&secretID)
 	if err != nil {
 		return 0, err
 	}
@@ -83,13 +88,14 @@ RETURNING id
 }
 
 func (r *secretsRepository) GetSecretByPath(ctx context.Context, keyManager *crypto.KeyManager, path string) (*DecryptedSecret, error) {
-	query := `SELECT id, path, encrypted_encryption_key, encrypted_value, created_at, updated_at FROM secrets WHERE path = $1`
+	query := `SELECT id, path, encrypted_encryption_key, encrypted_value, owner_user_id, created_at, updated_at FROM secrets WHERE path = $1`
 	var secret Secret
 	err := r.pool.QueryRow(ctx, query, path).Scan(
 		&secret.ID,
 		&secret.Path,
 		&secret.EncryptedEncryptionKey,
 		&secret.EncryptedValue,
+		&secret.OwnerUserId,
 		&secret.CreatedAt,
 		&secret.UpdatedAt,
 	)
@@ -105,18 +111,47 @@ func (r *secretsRepository) GetSecretByPath(ctx context.Context, keyManager *cry
 	if err != nil {
 		return nil, err
 	}
+
+	var authorizedUserIDs []int
+	var authorizedRoleIDs []int
+	accessQuery := `
+SELECT user_id, role_id
+FROM secrets_access
+WHERE secret_id = $1
+`
+	rows, err := r.pool.Query(ctx, accessQuery, secret.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var userID, roleID int
+		if err := rows.Scan(&userID, &roleID); err != nil {
+			return nil, err
+		}
+		if userID != 0 {
+			authorizedUserIDs = append(authorizedUserIDs, userID)
+		}
+		if roleID != 0 {
+			authorizedRoleIDs = append(authorizedRoleIDs, roleID)
+		}
+	}
+
 	return &DecryptedSecret{
 		ID:                     secret.ID,
 		Path:                   secret.Path,
 		DecryptedEncryptionKey: string(decryptedKey),
 		DecryptedValue:         string(decryptedValue),
+		OwnerUserId:            secret.OwnerUserId,
+		AuthorizedUserIDs:      authorizedUserIDs,
+		AuthorizedRoleIDs:      authorizedRoleIDs,
 		CreatedAt:              secret.CreatedAt,
 		UpdatedAt:              secret.UpdatedAt,
 	}, nil
 }
 
 func (r *secretsRepository) ListSecrets(ctx context.Context) ([]Secret, error) {
-	query := `SELECT id, path, encrypted_encryption_key, encrypted_value, created_at, updated_at FROM secrets ORDER BY created_at`
+	query := `SELECT id, path, encrypted_encryption_key, encrypted_value, owner_user_id, created_at, updated_at FROM secrets ORDER BY created_at`
 	rows, err := r.pool.Query(ctx, query)
 	if err != nil {
 		return nil, err
@@ -131,6 +166,7 @@ func (r *secretsRepository) ListSecrets(ctx context.Context) ([]Secret, error) {
 			&s.Path,
 			&s.EncryptedEncryptionKey,
 			&s.EncryptedValue,
+			&s.OwnerUserId,
 			&s.CreatedAt,
 			&s.UpdatedAt,
 		); err != nil {
@@ -167,7 +203,7 @@ JOIN secrets s ON sa.secret_id = s.id
 WHERE s.path = $1
 AND (
     (sa.user_id = $2) OR
-    (sa.role_id = ANY($3))
+    (sa.role_id = ANY($3)) OR
 )
 LIMIT 1
 `

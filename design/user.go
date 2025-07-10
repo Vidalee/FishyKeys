@@ -5,6 +5,9 @@ import (
 )
 
 var UserType = Type("User", func() {
+	Attribute("id", Int, "Unique identifier for the user", func() {
+		Example(1)
+	})
 	Attribute("username", String, "The username", func() {
 		Example("alice")
 		MinLength(3)

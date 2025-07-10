@@ -52,6 +52,7 @@ func SetupTestDB() (*pgxpool.Pool, error) {
 	}
 
 	dsn := fmt.Sprintf("postgres://test:test@%s:%d/testdb?sslmode=disable", host, port.Int())
+	fmt.Println("Test DB DSN:", dsn)
 	testDB, err = pgxpool.New(ctx, dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create connection pool: %w", err)
@@ -87,7 +88,16 @@ func TeardownTestDB() error {
 }
 
 func ClearTable(ctx context.Context, tableName string) error {
-	_, err := testDB.Exec(ctx, fmt.Sprintf("DELETE FROM %s", tableName))
+	var err error
+
+	// Filter rows created by migrations
+	if tableName == "users" {
+		_, err = testDB.Exec(ctx, fmt.Sprintf("DELETE FROM %s WHERE username != 'system'", tableName))
+	} else if tableName == "roles" {
+		_, err = testDB.Exec(ctx, fmt.Sprintf("DELETE FROM %s WHERE name != 'admin'", tableName))
+	} else {
+		_, err = testDB.Exec(ctx, fmt.Sprintf("DELETE FROM %s", tableName))
+	}
 	if err != nil {
 		return fmt.Errorf("failed to clear table %s: %w", tableName, err)
 	}

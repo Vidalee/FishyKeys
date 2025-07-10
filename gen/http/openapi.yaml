@@ -214,7 +214,7 @@ paths:
                         required:
                           - path
                           - owner
-                          - authorized_members
+                          - authorized_users
                           - authorized_roles
                           - created_at
                           - updated_at
@@ -1257,34 +1257,38 @@ definitions:
         title: SecretInfo
         type: object
         properties:
-            authorized_members:
+          authorized_roles:
+            type: array
+            items:
+              $ref: '#/definitions/RoleType'
+            description: Roles authorized to access the secret
+            example:
+              - id: 1
+                name: admin
+              - id: 1
+                name: admin
+          authorized_users:
                 type: array
                 items:
                     $ref: '#/definitions/User'
                 description: Members authorized to access the secret
                 example:
                   - created_at: "2025-06-30T12:00:00Z"
+                    id: 1
                     updated_at: "2025-06-30T15:00:00Z"
                     username: alice
                   - created_at: "2025-06-30T12:00:00Z"
+                    id: 1
                     updated_at: "2025-06-30T15:00:00Z"
                     username: alice
                   - created_at: "2025-06-30T12:00:00Z"
+                    id: 1
                     updated_at: "2025-06-30T15:00:00Z"
                     username: alice
                   - created_at: "2025-06-30T12:00:00Z"
+                    id: 1
                     updated_at: "2025-06-30T15:00:00Z"
                     username: alice
-            authorized_roles:
-                type: array
-                items:
-                    $ref: '#/definitions/RoleType'
-                description: Roles authorized to access the secret
-                example:
-                    - id: 1
-                      name: admin
-                    - id: 1
-                      name: admin
             created_at:
                 type: string
                 description: Creation timestamp of the secret
@@ -1301,31 +1305,36 @@ definitions:
                 example: "2025-06-30T15:00:00Z"
         description: The secret's information
         example:
-            authorized_members:
-              - created_at: "2025-06-30T12:00:00Z"
-                updated_at: "2025-06-30T15:00:00Z"
-                username: alice
-              - created_at: "2025-06-30T12:00:00Z"
-                updated_at: "2025-06-30T15:00:00Z"
-                username: alice
-              - created_at: "2025-06-30T12:00:00Z"
-                updated_at: "2025-06-30T15:00:00Z"
-                username: alice
-              - created_at: "2025-06-30T12:00:00Z"
-                updated_at: "2025-06-30T15:00:00Z"
-                username: alice
-            authorized_roles:
-                - id: 1
-                  name: admin
-                - id: 1
-                  name: admin
-                - id: 1
-                  name: admin
-                - id: 1
-                  name: admin
+          authorized_roles:
+            - id: 1
+              name: admin
+            - id: 1
+              name: admin
+            - id: 1
+              name: admin
+            - id: 1
+              name: admin
+          authorized_users:
+            - created_at: "2025-06-30T12:00:00Z"
+              id: 1
+              updated_at: "2025-06-30T15:00:00Z"
+              username: alice
+            - created_at: "2025-06-30T12:00:00Z"
+              id: 1
+              updated_at: "2025-06-30T15:00:00Z"
+              username: alice
+            - created_at: "2025-06-30T12:00:00Z"
+              id: 1
+              updated_at: "2025-06-30T15:00:00Z"
+              username: alice
+            - created_at: "2025-06-30T12:00:00Z"
+              id: 1
+              updated_at: "2025-06-30T15:00:00Z"
+              username: alice
             created_at: "2025-06-30T12:00:00Z"
             owner:
               created_at: "2025-06-30T12:00:00Z"
+              id: 1
               updated_at: "2025-06-30T15:00:00Z"
               username: alice
             path: customers/google/api_key
@@ -1333,7 +1342,7 @@ definitions:
         required:
           - path
           - owner
-          - authorized_members
+          - authorized_users
           - authorized_roles
           - created_at
           - updated_at
@@ -2012,6 +2021,11 @@ definitions:
                 type: string
                 description: User creation timestamp
                 example: "2025-06-30T12:00:00Z"
+            id:
+              type: integer
+              description: Unique identifier for the user
+              example: 1
+              format: int64
             updated_at:
                 type: string
                 description: User last update timestamp
@@ -2023,6 +2037,7 @@ definitions:
                 minLength: 3
         example:
           created_at: "2025-06-30T12:00:00Z"
+          id: 1
           updated_at: "2025-06-30T15:00:00Z"
           username: alice
         required:

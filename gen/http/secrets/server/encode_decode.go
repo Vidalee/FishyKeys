@@ -361,6 +361,7 @@ func EncodeCreateSecretError(encoder func(context.Context, http.ResponseWriter) 
 // *UserResponseBody from a value of type *secrets.User.
 func marshalSecretsUserToUserResponseBody(v *secrets.User) *UserResponseBody {
 	res := &UserResponseBody{
+		ID:        v.ID,
 		Username:  v.Username,
 		CreatedAt: v.CreatedAt,
 		UpdatedAt: v.UpdatedAt,

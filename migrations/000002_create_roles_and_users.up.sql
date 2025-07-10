@@ -24,3 +24,7 @@ CREATE TABLE IF NOT EXISTS user_roles (
 
 INSERT INTO roles (name, color, admin)
 VALUES ('admin', '#FF0000', true) ON CONFLICT DO NOTHING;
+
+-- User for internal secrets, auth is disabled for this user
+INSERT INTO users (username, password)
+VALUES ('system', '$2y$10$.KnYODNDlrsZvHZjo9agleATxQxF55fYq5CK/Ku6hap6bNkkDPnA.'); -- "deactivated_password"

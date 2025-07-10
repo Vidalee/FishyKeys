@@ -23,6 +23,8 @@ type User struct {
 type UsersRepository interface {
 	CreateUser(ctx context.Context, username string, hashedPassword string) (int, error)
 	GetUserByUsername(ctx context.Context, username string) (*User, error)
+	GetUserByID(ctx context.Context, id int) (*User, error)
+	GetUsersByIDs(ctx context.Context, ids []int) ([]User, error)
 	ListUsers(ctx context.Context) ([]User, error)
 	DeleteUser(ctx context.Context, username string) error
 }
@@ -58,6 +60,39 @@ func (r *usersRepository) GetUserByUsername(ctx context.Context, username string
 		return nil, ErrUserNotFound
 	}
 	return &user, nil
+}
+
+func (r *usersRepository) GetUserByID(ctx context.Context, id int) (*User, error) {
+	query := `SELECT id, username, password, created_at, updated_at FROM users WHERE id = $1`
+	var user User
+	err := r.pool.QueryRow(ctx, query, id).Scan(&user.ID, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		return nil, ErrUserNotFound
+	}
+	return &user, nil
+}
+
+func (r *usersRepository) GetUsersByIDs(ctx context.Context, ids []int) ([]User, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
+	query := `SELECT id, username, password, created_at, updated_at FROM users WHERE id = ANY($1)`
+	rows, err := r.pool.Query(ctx, query, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []User
+	for rows.Next() {
+		var u User
+		if err := rows.Scan(&u.ID, &u.Username, &u.Password, &u.CreatedAt, &u.UpdatedAt); err != nil {
+			return nil, err
+		}
+		users = append(users, u)
+	}
+	return users, nil
 }
 
 func (r *usersRepository) ListUsers(ctx context.Context) ([]User, error) {

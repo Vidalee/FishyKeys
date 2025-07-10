@@ -44,7 +44,7 @@ type GetSecretResponseBody struct {
 	// The owner of the secret
 	Owner *UserResponseBody `form:"owner" json:"owner" xml:"owner"`
 	// Members authorized to access the secret
-	AuthorizedMembers []*UserResponseBody `form:"authorized_members" json:"authorized_members" xml:"authorized_members"`
+	AuthorizedUsers []*UserResponseBody `form:"authorized_users" json:"authorized_users" xml:"authorized_users"`
 	// Roles authorized to access the secret
 	AuthorizedRoles []*RoleTypeResponseBody `form:"authorized_roles" json:"authorized_roles" xml:"authorized_roles"`
 	// Creation timestamp of the secret
@@ -311,6 +311,8 @@ type CreateSecretInternalErrorResponseBody struct {
 
 // UserResponseBody is used to define fields on response body types.
 type UserResponseBody struct {
+	// Unique identifier for the user
+	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// The username
 	Username string `form:"username" json:"username" xml:"username"`
 	// User creation timestamp
@@ -348,13 +350,13 @@ func NewGetSecretResponseBody(res *secrets.SecretInfo) *GetSecretResponseBody {
 	if res.Owner != nil {
 		body.Owner = marshalSecretsUserToUserResponseBody(res.Owner)
 	}
-	if res.AuthorizedMembers != nil {
-		body.AuthorizedMembers = make([]*UserResponseBody, len(res.AuthorizedMembers))
-		for i, val := range res.AuthorizedMembers {
-			body.AuthorizedMembers[i] = marshalSecretsUserToUserResponseBody(val)
+	if res.AuthorizedUsers != nil {
+		body.AuthorizedUsers = make([]*UserResponseBody, len(res.AuthorizedUsers))
+		for i, val := range res.AuthorizedUsers {
+			body.AuthorizedUsers[i] = marshalSecretsUserToUserResponseBody(val)
 		}
 	} else {
-		body.AuthorizedMembers = []*UserResponseBody{}
+		body.AuthorizedUsers = []*UserResponseBody{}
 	}
 	if res.AuthorizedRoles != nil {
 		body.AuthorizedRoles = make([]*RoleTypeResponseBody, len(res.AuthorizedRoles))

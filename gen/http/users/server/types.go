@@ -290,6 +290,8 @@ type AuthUserInternalErrorResponseBody struct {
 
 // UserResponse is used to define fields on response body types.
 type UserResponse struct {
+	// Unique identifier for the user
+	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// The username
 	Username string `form:"username" json:"username" xml:"username"`
 	// User creation timestamp

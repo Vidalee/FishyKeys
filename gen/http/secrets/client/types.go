@@ -44,7 +44,7 @@ type GetSecretResponseBody struct {
 	// The owner of the secret
 	Owner *UserResponseBody `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
 	// Members authorized to access the secret
-	AuthorizedMembers []*UserResponseBody `form:"authorized_members,omitempty" json:"authorized_members,omitempty" xml:"authorized_members,omitempty"`
+	AuthorizedUsers []*UserResponseBody `form:"authorized_users,omitempty" json:"authorized_users,omitempty" xml:"authorized_users,omitempty"`
 	// Roles authorized to access the secret
 	AuthorizedRoles []*RoleTypeResponseBody `form:"authorized_roles,omitempty" json:"authorized_roles,omitempty" xml:"authorized_roles,omitempty"`
 	// Creation timestamp of the secret
@@ -311,6 +311,8 @@ type CreateSecretInternalErrorResponseBody struct {
 
 // UserResponseBody is used to define fields on response body types.
 type UserResponseBody struct {
+	// Unique identifier for the user
+	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// The username
 	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
 	// User creation timestamp
@@ -448,9 +450,9 @@ func NewGetSecretSecretInfoOK(body *GetSecretResponseBody) *secrets.SecretInfo {
 		UpdatedAt: *body.UpdatedAt,
 	}
 	v.Owner = unmarshalUserResponseBodyToSecretsUser(body.Owner)
-	v.AuthorizedMembers = make([]*secrets.User, len(body.AuthorizedMembers))
-	for i, val := range body.AuthorizedMembers {
-		v.AuthorizedMembers[i] = unmarshalUserResponseBodyToSecretsUser(val)
+	v.AuthorizedUsers = make([]*secrets.User, len(body.AuthorizedUsers))
+	for i, val := range body.AuthorizedUsers {
+		v.AuthorizedUsers[i] = unmarshalUserResponseBodyToSecretsUser(val)
 	}
 	v.AuthorizedRoles = make([]*secrets.RoleType, len(body.AuthorizedRoles))
 	for i, val := range body.AuthorizedRoles {
@@ -604,8 +606,8 @@ func ValidateGetSecretResponseBody(body *GetSecretResponseBody) (err error) {
 	if body.Owner == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("owner", "body"))
 	}
-	if body.AuthorizedMembers == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("authorized_members", "body"))
+	if body.AuthorizedUsers == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("authorized_users", "body"))
 	}
 	if body.AuthorizedRoles == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("authorized_roles", "body"))
@@ -621,7 +623,7 @@ func ValidateGetSecretResponseBody(body *GetSecretResponseBody) (err error) {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
-	for _, e := range body.AuthorizedMembers {
+	for _, e := range body.AuthorizedUsers {
 		if e != nil {
 			if err2 := ValidateUserResponseBody(e); err2 != nil {
 				err = goa.MergeErrors(err, err2)

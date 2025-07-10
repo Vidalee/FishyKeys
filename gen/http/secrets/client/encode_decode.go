@@ -422,6 +422,7 @@ func DecodeCreateSecretResponse(decoder func(*http.Response) goahttp.Decoder, re
 // from a value of type *UserResponseBody.
 func unmarshalUserResponseBodyToSecretsUser(v *UserResponseBody) *secrets.User {
 	res := &secrets.User{
+		ID:        v.ID,
 		Username:  *v.Username,
 		CreatedAt: *v.CreatedAt,
 		UpdatedAt: *v.UpdatedAt,

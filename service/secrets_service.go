@@ -76,7 +76,81 @@ func (s *SecretsService) GetSecretValue(ctx context.Context, payload *gensecrets
 }
 
 func (s *SecretsService) GetSecret(ctx context.Context, payload *gensecrets.GetSecretPayload) (res *gensecrets.SecretInfo, err error) {
-	return nil, nil
+	// Guaranteed by the Authentified interceptor
+	jwtClaims := ctx.Value("token").(*JwtClaims)
+
+	roleIDs, err := s.userRolesRepository.GetUserRoleIDs(ctx, jwtClaims.UserID)
+	if err != nil {
+		return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving user roles: %w", err))
+	}
+
+	decodedPath, err := base64.StdEncoding.DecodeString(payload.Path)
+	if err != nil {
+		return nil, gensecrets.MakeInvalidParameters(fmt.Errorf("invalid path encoding: %w", err))
+	}
+	decodedPathStr := string(decodedPath)
+
+	hasAccess, err := s.secretsRepository.HasAccess(ctx, decodedPathStr, &jwtClaims.UserID, roleIDs)
+	if err != nil {
+		return nil, gensecrets.MakeInternalError(fmt.Errorf("error checking access to secret: %w", err))
+	}
+
+	if !hasAccess {
+		return nil, gensecrets.MakeForbidden(fmt.Errorf("you do not have access to this secret"))
+	}
+
+	decryptedSecret, err := s.secretsRepository.GetSecretByPath(ctx, s.keyManager, decodedPathStr)
+	if err != nil {
+		if errors.Is(err, repository.ErrSecretNotFound) {
+			return nil, gensecrets.MakeSecretNotFound(fmt.Errorf("secret not found at path: %s", decodedPathStr))
+		}
+		return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving secret: %w", err))
+	}
+
+	owner, err := s.usersRepository.GetUserByID(ctx, decryptedSecret.OwnerUserId)
+	if err != nil {
+		return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving secret owner: %w", err))
+	}
+
+	authorizedUsers, err := s.usersRepository.GetUsersByIDs(ctx, decryptedSecret.AuthorizedUserIDs)
+	if err != nil {
+		return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving authorized users: %w", err))
+	}
+	var authorizedUsersPayload []*gensecrets.User
+	for _, user := range authorizedUsers {
+		authorizedUsersPayload = append(authorizedUsersPayload, &gensecrets.User{
+			ID:        &user.ID,
+			Username:  user.Username,
+			CreatedAt: user.CreatedAt.Format("2006-01-02T15:04:05Z"),
+			UpdatedAt: user.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+		})
+	}
+
+	authorizedRoles, err := s.rolesRepository.GetRolesByIDs(ctx, decryptedSecret.AuthorizedRoleIDs)
+	if err != nil {
+		return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving authorized roles: %w", err))
+	}
+	var authorizedRolesPayload []*gensecrets.RoleType
+	for _, role := range authorizedRoles {
+		authorizedRolesPayload = append(authorizedRolesPayload, &gensecrets.RoleType{
+			ID:   role.ID,
+			Name: role.Name,
+		})
+	}
+
+	return &gensecrets.SecretInfo{
+		Path: decryptedSecret.Path,
+		Owner: &gensecrets.User{
+			ID:        &owner.ID,
+			Username:  owner.Username,
+			CreatedAt: owner.CreatedAt.Format("2006-01-02T15:04:05Z"),
+			UpdatedAt: owner.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+		},
+		AuthorizedUsers: authorizedUsersPayload,
+		AuthorizedRoles: authorizedRolesPayload,
+		CreatedAt:       decryptedSecret.CreatedAt.Format("2006-01-02T15:04:05Z"),
+		UpdatedAt:       decryptedSecret.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+	}, nil
 }
 
 func (s *SecretsService) CreateSecret(ctx context.Context, payload *gensecrets.CreateSecretPayload) error {
