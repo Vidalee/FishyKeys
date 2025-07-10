@@ -1500,6 +1500,7 @@ definitions:
             type: string
             description: The secret value
             example: SECRET_API_KEY123
+            minLength: 1
         example:
           authorized_members:
             - 1

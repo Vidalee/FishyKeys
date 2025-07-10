@@ -619,5 +619,10 @@ func ValidateCreateSecretRequestBody(body *CreateSecretRequestBody) (err error) 
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.path", *body.Path, utf8.RuneCountInString(*body.Path), 2, true))
 		}
 	}
+	if body.Value != nil {
+		if utf8.RuneCountInString(*body.Value) < 1 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.value", *body.Value, utf8.RuneCountInString(*body.Value), 1, true))
+		}
+	}
 	return
 }

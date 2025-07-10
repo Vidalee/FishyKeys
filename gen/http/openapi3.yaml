@@ -239,10 +239,10 @@ paths:
                   description: Base64 encoded secret's path
                   required: true
                   schema:
-                      type: string
-                      description: Base64 encoded secret's path
-                      example: L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==
-                      minLength: 2
+                    type: string
+                    description: Base64 encoded secret's path
+                    example: L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==
+                    minLength: 2
                   example: L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==
             responses:
                 "200":
@@ -317,10 +317,10 @@ paths:
                   description: Base64 encoded secret's path
                   required: true
                   schema:
-                      type: string
-                      description: Base64 encoded secret's path
-                      example: L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==
-                      minLength: 2
+                    type: string
+                    description: Base64 encoded secret's path
+                    example: L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==
+                    minLength: 2
                   example: L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==
             responses:
                 "200":
@@ -699,6 +699,7 @@ components:
                     type: string
                     description: The secret value
                     example: SECRET_API_KEY123
+                    minLength: 1
             example:
                 authorized_members:
                     - 1

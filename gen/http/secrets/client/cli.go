@@ -75,6 +75,9 @@ func BuildCreateSecretPayload(secretsCreateSecretBody string) (*secrets.CreateSe
 		if utf8.RuneCountInString(body.Path) < 2 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.path", body.Path, utf8.RuneCountInString(body.Path), 2, true))
 		}
+		if utf8.RuneCountInString(body.Value) < 1 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.value", body.Value, utf8.RuneCountInString(body.Value), 1, true))
+		}
 		if err != nil {
 			return nil, err
 		}
