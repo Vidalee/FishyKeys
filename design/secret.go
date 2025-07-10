@@ -107,6 +107,7 @@ var _ = Service("secrets", func() {
 			})
 			Attribute("value", String, "The secret value", func() {
 				Example("SECRET_API_KEY123")
+				MinLength(1)
 			})
 			Attribute("authorized_members", ArrayOf(Int), "Members IDs authorized to access the secret", func() {
 				Example([]int{1, 2, 3})
