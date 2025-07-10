@@ -10,6 +10,8 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// Unfortunately due to the way goa generates interceptors' code, we need to write their implementations once per service.
+
 type ServerUsersInterceptors struct {
 	rolesRepository     repository.RolesRepository
 	userRolesRepository repository.UserRolesRepository
