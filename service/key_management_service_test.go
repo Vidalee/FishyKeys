@@ -145,11 +145,9 @@ func TestKeyManagementService_CreateMasterKey(t *testing.T) {
 				// Verify checksum exists and is not empty
 				assert.NotEmpty(t, settings[columnMasterKeyChecksumColumn])
 
-				//jwtSigningKey, exists := settings[jwtSigningKeyColumn]
-				//assert.True(t, exists)
-				//assert.NotEmpty(t, jwtSigningKey)
-				//_, err = base64.StdEncoding.DecodeString(settings[columnMasterKeyChecksumColumn])
-				//assert.NoError(t, err)
+				jwtSigningKey, err := service.secretsRepository.GetSecretByPath(ctx, service.keyManager, "internal/jwt_signing_key")
+				require.NoError(t, err)
+				assert.NotNil(t, jwtSigningKey)
 
 				// Verify admin user
 				user, err := service.usersRepository.GetUserByUsername(ctx, tt.adminUsername)
