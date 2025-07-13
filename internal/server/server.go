@@ -24,10 +24,11 @@ func NewServer(pool *pgxpool.Pool) http.Handler {
 	rolesRepo := repository.NewRolesRepository(pool)
 	userRolesRepo := repository.NewUserRolesRepository(pool)
 	secretsRepo := repository.NewSecretsRepository(pool)
+	secretsAccessRepository := repository.NewSecretsAccessRepository(pool)
 
 	keyService := service.NewKeyManagementService(keyManager, globalSettingsRepo, usersRepo, rolesRepo, userRolesRepo, secretsRepo)
 	userService := service.NewUsersService(keyManager, usersRepo, globalSettingsRepo, secretsRepo)
-	secretsService := service.NewSecretsService(keyManager, usersRepo, rolesRepo, userRolesRepo, globalSettingsRepo, secretsRepo)
+	secretsService := service.NewSecretsService(keyManager, usersRepo, rolesRepo, userRolesRepo, globalSettingsRepo, secretsRepo, secretsAccessRepository)
 
 	keyManagementEndpoints := keymanagement.NewEndpoints(keyService)
 	usersEndpoints := users.NewEndpoints(userService, &ServerUsersInterceptors{

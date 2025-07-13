@@ -17,6 +17,7 @@ type SecretsService struct {
 	userRolesRepository      repository.UserRolesRepository
 	globalSettingsRepository repository.GlobalSettingsRepository
 	secretsRepository        repository.SecretsRepository
+	secretsAccessRepository  repository.SecretsAccessRepository
 }
 
 func NewSecretsService(
@@ -26,6 +27,7 @@ func NewSecretsService(
 	userRolesRepository repository.UserRolesRepository,
 	globalSettingsRepository repository.GlobalSettingsRepository,
 	secretsRepository repository.SecretsRepository,
+	secretsAccessRepository repository.SecretsAccessRepository,
 ) *SecretsService {
 	return &SecretsService{
 		keyManager:               keyManager,
@@ -34,6 +36,7 @@ func NewSecretsService(
 		userRolesRepository:      userRolesRepository,
 		globalSettingsRepository: globalSettingsRepository,
 		secretsRepository:        secretsRepository,
+		secretsAccessRepository:  secretsAccessRepository,
 	}
 }
 
@@ -154,5 +157,37 @@ func (s *SecretsService) GetSecret(ctx context.Context, payload *gensecrets.GetS
 }
 
 func (s *SecretsService) CreateSecret(ctx context.Context, payload *gensecrets.CreateSecretPayload) error {
+	// Guaranteed by the Authentified interceptor
+	jwtClaims := ctx.Value("token").(*JwtClaims)
+
+	decodedPath, err := base64.StdEncoding.DecodeString(payload.Path)
+	if err != nil {
+		return gensecrets.MakeInvalidParameters(fmt.Errorf("invalid path encoding: %w", err))
+	}
+	decodedPathStr := string(decodedPath)
+
+	_, err = s.secretsRepository.GetSecretByPath(ctx, s.keyManager, decodedPathStr)
+	if err == nil {
+		return gensecrets.MakeInvalidParameters(fmt.Errorf("secret already exists at path: %s", decodedPathStr))
+	}
+	if !errors.Is(err, repository.ErrSecretNotFound) {
+		return gensecrets.MakeInternalError(fmt.Errorf("error checking if secret already exists: %w", err))
+	}
+
+	_, err = s.secretsRepository.CreateSecret(ctx, s.keyManager, decodedPathStr, jwtClaims.UserID, payload.Value)
+	if err != nil {
+		return gensecrets.MakeInternalError(fmt.Errorf("error creating secret: %w", err))
+	}
+
+	err = s.secretsAccessRepository.GrantUsersAccess(ctx, decodedPathStr, payload.AuthorizedMembers)
+	if err != nil {
+		return gensecrets.MakeInternalError(fmt.Errorf("error adding authorized users: %w", err))
+	}
+
+	err = s.secretsAccessRepository.GrantRolesAccess(ctx, decodedPathStr, payload.AuthorizedRoles)
+	if err != nil {
+		return gensecrets.MakeInternalError(fmt.Errorf("error adding authorized roles: %w", err))
+	}
+
 	return nil
 }
