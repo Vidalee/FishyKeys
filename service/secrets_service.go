@@ -40,6 +40,46 @@ func NewSecretsService(
 	}
 }
 
+func (s *SecretsService) CreateSecret(ctx context.Context, payload *gensecrets.CreateSecretPayload) error {
+	// Guaranteed by the Authentified interceptor
+	jwtClaims := ctx.Value("token").(*JwtClaims)
+
+	decodedPath, err := base64.StdEncoding.DecodeString(payload.Path)
+	if err != nil {
+		return gensecrets.MakeInvalidParameters(fmt.Errorf("invalid path encoding: %w", err))
+	}
+	decodedPathStr := string(decodedPath)
+
+	if len(decodedPathStr) == 0 || decodedPathStr[0] != '/' {
+		return gensecrets.MakeInvalidParameters(fmt.Errorf("path must start with '/'"))
+	}
+
+	_, err = s.secretsRepository.GetSecretByPath(ctx, s.keyManager, decodedPathStr)
+	if err == nil {
+		return gensecrets.MakeInvalidParameters(fmt.Errorf("secret already exists at path: %s", decodedPathStr))
+	}
+	if !errors.Is(err, repository.ErrSecretNotFound) {
+		return gensecrets.MakeInternalError(fmt.Errorf("error checking if secret already exists: %w", err))
+	}
+
+	_, err = s.secretsRepository.CreateSecret(ctx, s.keyManager, decodedPathStr, jwtClaims.UserID, payload.Value)
+	if err != nil {
+		return gensecrets.MakeInternalError(fmt.Errorf("error creating secret: %w", err))
+	}
+
+	err = s.secretsAccessRepository.GrantUsersAccess(ctx, decodedPathStr, payload.AuthorizedMembers)
+	if err != nil {
+		return gensecrets.MakeInternalError(fmt.Errorf("error adding authorized users: %w", err))
+	}
+
+	err = s.secretsAccessRepository.GrantRolesAccess(ctx, decodedPathStr, payload.AuthorizedRoles)
+	if err != nil {
+		return gensecrets.MakeInternalError(fmt.Errorf("error adding authorized roles: %w", err))
+	}
+
+	return nil
+}
+
 func (s *SecretsService) GetSecretValue(ctx context.Context, payload *gensecrets.GetSecretValuePayload) (res *gensecrets.GetSecretValueResult, err error) {
 	// Guaranteed by the Authentified interceptor
 	jwtClaims := ctx.Value("token").(*JwtClaims)
@@ -154,40 +194,4 @@ func (s *SecretsService) GetSecret(ctx context.Context, payload *gensecrets.GetS
 		CreatedAt:       decryptedSecret.CreatedAt.Format("2006-01-02T15:04:05Z"),
 		UpdatedAt:       decryptedSecret.UpdatedAt.Format("2006-01-02T15:04:05Z"),
 	}, nil
-}
-
-func (s *SecretsService) CreateSecret(ctx context.Context, payload *gensecrets.CreateSecretPayload) error {
-	// Guaranteed by the Authentified interceptor
-	jwtClaims := ctx.Value("token").(*JwtClaims)
-
-	decodedPath, err := base64.StdEncoding.DecodeString(payload.Path)
-	if err != nil {
-		return gensecrets.MakeInvalidParameters(fmt.Errorf("invalid path encoding: %w", err))
-	}
-	decodedPathStr := string(decodedPath)
-
-	_, err = s.secretsRepository.GetSecretByPath(ctx, s.keyManager, decodedPathStr)
-	if err == nil {
-		return gensecrets.MakeInvalidParameters(fmt.Errorf("secret already exists at path: %s", decodedPathStr))
-	}
-	if !errors.Is(err, repository.ErrSecretNotFound) {
-		return gensecrets.MakeInternalError(fmt.Errorf("error checking if secret already exists: %w", err))
-	}
-
-	_, err = s.secretsRepository.CreateSecret(ctx, s.keyManager, decodedPathStr, jwtClaims.UserID, payload.Value)
-	if err != nil {
-		return gensecrets.MakeInternalError(fmt.Errorf("error creating secret: %w", err))
-	}
-
-	err = s.secretsAccessRepository.GrantUsersAccess(ctx, decodedPathStr, payload.AuthorizedMembers)
-	if err != nil {
-		return gensecrets.MakeInternalError(fmt.Errorf("error adding authorized users: %w", err))
-	}
-
-	err = s.secretsAccessRepository.GrantRolesAccess(ctx, decodedPathStr, payload.AuthorizedRoles)
-	if err != nil {
-		return gensecrets.MakeInternalError(fmt.Errorf("error adding authorized roles: %w", err))
-	}
-
-	return nil
 }

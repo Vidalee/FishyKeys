@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"github.com/jackc/pgx/v5"
 	"time"
@@ -125,15 +126,15 @@ WHERE secret_id = $1
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var userID, roleID int
+		var userID, roleID sql.NullInt64
 		if err := rows.Scan(&userID, &roleID); err != nil {
 			return nil, err
 		}
-		if userID != 0 {
-			authorizedUserIDs = append(authorizedUserIDs, userID)
+		if userID.Valid {
+			authorizedUserIDs = append(authorizedUserIDs, int(userID.Int64))
 		}
-		if roleID != 0 {
-			authorizedRoleIDs = append(authorizedRoleIDs, roleID)
+		if roleID.Valid {
+			authorizedRoleIDs = append(authorizedRoleIDs, int(roleID.Int64))
 		}
 	}
 
