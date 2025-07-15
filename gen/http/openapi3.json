@@ -296,14 +296,14 @@
                 "$ref": "#/components/schemas/CreateSecretRequestBody"
               },
               "example": {
-                "authorized_members": [
-                  1,
-                  2,
-                  3
-                ],
                 "authorized_roles": [
                   1,
                   2
+                ],
+                "authorized_users": [
+                  1,
+                  2,
+                  3
                 ],
                 "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==",
                 "value": "SECRET_API_KEY123"
@@ -1043,20 +1043,6 @@
       "CreateSecretRequestBody": {
         "type": "object",
         "properties": {
-          "authorized_members": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "example": 6772079528695378523,
-              "format": "int64"
-            },
-            "description": "Members IDs authorized to access the secret",
-            "example": [
-              1,
-              2,
-              3
-            ]
-          },
           "authorized_roles": {
             "type": "array",
             "items": {
@@ -1068,6 +1054,20 @@
             "example": [
               1,
               2
+            ]
+          },
+          "authorized_users": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "example": 6772079528695378523,
+              "format": "int64"
+            },
+            "description": "Users IDs authorized to access the secret",
+            "example": [
+              1,
+              2,
+              3
             ]
           },
           "path": {
@@ -1084,14 +1084,14 @@
           }
         },
         "example": {
-          "authorized_members": [
-            1,
-            2,
-            3
-          ],
           "authorized_roles": [
             1,
             2
+          ],
+          "authorized_users": [
+            1,
+            2,
+            3
           ],
           "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==",
           "value": "SECRET_API_KEY123"
@@ -1099,7 +1099,7 @@
         "required": [
           "path",
           "value",
-          "authorized_members",
+          "authorized_users",
           "authorized_roles"
         ]
       },

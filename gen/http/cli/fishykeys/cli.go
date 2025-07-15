@@ -377,14 +377,14 @@ Create a secret
 
 Example:
     %[1]s secrets create-secret --body '{
-      "authorized_members": [
-         1,
-         2,
-         3
-      ],
       "authorized_roles": [
          1,
          2
+      ],
+      "authorized_users": [
+         1,
+         2,
+         3
       ],
       "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==",
       "value": "SECRET_API_KEY123"

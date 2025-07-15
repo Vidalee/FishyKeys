@@ -35,6 +35,10 @@ func clearSecretsServiceTables(t *testing.T, ctx context.Context) {
 	require.NoError(t, err)
 	err = testutil.ClearTable(ctx, "users")
 	require.NoError(t, err)
+	err = testutil.ClearTable(ctx, "roles")
+	require.NoError(t, err)
+	err = testutil.ClearTable(ctx, "secrets_access")
+	require.NoError(t, err)
 }
 
 func TestSecretsService_CreateSecret(t *testing.T) {
@@ -42,32 +46,28 @@ func TestSecretsService_CreateSecret(t *testing.T) {
 	ctx := context.Background()
 
 	tests := []struct {
-		name              string
-		path              string
-		value             string
-		authorizedUserIDs []int
-		authorizedRoleIDs []int
-
-		doDuplicate       bool
-		expectedError     bool
-		expectedErrorText string
+		name                    string
+		path                    string
+		value                   string
+		addCreatedUsersAndRoles bool
+		doDuplicate             bool
+		expectedError           bool
+		expectedErrorText       string
 	}{
 		{
-			name:              "correct parameters",
-			path:              "/test/secret1",
-			value:             "test_value_1",
-			authorizedUserIDs: []int{1, 2},
-			authorizedRoleIDs: []int{1, 2},
+			name:                    "correct parameters",
+			path:                    "/test/secret1",
+			value:                   "test_value_1",
+			addCreatedUsersAndRoles: true,
 		},
 		{
-			name:              "secret already exists",
-			path:              "/test/secret1",
-			value:             "test_value_1",
-			authorizedUserIDs: []int{1, 2},
-			authorizedRoleIDs: []int{1, 2},
-			doDuplicate:       true,
-			expectedError:     true,
-			expectedErrorText: "secret already exists at path: /test/secret1",
+			name:                    "secret already exists",
+			path:                    "/test/secret1",
+			value:                   "test_value_1",
+			addCreatedUsersAndRoles: true,
+			doDuplicate:             true,
+			expectedError:           true,
+			expectedErrorText:       "secret already exists at path: /test/secret1",
 		},
 	}
 
@@ -77,18 +77,25 @@ func TestSecretsService_CreateSecret(t *testing.T) {
 
 			userID1, err := service.usersRepository.CreateUser(ctx, "user1", "password1")
 			require.NoError(t, err, "failed to create user1")
-			_, err = service.usersRepository.CreateUser(ctx, "user2", "password2")
+			userID2, err := service.usersRepository.CreateUser(ctx, "user2", "password2")
 			require.NoError(t, err, "failed to create user2")
-			err = service.rolesRepository.CreateRole(ctx, "role1", "#FFFFFF")
+			roleID1, err := service.rolesRepository.CreateRole(ctx, "role1", "#FFFFFF")
 			require.NoError(t, err, "failed to create role1")
-			err = service.rolesRepository.CreateRole(ctx, "role2", "#000000")
+			roleID2, err := service.rolesRepository.CreateRole(ctx, "role2", "#000000")
 			require.NoError(t, err, "failed to create role2")
 
+			var roles []int
+			var users []int
+			if tt.addCreatedUsersAndRoles {
+				roles = []int{roleID1, roleID2}
+				users = []int{userID1, userID2}
+			}
+
 			payload := &gensecrets.CreateSecretPayload{
-				Path:              base64.StdEncoding.EncodeToString([]byte(tt.path)),
-				Value:             tt.value,
-				AuthorizedMembers: tt.authorizedUserIDs,
-				AuthorizedRoles:   tt.authorizedRoleIDs,
+				Path:            base64.StdEncoding.EncodeToString([]byte(tt.path)),
+				Value:           tt.value,
+				AuthorizedUsers: users,
+				AuthorizedRoles: roles,
 			}
 
 			ctx = context.WithValue(ctx, "token", &JwtClaims{
@@ -110,8 +117,8 @@ func TestSecretsService_CreateSecret(t *testing.T) {
 				assert.NotNil(t, secret)
 				assert.Equal(t, tt.path, secret.Path)
 				assert.Equal(t, tt.value, secret.DecryptedValue)
-				assert.ElementsMatch(t, tt.authorizedUserIDs, secret.AuthorizedUserIDs)
-				assert.ElementsMatch(t, tt.authorizedRoleIDs, secret.AuthorizedRoleIDs)
+				assert.ElementsMatch(t, users, secret.AuthorizedUserIDs)
+				assert.ElementsMatch(t, roles, secret.AuthorizedRoleIDs)
 				assert.Equal(t, userID1, secret.OwnerUserId)
 			}
 		})

@@ -190,13 +190,13 @@ paths:
                         schema:
                             $ref: '#/components/schemas/CreateSecretRequestBody'
                         example:
-                            authorized_members:
-                                - 1
-                                - 2
-                                - 3
                             authorized_roles:
                                 - 1
                                 - 2
+                            authorized_users:
+                              - 1
+                              - 2
+                              - 3
                             path: L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==
                             value: SECRET_API_KEY123
             responses:
@@ -680,18 +680,7 @@ components:
         CreateSecretRequestBody:
             type: object
             properties:
-                authorized_members:
-                    type: array
-                    items:
-                        type: integer
-                        example: 6772079528695378523
-                        format: int64
-                    description: Members IDs authorized to access the secret
-                    example:
-                        - 1
-                        - 2
-                        - 3
-                authorized_roles:
+              authorized_roles:
                     type: array
                     items:
                         type: integer
@@ -701,6 +690,17 @@ components:
                     example:
                         - 1
                         - 2
+              authorized_users:
+                    type: array
+                    items:
+                        type: integer
+                        example: 6772079528695378523
+                        format: int64
+                    description: Users IDs authorized to access the secret
+                    example:
+                        - 1
+                        - 2
+                        - 3
                 path:
                     type: string
                     description: Base64 encoded secret's path
@@ -712,19 +712,19 @@ components:
                     example: SECRET_API_KEY123
                     minLength: 1
             example:
-                authorized_members:
-                    - 1
-                    - 2
-                    - 3
                 authorized_roles:
                     - 1
                     - 2
+                authorized_users:
+                  - 1
+                  - 2
+                  - 3
                 path: L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==
                 value: SECRET_API_KEY123
             required:
                 - path
                 - value
-                - authorized_members
+                - authorized_users
                 - authorized_roles
         CreateUserRequestBody:
             type: object

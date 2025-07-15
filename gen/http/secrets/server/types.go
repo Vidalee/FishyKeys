@@ -21,8 +21,8 @@ type CreateSecretRequestBody struct {
 	Path *string `form:"path,omitempty" json:"path,omitempty" xml:"path,omitempty"`
 	// The secret value
 	Value *string `form:"value,omitempty" json:"value,omitempty" xml:"value,omitempty"`
-	// Members IDs authorized to access the secret
-	AuthorizedMembers []int `form:"authorized_members,omitempty" json:"authorized_members,omitempty" xml:"authorized_members,omitempty"`
+	// Users IDs authorized to access the secret
+	AuthorizedUsers []int `form:"authorized_users,omitempty" json:"authorized_users,omitempty" xml:"authorized_users,omitempty"`
 	// Role IDs authorized to access the secret
 	AuthorizedRoles []int `form:"authorized_roles,omitempty" json:"authorized_roles,omitempty" xml:"authorized_roles,omitempty"`
 }
@@ -589,9 +589,9 @@ func NewCreateSecretPayload(body *CreateSecretRequestBody) *secrets.CreateSecret
 		Path:  *body.Path,
 		Value: *body.Value,
 	}
-	v.AuthorizedMembers = make([]int, len(body.AuthorizedMembers))
-	for i, val := range body.AuthorizedMembers {
-		v.AuthorizedMembers[i] = val
+	v.AuthorizedUsers = make([]int, len(body.AuthorizedUsers))
+	for i, val := range body.AuthorizedUsers {
+		v.AuthorizedUsers[i] = val
 	}
 	v.AuthorizedRoles = make([]int, len(body.AuthorizedRoles))
 	for i, val := range body.AuthorizedRoles {
@@ -610,8 +610,8 @@ func ValidateCreateSecretRequestBody(body *CreateSecretRequestBody) (err error) 
 	if body.Value == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("value", "body"))
 	}
-	if body.AuthorizedMembers == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("authorized_members", "body"))
+	if body.AuthorizedUsers == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("authorized_users", "body"))
 	}
 	if body.AuthorizedRoles == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("authorized_roles", "body"))

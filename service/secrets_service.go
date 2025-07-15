@@ -67,7 +67,7 @@ func (s *SecretsService) CreateSecret(ctx context.Context, payload *gensecrets.C
 		return gensecrets.MakeInternalError(fmt.Errorf("error creating secret: %w", err))
 	}
 
-	err = s.secretsAccessRepository.GrantUsersAccess(ctx, decodedPathStr, payload.AuthorizedMembers)
+	err = s.secretsAccessRepository.GrantUsersAccess(ctx, decodedPathStr, payload.AuthorizedUsers)
 	if err != nil {
 		return gensecrets.MakeInternalError(fmt.Errorf("error adding authorized users: %w", err))
 	}

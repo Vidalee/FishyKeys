@@ -32,9 +32,11 @@ func setupUsersTestService(t *testing.T) *UsersService {
 func clearUsersServiceTables(t *testing.T, ctx context.Context) {
 	err := testutil.ClearTable(ctx, "global_settings")
 	require.NoError(t, err)
+	err = testutil.ClearTable(ctx, "secrets")
+	require.NoError(t, err)
 	err = testutil.ClearTable(ctx, "users")
 	require.NoError(t, err)
-	err = testutil.ClearTable(ctx, "secrets")
+	err = testutil.ClearTable(ctx, "secrets_access")
 	require.NoError(t, err)
 }
 

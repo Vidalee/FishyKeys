@@ -46,8 +46,8 @@ type CreateSecretPayload struct {
 	Path string
 	// The secret value
 	Value string
-	// Members IDs authorized to access the secret
-	AuthorizedMembers []int
+	// Users IDs authorized to access the secret
+	AuthorizedUsers []int
 	// Role IDs authorized to access the secret
 	AuthorizedRoles []int
 }

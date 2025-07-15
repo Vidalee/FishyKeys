@@ -39,20 +39,29 @@ func (_m *MockRolesRepository) EXPECT() *MockRolesRepository_Expecter {
 }
 
 // CreateRole provides a mock function for the type MockRolesRepository
-func (_mock *MockRolesRepository) CreateRole(ctx context.Context, name string, color string) error {
+func (_mock *MockRolesRepository) CreateRole(ctx context.Context, name string, color string) (int, error) {
 	ret := _mock.Called(ctx, name, color)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateRole")
 	}
 
-	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
+	var r0 int
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string) (int, error)); ok {
+		return returnFunc(ctx, name, color)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string, string) int); ok {
 		r0 = returnFunc(ctx, name, color)
 	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(int)
 	}
-	return r0
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
+		r1 = returnFunc(ctx, name, color)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
 }
 
 // MockRolesRepository_CreateRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateRole'
@@ -91,12 +100,12 @@ func (_c *MockRolesRepository_CreateRole_Call) Run(run func(ctx context.Context,
 	return _c
 }
 
-func (_c *MockRolesRepository_CreateRole_Call) Return(err error) *MockRolesRepository_CreateRole_Call {
-	_c.Call.Return(err)
+func (_c *MockRolesRepository_CreateRole_Call) Return(n int, err error) *MockRolesRepository_CreateRole_Call {
+	_c.Call.Return(n, err)
 	return _c
 }
 
-func (_c *MockRolesRepository_CreateRole_Call) RunAndReturn(run func(ctx context.Context, name string, color string) error) *MockRolesRepository_CreateRole_Call {
+func (_c *MockRolesRepository_CreateRole_Call) RunAndReturn(run func(ctx context.Context, name string, color string) (int, error)) *MockRolesRepository_CreateRole_Call {
 	_c.Call.Return(run)
 	return _c
 }

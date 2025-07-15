@@ -169,7 +169,7 @@ paths:
               required:
                 - path
                 - value
-                - authorized_members
+                - authorized_users
                 - authorized_roles
         responses:
           "201":
@@ -1479,17 +1479,6 @@ definitions:
     title: SecretsCreateSecretRequestBody
         type: object
         properties:
-          authorized_members:
-            type: array
-            items:
-              type: integer
-              example: 2241520619896973575
-              format: int64
-            description: Members IDs authorized to access the secret
-            example:
-              - 1
-              - 2
-              - 3
           authorized_roles:
             type: array
             items:
@@ -1500,6 +1489,17 @@ definitions:
             example:
               - 1
               - 2
+          authorized_users:
+            type: array
+            items:
+              type: integer
+              example: 2241520619896973575
+              format: int64
+            description: Users IDs authorized to access the secret
+            example:
+              - 1
+              - 2
+              - 3
             path:
                 type: string
                 description: Base64 encoded secret's path
@@ -1511,19 +1511,19 @@ definitions:
             example: SECRET_API_KEY123
             minLength: 1
         example:
-          authorized_members:
-            - 1
-            - 2
-            - 3
           authorized_roles:
             - 1
             - 2
+          authorized_users:
+            - 1
+            - 2
+            - 3
             path: L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==
           value: SECRET_API_KEY123
         required:
             - path
             - value
-            - authorized_members
+            - authorized_users
             - authorized_roles
   SecretsCreateSecretUnauthorizedResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'

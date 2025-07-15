@@ -21,8 +21,8 @@ type CreateSecretRequestBody struct {
 	Path string `form:"path" json:"path" xml:"path"`
 	// The secret value
 	Value string `form:"value" json:"value" xml:"value"`
-	// Members IDs authorized to access the secret
-	AuthorizedMembers []int `form:"authorized_members" json:"authorized_members" xml:"authorized_members"`
+	// Users IDs authorized to access the secret
+	AuthorizedUsers []int `form:"authorized_users" json:"authorized_users" xml:"authorized_users"`
 	// Role IDs authorized to access the secret
 	AuthorizedRoles []int `form:"authorized_roles" json:"authorized_roles" xml:"authorized_roles"`
 }
@@ -336,13 +336,13 @@ func NewCreateSecretRequestBody(p *secrets.CreateSecretPayload) *CreateSecretReq
 		Path:  p.Path,
 		Value: p.Value,
 	}
-	if p.AuthorizedMembers != nil {
-		body.AuthorizedMembers = make([]int, len(p.AuthorizedMembers))
-		for i, val := range p.AuthorizedMembers {
-			body.AuthorizedMembers[i] = val
+	if p.AuthorizedUsers != nil {
+		body.AuthorizedUsers = make([]int, len(p.AuthorizedUsers))
+		for i, val := range p.AuthorizedUsers {
+			body.AuthorizedUsers[i] = val
 		}
 	} else {
-		body.AuthorizedMembers = []int{}
+		body.AuthorizedUsers = []int{}
 	}
 	if p.AuthorizedRoles != nil {
 		body.AuthorizedRoles = make([]int, len(p.AuthorizedRoles))

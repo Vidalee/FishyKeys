@@ -22,7 +22,7 @@ type Role struct {
 }
 
 type RolesRepository interface {
-	CreateRole(ctx context.Context, name string, color string) error
+	CreateRole(ctx context.Context, name string, color string) (int, error)
 	GetRoleByID(ctx context.Context, id int) (*Role, error)
 	GetRoleByName(ctx context.Context, name string) (*Role, error)
 	ListRoles(ctx context.Context) ([]Role, error)
@@ -37,14 +37,20 @@ func NewRolesRepository(pool *pgxpool.Pool) RolesRepository {
 	return &rolesRepository{pool: pool}
 }
 
-func (r *rolesRepository) CreateRole(ctx context.Context, name string, color string) error {
+func (r *rolesRepository) CreateRole(ctx context.Context, name string, color string) (int, error) {
 	query := `
 		INSERT INTO roles (name, color, created_at, updated_at)
 		VALUES ($1, $2, $3, $3)
 		ON CONFLICT (name) DO NOTHING
+		RETURNING id
 	`
-	_, err := r.pool.Exec(ctx, query, name, color, time.Now().UTC())
-	return err
+
+	var roleID int
+	err := r.pool.QueryRow(ctx, query, name, color, time.Now().UTC()).Scan(&roleID)
+	if err != nil {
+		return 0, err
+	}
+	return roleID, nil
 }
 
 func (r *rolesRepository) GetRoleByID(ctx context.Context, id int) (*Role, error) {
