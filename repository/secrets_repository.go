@@ -72,11 +72,7 @@ func (r *secretsRepository) CreateSecret(ctx context.Context, keyManager *crypto
 	query := `
 INSERT INTO secrets (path, encrypted_encryption_key, encrypted_value, owner_user_id, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $5)
-ON CONFLICT (path) DO UPDATE SET 
-    encrypted_encryption_key = EXCLUDED.encrypted_encryption_key,
-    encrypted_value = EXCLUDED.encrypted_value,
-    owner_user_id = EXCLUDED.owner_user_id,
-    updated_at = EXCLUDED.updated_at
+ON CONFLICT (path) DO NOTHING
 RETURNING id
 `
 	var secretID int
@@ -193,18 +189,16 @@ func (r *secretsRepository) HasAccess(ctx context.Context, secretPath string, us
 	if secretPath == "" {
 		return false, errors.New("secretPath must not be empty")
 	}
-	if userID == nil || roleIDs == nil {
-		return false, errors.New("must provide either userID and roleIDs (can be empty) for access check")
-	}
 
 	query := `
 SELECT 1
-FROM secrets_access sa
-JOIN secrets s ON sa.secret_id = s.id
+FROM secrets s
+LEFT JOIN secrets_access sa ON sa.secret_id = s.id
 WHERE s.path = $1
 AND (
-    (sa.user_id = $2) OR
-    (sa.role_id = ANY($3)) OR
+    s.owner_user_id = $2 OR
+    sa.user_id = $2 OR
+    sa.role_id = ANY($3)
 )
 LIMIT 1
 `
