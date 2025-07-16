@@ -240,3 +240,118 @@ func TestSecretsService_GetSecretValue(t *testing.T) {
 		})
 	}
 }
+
+func TestSecretsService_GetSecret(t *testing.T) {
+	service := setupSecretsTestService(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		name               string
+		path               string
+		value              string
+		accessAsUserNumber int
+		createSecret       bool
+		expectedError      bool
+		expectedErrorText  string
+	}{
+		{
+			name:               "access as owner",
+			path:               "/test/secret1",
+			value:              "test_value_1",
+			accessAsUserNumber: 0,
+			createSecret:       true,
+		},
+		{
+			name:               "access as authorized user",
+			path:               "/test/secret1",
+			value:              "test_value_1",
+			accessAsUserNumber: 1,
+			createSecret:       true,
+		},
+		{
+			name:               "access as authorized role",
+			path:               "/test/secret1",
+			value:              "test_value_1",
+			accessAsUserNumber: 2,
+			createSecret:       true,
+		},
+		{
+			name:               "access as not authorized",
+			path:               "/test/secret1",
+			value:              "test_value_1",
+			accessAsUserNumber: 3,
+			createSecret:       true,
+			expectedError:      true,
+			expectedErrorText:  "you do not have access to this secret",
+		},
+		{
+			name:               "non-existing secret",
+			path:               "/test/secret1",
+			value:              "test_value_1",
+			accessAsUserNumber: 0,
+			createSecret:       false,
+			expectedError:      true,
+			expectedErrorText:  "you do not have access to this secret",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			clearSecretsServiceTables(t, ctx)
+
+			userID1, err := service.usersRepository.CreateUser(ctx, "user1", "password1")
+			require.NoError(t, err, "failed to create user1")
+			userID2, err := service.usersRepository.CreateUser(ctx, "user2", "password2")
+			require.NoError(t, err, "failed to create user2")
+			userID3, err := service.usersRepository.CreateUser(ctx, "user3", "password3")
+			require.NoError(t, err, "failed to create user3")
+			userID4, err := service.usersRepository.CreateUser(ctx, "user4", "password4")
+			require.NoError(t, err, "failed to create user4")
+			roleID1, err := service.rolesRepository.CreateRole(ctx, "role1", "#FFFFFF")
+			require.NoError(t, err, "failed to create role1")
+			err = service.userRolesRepository.AssignRoleToUser(ctx, userID3, roleID1)
+			require.NoError(t, err, "failed to assign role1 to user1")
+
+			users := []int{userID1, userID2, userID3, userID4}
+
+			if tt.createSecret {
+				_, err = service.secretsRepository.CreateSecret(ctx, service.keyManager, tt.path, userID1, tt.value)
+				require.NoError(t, err, "failed to create secret")
+
+				err = service.secretsAccessRepository.GrantUserAccess(ctx, tt.path, userID2)
+				require.NoError(t, err, "failed to grant users access")
+				err = service.secretsAccessRepository.GrantRoleAccess(ctx, tt.path, roleID1)
+				require.NoError(t, err, "failed to grant roles access")
+
+			}
+			ctx = context.WithValue(ctx, "token", &JwtClaims{
+				UserID: users[tt.accessAsUserNumber],
+			})
+
+			payload := &gensecrets.GetSecretPayload{
+				Path: base64.StdEncoding.EncodeToString([]byte(tt.path)),
+			}
+
+			secretInfo, err := service.GetSecret(ctx, payload)
+
+			if tt.expectedError {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedErrorText, err.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, secretInfo)
+				assert.Equal(t, tt.path, secretInfo.Path)
+				assert.Equal(t, userID1, secretInfo.Owner.ID)
+				assert.Equal(t, "user1", secretInfo.Owner.Username)
+				assert.Equal(t, 1, len(secretInfo.AuthorizedUsers), "should have 1 authorized user")
+				assert.Equal(t, userID2, secretInfo.AuthorizedUsers[0].ID)
+				assert.Equal(t, "user2", secretInfo.AuthorizedUsers[0].Username)
+				assert.Equal(t, 1, len(secretInfo.AuthorizedRoles), "should have 1 authorized role")
+				assert.Equal(t, roleID1, secretInfo.AuthorizedRoles[0].ID)
+				assert.Equal(t, "role1", secretInfo.AuthorizedRoles[0].Name)
+				assert.NotEmpty(t, secretInfo.CreatedAt, "created at should not be empty")
+				assert.NotEmpty(t, secretInfo.UpdatedAt, "updated at should not be empty")
+			}
+		})
+	}
+}

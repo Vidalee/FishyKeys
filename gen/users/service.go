@@ -83,7 +83,7 @@ type DeleteUserPayload struct {
 
 type User struct {
 	// Unique identifier for the user
-	ID *int
+	ID int
 	// The username
 	Username string
 	// User creation timestamp

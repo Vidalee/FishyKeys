@@ -162,7 +162,7 @@ func (s *SecretsService) GetSecret(ctx context.Context, payload *gensecrets.GetS
 	var authorizedUsersPayload []*gensecrets.User
 	for _, user := range authorizedUsers {
 		authorizedUsersPayload = append(authorizedUsersPayload, &gensecrets.User{
-			ID:        &user.ID,
+			ID:        user.ID,
 			Username:  user.Username,
 			CreatedAt: user.CreatedAt.Format("2006-01-02T15:04:05Z"),
 			UpdatedAt: user.UpdatedAt.Format("2006-01-02T15:04:05Z"),
@@ -184,7 +184,7 @@ func (s *SecretsService) GetSecret(ctx context.Context, payload *gensecrets.GetS
 	return &gensecrets.SecretInfo{
 		Path: decryptedSecret.Path,
 		Owner: &gensecrets.User{
-			ID:        &owner.ID,
+			ID:        owner.ID,
 			Username:  owner.Username,
 			CreatedAt: owner.CreatedAt.Format("2006-01-02T15:04:05Z"),
 			UpdatedAt: owner.UpdatedAt.Format("2006-01-02T15:04:05Z"),

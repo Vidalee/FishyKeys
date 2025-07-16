@@ -978,6 +978,9 @@ func ValidateCreateSecretInternalErrorResponseBody(body *CreateSecretInternalErr
 
 // ValidateUserResponseBody runs the validations defined on UserResponseBody
 func ValidateUserResponseBody(body *UserResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
 	if body.Username == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("username", "body"))
 	}

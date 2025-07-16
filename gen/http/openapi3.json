@@ -1454,6 +1454,7 @@
           "username": "alice"
         },
         "required": [
+          "id",
           "username",
           "created_at",
           "updated_at"

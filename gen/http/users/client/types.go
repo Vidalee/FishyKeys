@@ -862,6 +862,9 @@ func ValidateAuthUserInternalErrorResponseBody(body *AuthUserInternalErrorRespon
 
 // ValidateUserResponse runs the validations defined on UserResponse
 func ValidateUserResponse(body *UserResponse) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
 	if body.Username == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("username", "body"))
 	}

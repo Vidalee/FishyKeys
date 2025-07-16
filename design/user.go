@@ -18,7 +18,7 @@ var UserType = Type("User", func() {
 	Attribute("updated_at", String, "User last update timestamp", func() {
 		Example("2025-06-30T15:00:00Z")
 	})
-	Required("username", "created_at", "updated_at")
+	Required("id", "username", "created_at", "updated_at")
 })
 
 var _ = Service("users", func() {

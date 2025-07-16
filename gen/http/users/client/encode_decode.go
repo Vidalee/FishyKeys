@@ -473,7 +473,7 @@ func DecodeAuthUserResponse(decoder func(*http.Response) goahttp.Decoder, restor
 // value of type *UserResponse.
 func unmarshalUserResponseToUsersUser(v *UserResponse) *users.User {
 	res := &users.User{
-		ID:        v.ID,
+		ID:        *v.ID,
 		Username:  *v.Username,
 		CreatedAt: *v.CreatedAt,
 		UpdatedAt: *v.UpdatedAt,
