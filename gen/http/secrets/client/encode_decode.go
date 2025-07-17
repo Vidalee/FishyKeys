@@ -18,6 +18,108 @@ import (
 	goahttp "goa.design/goa/v3/http"
 )
 
+// BuildListSecretsRequest instantiates a HTTP request object with method and
+// path set to call the "secrets" service "list secrets" endpoint
+func (c *Client) BuildListSecretsRequest(ctx context.Context, v any) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ListSecretsSecretsPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("secrets", "list secrets", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// DecodeListSecretsResponse returns a decoder for responses returned by the
+// secrets list secrets endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeListSecretsResponse may return the following errors:
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
+//   - error: internal error
+func DecodeListSecretsResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body ListSecretsResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("secrets", "list secrets", err)
+			}
+			err = ValidateListSecretsResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("secrets", "list secrets", err)
+			}
+			res := NewListSecretsResultOK(&body)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body ListSecretsUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("secrets", "list secrets", err)
+			}
+			err = ValidateListSecretsUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("secrets", "list secrets", err)
+			}
+			return nil, NewListSecretsUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body ListSecretsForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("secrets", "list secrets", err)
+			}
+			err = ValidateListSecretsForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("secrets", "list secrets", err)
+			}
+			return nil, NewListSecretsForbidden(&body)
+		case http.StatusInternalServerError:
+			var (
+				body ListSecretsInternalErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("secrets", "list secrets", err)
+			}
+			err = ValidateListSecretsInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("secrets", "list secrets", err)
+			}
+			return nil, NewListSecretsInternalError(&body)
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("secrets", "list secrets", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildGetSecretValueRequest instantiates a HTTP request object with method
 // and path set to call the "secrets" service "get secret value" endpoint
 func (c *Client) BuildGetSecretValueRequest(ctx context.Context, v any) (*http.Request, error) {
@@ -416,6 +518,23 @@ func DecodeCreateSecretResponse(decoder func(*http.Response) goahttp.Decoder, re
 			return nil, goahttp.ErrInvalidResponse("secrets", "create secret", resp.StatusCode, string(body))
 		}
 	}
+}
+
+// unmarshalSecretInfoSummaryResponseBodyToSecretsSecretInfoSummary builds a
+// value of type *secrets.SecretInfoSummary from a value of type
+// *SecretInfoSummaryResponseBody.
+func unmarshalSecretInfoSummaryResponseBodyToSecretsSecretInfoSummary(v *SecretInfoSummaryResponseBody) *secrets.SecretInfoSummary {
+	if v == nil {
+		return nil
+	}
+	res := &secrets.SecretInfoSummary{
+		Path:      *v.Path,
+		CreatedAt: *v.CreatedAt,
+		UpdatedAt: *v.UpdatedAt,
+	}
+	res.Owner = unmarshalUserResponseBodyToSecretsUser(v.Owner)
+
+	return res
 }
 
 // unmarshalUserResponseBodyToSecretsUser builds a value of type *secrets.User

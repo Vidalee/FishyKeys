@@ -11,6 +11,11 @@ import (
 	"fmt"
 )
 
+// ListSecretsSecretsPath returns the URL path to the secrets service list secrets HTTP endpoint.
+func ListSecretsSecretsPath() string {
+	return "/secrets"
+}
+
 // GetSecretValueSecretsPath returns the URL path to the secrets service get secret value HTTP endpoint.
 func GetSecretValueSecretsPath(path string) string {
 	return fmt.Sprintf("/secrets/%v/value", path)

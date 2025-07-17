@@ -4,8 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/jackc/pgx/v5"
 	"time"
+
+	"github.com/jackc/pgx/v5"
 
 	"github.com/Vidalee/FishyKeys/internal/crypto"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -40,7 +41,7 @@ type DecryptedSecret struct {
 type SecretsRepository interface {
 	CreateSecret(ctx context.Context, keyManager *crypto.KeyManager, path string, ownerUserId int, value string) (int, error)
 	GetSecretByPath(ctx context.Context, keyManager *crypto.KeyManager, path string) (*DecryptedSecret, error)
-	ListSecrets(ctx context.Context) ([]Secret, error)
+	ListSecretsForUser(ctx context.Context, userID int) ([]Secret, error)
 	DeleteSecret(ctx context.Context, path string) error
 	HasAccess(ctx context.Context, secretPath string, userID *int, roleIDs []int) (bool, error)
 }
@@ -147,9 +148,30 @@ WHERE secret_id = $1
 	}, nil
 }
 
-func (r *secretsRepository) ListSecrets(ctx context.Context) ([]Secret, error) {
-	query := `SELECT id, path, encrypted_encryption_key, encrypted_value, owner_user_id, created_at, updated_at FROM secrets ORDER BY created_at`
-	rows, err := r.pool.Query(ctx, query)
+func (r *secretsRepository) ListSecretsForUser(ctx context.Context, userID int) ([]Secret, error) {
+	// Get the user's role IDs
+	roleIDs := []int{}
+	roleRows, err := r.pool.Query(ctx, `SELECT role_id FROM user_roles WHERE user_id = $1`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer roleRows.Close()
+	for roleRows.Next() {
+		var id int
+		if err := roleRows.Scan(&id); err != nil {
+			return nil, err
+		}
+		roleIDs = append(roleIDs, id)
+	}
+
+	query := `
+SELECT DISTINCT ON (s.id) s.id, s.path, s.encrypted_encryption_key, s.encrypted_value, s.owner_user_id, s.created_at, s.updated_at
+FROM secrets s
+LEFT JOIN secrets_access sa ON sa.secret_id = s.id
+WHERE s.owner_user_id = $1 OR sa.user_id = $1 OR sa.role_id = ANY($2)
+ORDER BY s.id`
+
+	rows, err := r.pool.Query(ctx, query, userID, roleIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -157,19 +179,19 @@ func (r *secretsRepository) ListSecrets(ctx context.Context) ([]Secret, error) {
 
 	var secrets []Secret
 	for rows.Next() {
-		var s Secret
+		var secret Secret
 		if err := rows.Scan(
-			&s.ID,
-			&s.Path,
-			&s.EncryptedEncryptionKey,
-			&s.EncryptedValue,
-			&s.OwnerUserId,
-			&s.CreatedAt,
-			&s.UpdatedAt,
+			&secret.ID,
+			&secret.Path,
+			&secret.EncryptedEncryptionKey,
+			&secret.EncryptedValue,
+			&secret.OwnerUserId,
+			&secret.CreatedAt,
+			&secret.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
-		secrets = append(secrets, s)
+		secrets = append(secrets, secret)
 	}
 	return secrets, nil
 }

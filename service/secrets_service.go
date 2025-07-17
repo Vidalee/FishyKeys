@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+
 	gensecrets "github.com/Vidalee/FishyKeys/gen/secrets"
 	"github.com/Vidalee/FishyKeys/internal/crypto"
 	"github.com/Vidalee/FishyKeys/repository"
@@ -38,6 +39,40 @@ func NewSecretsService(
 		secretsRepository:        secretsRepository,
 		secretsAccessRepository:  secretsAccessRepository,
 	}
+}
+
+func (s *SecretsService) ListSecrets(ctx context.Context) (res *gensecrets.ListSecretsResult, err error) {
+	// Guaranteed by the Authentified interceptor
+	jwtClaims := ctx.Value("token").(*JwtClaims)
+
+	secrets, err := s.secretsRepository.ListSecretsForUser(ctx, jwtClaims.UserID)
+	if err != nil {
+		return nil, gensecrets.MakeInternalError(fmt.Errorf("error listing secrets: %w", err))
+	}
+
+	secretInfos := make([]*gensecrets.SecretInfoSummary, 0, len(secrets))
+	for _, secret := range secrets {
+		owner, err := s.usersRepository.GetUserByID(ctx, secret.OwnerUserId)
+		if err != nil {
+			return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving secret owner: %w", err))
+		}
+
+		secretInfos = append(secretInfos, &gensecrets.SecretInfoSummary{
+			Path: secret.Path,
+			Owner: &gensecrets.User{
+				ID:        owner.ID,
+				Username:  owner.Username,
+				CreatedAt: owner.CreatedAt.Format("2006-01-02T15:04:05Z"),
+				UpdatedAt: owner.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+			},
+			CreatedAt: secret.CreatedAt.Format("2006-01-02T15:04:05Z"),
+			UpdatedAt: secret.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+		})
+	}
+
+	return &gensecrets.ListSecretsResult{
+		Secrets: secretInfos,
+	}, nil
 }
 
 func (s *SecretsService) CreateSecret(ctx context.Context, payload *gensecrets.CreateSecretPayload) error {

@@ -34,6 +34,13 @@ type (
 	}
 )
 
+// WrapListSecretsEndpoint wraps the list secrets endpoint with the server-side
+// interceptors defined in the design.
+func WrapListSecretsEndpoint(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	endpoint = wrapListSecretsAuthentified(endpoint, i)
+	return endpoint
+}
+
 // WrapGetSecretValueEndpoint wraps the get secret value endpoint with the
 // server-side interceptors defined in the design.
 func WrapGetSecretValueEndpoint(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {

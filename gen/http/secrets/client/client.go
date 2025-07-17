@@ -17,6 +17,10 @@ import (
 
 // Client lists the secrets service endpoint HTTP clients.
 type Client struct {
+	// ListSecrets Doer is the HTTP client used to make requests to the list
+	// secrets endpoint.
+	ListSecretsDoer goahttp.Doer
+
 	// GetSecretValue Doer is the HTTP client used to make requests to the get
 	// secret value endpoint.
 	GetSecretValueDoer goahttp.Doer
@@ -52,6 +56,7 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
+		ListSecretsDoer:     doer,
 		GetSecretValueDoer:  doer,
 		GetSecretDoer:       doer,
 		CreateSecretDoer:    doer,
@@ -61,6 +66,25 @@ func NewClient(
 		host:                host,
 		decoder:             dec,
 		encoder:             enc,
+	}
+}
+
+// ListSecrets returns an endpoint that makes HTTP requests to the secrets
+// service list secrets server.
+func (c *Client) ListSecrets() goa.Endpoint {
+	var (
+		decodeResponse = DecodeListSecretsResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildListSecretsRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ListSecretsDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("secrets", "list secrets", err)
+		}
+		return decodeResponse(resp)
 	}
 }
 

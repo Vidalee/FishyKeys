@@ -20,6 +20,7 @@ import (
 // Server lists the secrets service endpoint HTTP handlers.
 type Server struct {
 	Mounts         []*MountPoint
+	ListSecrets    http.Handler
 	GetSecretValue http.Handler
 	GetSecret      http.Handler
 	CreateSecret   http.Handler
@@ -53,13 +54,15 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
+			{"ListSecrets", "GET", "/secrets"},
 			{"GetSecretValue", "GET", "/secrets/{path}/value"},
 			{"GetSecret", "GET", "/secrets/{path}"},
 			{"CreateSecret", "POST", "/secrets"},
+			{"CORS", "OPTIONS", "/secrets"},
 			{"CORS", "OPTIONS", "/secrets/{path}/value"},
 			{"CORS", "OPTIONS", "/secrets/{path}"},
-			{"CORS", "OPTIONS", "/secrets"},
 		},
+		ListSecrets:    NewListSecretsHandler(e.ListSecrets, mux, decoder, encoder, errhandler, formatter),
 		GetSecretValue: NewGetSecretValueHandler(e.GetSecretValue, mux, decoder, encoder, errhandler, formatter),
 		GetSecret:      NewGetSecretHandler(e.GetSecret, mux, decoder, encoder, errhandler, formatter),
 		CreateSecret:   NewCreateSecretHandler(e.CreateSecret, mux, decoder, encoder, errhandler, formatter),
@@ -72,6 +75,7 @@ func (s *Server) Service() string { return "secrets" }
 
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
+	s.ListSecrets = m(s.ListSecrets)
 	s.GetSecretValue = m(s.GetSecretValue)
 	s.GetSecret = m(s.GetSecret)
 	s.CreateSecret = m(s.CreateSecret)
@@ -83,6 +87,7 @@ func (s *Server) MethodNames() []string { return secrets.MethodNames[:] }
 
 // Mount configures the mux to serve the secrets endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
+	MountListSecretsHandler(mux, h.ListSecrets)
 	MountGetSecretValueHandler(mux, h.GetSecretValue)
 	MountGetSecretHandler(mux, h.GetSecret)
 	MountCreateSecretHandler(mux, h.CreateSecret)
@@ -92,6 +97,50 @@ func Mount(mux goahttp.Muxer, h *Server) {
 // Mount configures the mux to serve the secrets endpoints.
 func (s *Server) Mount(mux goahttp.Muxer) {
 	Mount(mux, s)
+}
+
+// MountListSecretsHandler configures the mux to serve the "secrets" service
+// "list secrets" endpoint.
+func MountListSecretsHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := HandleSecretsOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/secrets", f)
+}
+
+// NewListSecretsHandler creates a HTTP handler which loads the HTTP request
+// and calls the "secrets" service "list secrets" endpoint.
+func NewListSecretsHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		encodeResponse = EncodeListSecretsResponse(encoder)
+		encodeError    = EncodeListSecretsError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "list secrets")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "secrets")
+		var err error
+		res, err := endpoint(ctx, nil)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
 }
 
 // MountGetSecretValueHandler configures the mux to serve the "secrets" service
@@ -251,9 +300,9 @@ func NewCreateSecretHandler(
 // service secrets.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	h = HandleSecretsOrigin(h)
+	mux.Handle("OPTIONS", "/secrets", h.ServeHTTP)
 	mux.Handle("OPTIONS", "/secrets/{path}/value", h.ServeHTTP)
 	mux.Handle("OPTIONS", "/secrets/{path}", h.ServeHTTP)
-	mux.Handle("OPTIONS", "/secrets", h.ServeHTTP)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 204 response.

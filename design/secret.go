@@ -33,6 +33,22 @@ var SecretInfoType = Type("SecretInfo", func() {
 	Required("path", "owner", "authorized_users", "authorized_roles", "created_at", "updated_at")
 })
 
+var SecretInfoSummaryType = Type("SecretInfoSummary", func() {
+	Attribute("path", String, "The original path of the secret", func() {
+		Example("customers/google/api_key")
+	})
+
+	Attribute("owner", UserType, "The owner of the secret")
+	Attribute("created_at", String, "Creation timestamp of the secret", func() {
+		Example("2025-06-30T12:00:00Z")
+	})
+	Attribute("updated_at", String, "Last update timestamp of the secret", func() {
+		Example("2025-06-30T15:00:00Z")
+	})
+
+	Required("path", "owner", "created_at", "updated_at")
+})
+
 var _ = Service("secrets", func() {
 	Description("User service manages user accounts and authentication")
 
@@ -40,6 +56,23 @@ var _ = Service("secrets", func() {
 	Error("unauthorized", ErrorResult, "Unauthorized access")
 	Error("forbidden", ErrorResult, "Forbidden access")
 	Error("internal_error", ErrorResult, "Internal server error")
+
+	Method("list secrets", func() {
+		ServerInterceptor(Authentified)
+
+		Description("Retrieve all secrets you have access to")
+		Result(func() {
+			Attribute("secrets", ArrayOf(SecretInfoSummaryType), "List of secrets you have access to")
+		})
+		Error("secret_not_found", ErrorResult, "Secret not found")
+		HTTP(func() {
+			GET("/secrets")
+			Response(StatusOK)
+			Response("unauthorized", StatusUnauthorized)
+			Response("forbidden", StatusForbidden)
+			Response("internal_error", StatusInternalServerError)
+		})
+	})
 
 	Method("get secret value", func() {
 		ServerInterceptor(Authentified)

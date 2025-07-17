@@ -27,6 +27,13 @@ type CreateSecretRequestBody struct {
 	AuthorizedRoles []int `form:"authorized_roles,omitempty" json:"authorized_roles,omitempty" xml:"authorized_roles,omitempty"`
 }
 
+// ListSecretsResponseBody is the type of the "secrets" service "list secrets"
+// endpoint HTTP response body.
+type ListSecretsResponseBody struct {
+	// List of secrets you have access to
+	Secrets []*SecretInfoSummaryResponseBody `form:"secrets,omitempty" json:"secrets,omitempty" xml:"secrets,omitempty"`
+}
+
 // GetSecretValueResponseBody is the type of the "secrets" service "get secret
 // value" endpoint HTTP response body.
 type GetSecretValueResponseBody struct {
@@ -51,6 +58,60 @@ type GetSecretResponseBody struct {
 	CreatedAt string `form:"created_at" json:"created_at" xml:"created_at"`
 	// Last update timestamp of the secret
 	UpdatedAt string `form:"updated_at" json:"updated_at" xml:"updated_at"`
+}
+
+// ListSecretsUnauthorizedResponseBody is the type of the "secrets" service
+// "list secrets" endpoint HTTP response body for the "unauthorized" error.
+type ListSecretsUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListSecretsForbiddenResponseBody is the type of the "secrets" service "list
+// secrets" endpoint HTTP response body for the "forbidden" error.
+type ListSecretsForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListSecretsInternalErrorResponseBody is the type of the "secrets" service
+// "list secrets" endpoint HTTP response body for the "internal_error" error.
+type ListSecretsInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
 // GetSecretValueSecretNotFoundResponseBody is the type of the "secrets"
@@ -309,6 +370,19 @@ type CreateSecretInternalErrorResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// SecretInfoSummaryResponseBody is used to define fields on response body
+// types.
+type SecretInfoSummaryResponseBody struct {
+	// The original path of the secret
+	Path string `form:"path" json:"path" xml:"path"`
+	// The owner of the secret
+	Owner *UserResponseBody `form:"owner" json:"owner" xml:"owner"`
+	// Creation timestamp of the secret
+	CreatedAt string `form:"created_at" json:"created_at" xml:"created_at"`
+	// Last update timestamp of the secret
+	UpdatedAt string `form:"updated_at" json:"updated_at" xml:"updated_at"`
+}
+
 // UserResponseBody is used to define fields on response body types.
 type UserResponseBody struct {
 	// Unique identifier for the user
@@ -327,6 +401,19 @@ type RoleTypeResponseBody struct {
 	ID int `form:"id" json:"id" xml:"id"`
 	// Name of the role
 	Name string `form:"name" json:"name" xml:"name"`
+}
+
+// NewListSecretsResponseBody builds the HTTP response body from the result of
+// the "list secrets" endpoint of the "secrets" service.
+func NewListSecretsResponseBody(res *secrets.ListSecretsResult) *ListSecretsResponseBody {
+	body := &ListSecretsResponseBody{}
+	if res.Secrets != nil {
+		body.Secrets = make([]*SecretInfoSummaryResponseBody, len(res.Secrets))
+		for i, val := range res.Secrets {
+			body.Secrets[i] = marshalSecretsSecretInfoSummaryToSecretInfoSummaryResponseBody(val)
+		}
+	}
+	return body
 }
 
 // NewGetSecretValueResponseBody builds the HTTP response body from the result
@@ -365,6 +452,48 @@ func NewGetSecretResponseBody(res *secrets.SecretInfo) *GetSecretResponseBody {
 		}
 	} else {
 		body.AuthorizedRoles = []*RoleTypeResponseBody{}
+	}
+	return body
+}
+
+// NewListSecretsUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "list secrets" endpoint of the "secrets" service.
+func NewListSecretsUnauthorizedResponseBody(res *goa.ServiceError) *ListSecretsUnauthorizedResponseBody {
+	body := &ListSecretsUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListSecretsForbiddenResponseBody builds the HTTP response body from the
+// result of the "list secrets" endpoint of the "secrets" service.
+func NewListSecretsForbiddenResponseBody(res *goa.ServiceError) *ListSecretsForbiddenResponseBody {
+	body := &ListSecretsForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListSecretsInternalErrorResponseBody builds the HTTP response body from
+// the result of the "list secrets" endpoint of the "secrets" service.
+func NewListSecretsInternalErrorResponseBody(res *goa.ServiceError) *ListSecretsInternalErrorResponseBody {
+	body := &ListSecretsInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
 	}
 	return body
 }

@@ -25,7 +25,7 @@ import (
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
 	return `key-management (create-master-key|get-key-status|add-share|delete-share)
-secrets (get-secret-value|get-secret|create-secret)
+secrets (list-secrets|get-secret-value|get-secret|create-secret)
 users (create-user|list-users|delete-user|auth-user)
 `
 }
@@ -38,7 +38,7 @@ func UsageExamples() string {
       "min_shares": 3,
       "total_shares": 5
    }'` + "\n" +
-		os.Args[0] + ` secrets get-secret-value --path "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ=="` + "\n" +
+		os.Args[0] + ` secrets list-secrets` + "\n" +
 		os.Args[0] + ` users create-user --body '{
       "password": "s3cr3t",
       "username": "alice"
@@ -71,6 +71,8 @@ func ParseEndpoint(
 
 		secretsFlags = flag.NewFlagSet("secrets", flag.ContinueOnError)
 
+		secretsListSecretsFlags = flag.NewFlagSet("list-secrets", flag.ExitOnError)
+
 		secretsGetSecretValueFlags    = flag.NewFlagSet("get-secret-value", flag.ExitOnError)
 		secretsGetSecretValuePathFlag = secretsGetSecretValueFlags.String("path", "REQUIRED", "Base64 encoded secret's path")
 
@@ -100,6 +102,7 @@ func ParseEndpoint(
 	keyManagementDeleteShareFlags.Usage = keyManagementDeleteShareUsage
 
 	secretsFlags.Usage = secretsUsage
+	secretsListSecretsFlags.Usage = secretsListSecretsUsage
 	secretsGetSecretValueFlags.Usage = secretsGetSecretValueUsage
 	secretsGetSecretFlags.Usage = secretsGetSecretUsage
 	secretsCreateSecretFlags.Usage = secretsCreateSecretUsage
@@ -164,6 +167,9 @@ func ParseEndpoint(
 
 		case "secrets":
 			switch epn {
+			case "list-secrets":
+				epf = secretsListSecretsFlags
+
 			case "get-secret-value":
 				epf = secretsGetSecretValueFlags
 
@@ -229,6 +235,8 @@ func ParseEndpoint(
 		case "secrets":
 			c := secretsc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
+			case "list-secrets":
+				endpoint = c.ListSecrets()
 			case "get-secret-value":
 				endpoint = c.GetSecretValue()
 				data, err = secretsc.BuildGetSecretValuePayload(*secretsGetSecretValuePathFlag)
@@ -339,6 +347,7 @@ Usage:
     %[1]s [globalflags] secrets COMMAND [flags]
 
 COMMAND:
+    list-secrets: Retrieve all secrets you have access to
     get-secret-value: Retrieve a secret value
     get-secret: Retrieve a secret's information
     create-secret: Create a secret
@@ -347,6 +356,16 @@ Additional help:
     %[1]s secrets COMMAND --help
 `, os.Args[0])
 }
+func secretsListSecretsUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] secrets list-secrets
+
+Retrieve all secrets you have access to
+
+Example:
+    %[1]s secrets list-secrets
+`, os.Args[0])
+}
+
 func secretsGetSecretValueUsage() {
 	fmt.Fprintf(os.Stderr, `%[1]s [flags] secrets get-secret-value -path STRING
 

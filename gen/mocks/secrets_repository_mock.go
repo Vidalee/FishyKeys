@@ -332,64 +332,70 @@ func (_c *MockSecretsRepository_HasAccess_Call) RunAndReturn(run func(ctx contex
 	return _c
 }
 
-// ListSecrets provides a mock function for the type MockSecretsRepository
-func (_mock *MockSecretsRepository) ListSecrets(ctx context.Context) ([]repository.Secret, error) {
-	ret := _mock.Called(ctx)
+// ListSecretsForUser provides a mock function for the type MockSecretsRepository
+func (_mock *MockSecretsRepository) ListSecretsForUser(ctx context.Context, userID int) ([]repository.Secret, error) {
+	ret := _mock.Called(ctx, userID)
 
 	if len(ret) == 0 {
-		panic("no return value specified for ListSecrets")
+		panic("no return value specified for ListSecretsForUser")
 	}
 
 	var r0 []repository.Secret
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context) ([]repository.Secret, error)); ok {
-		return returnFunc(ctx)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) ([]repository.Secret, error)); ok {
+		return returnFunc(ctx, userID)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context) []repository.Secret); ok {
-		r0 = returnFunc(ctx)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) []repository.Secret); ok {
+		r0 = returnFunc(ctx, userID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]repository.Secret)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = returnFunc(ctx)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, int) error); ok {
+		r1 = returnFunc(ctx, userID)
 	} else {
 		r1 = ret.Error(1)
 	}
 	return r0, r1
 }
 
-// MockSecretsRepository_ListSecrets_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListSecrets'
-type MockSecretsRepository_ListSecrets_Call struct {
+// MockSecretsRepository_ListSecretsForUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListSecretsForUser'
+type MockSecretsRepository_ListSecretsForUser_Call struct {
 	*mock.Call
 }
 
-// ListSecrets is a helper method to define mock.On call
+// ListSecretsForUser is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *MockSecretsRepository_Expecter) ListSecrets(ctx interface{}) *MockSecretsRepository_ListSecrets_Call {
-	return &MockSecretsRepository_ListSecrets_Call{Call: _e.mock.On("ListSecrets", ctx)}
+//   - userID int
+func (_e *MockSecretsRepository_Expecter) ListSecretsForUser(ctx interface{}, userID interface{}) *MockSecretsRepository_ListSecretsForUser_Call {
+	return &MockSecretsRepository_ListSecretsForUser_Call{Call: _e.mock.On("ListSecretsForUser", ctx, userID)}
 }
 
-func (_c *MockSecretsRepository_ListSecrets_Call) Run(run func(ctx context.Context)) *MockSecretsRepository_ListSecrets_Call {
+func (_c *MockSecretsRepository_ListSecretsForUser_Call) Run(run func(ctx context.Context, userID int)) *MockSecretsRepository_ListSecretsForUser_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
+		var arg1 int
+		if args[1] != nil {
+			arg1 = args[1].(int)
+		}
 		run(
 			arg0,
+			arg1,
 		)
 	})
 	return _c
 }
 
-func (_c *MockSecretsRepository_ListSecrets_Call) Return(secrets []repository.Secret, err error) *MockSecretsRepository_ListSecrets_Call {
+func (_c *MockSecretsRepository_ListSecretsForUser_Call) Return(secrets []repository.Secret, err error) *MockSecretsRepository_ListSecretsForUser_Call {
 	_c.Call.Return(secrets, err)
 	return _c
 }
 
-func (_c *MockSecretsRepository_ListSecrets_Call) RunAndReturn(run func(ctx context.Context) ([]repository.Secret, error)) *MockSecretsRepository_ListSecrets_Call {
+func (_c *MockSecretsRepository_ListSecretsForUser_Call) RunAndReturn(run func(ctx context.Context, userID int) ([]repository.Secret, error)) *MockSecretsRepository_ListSecretsForUser_Call {
 	_c.Call.Return(run)
 	return _c
 }

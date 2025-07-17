@@ -13,6 +13,20 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// wrapAuthentifiedListSecrets applies the Authentified server interceptor to
+// endpoints.
+func wrapListSecretsAuthentified(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		info := &AuthentifiedInfo{
+			service:    "secrets",
+			method:     "ListSecrets",
+			callType:   goa.InterceptorUnary,
+			rawPayload: req,
+		}
+		return i.Authentified(ctx, info, endpoint)
+	}
+}
+
 // wrapAuthentifiedGetSecretValue applies the Authentified server interceptor
 // to endpoints.
 func wrapGetSecretValueAuthentified(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {

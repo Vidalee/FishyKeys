@@ -3,8 +3,9 @@ package service
 import (
 	"context"
 	"encoding/base64"
-	gensecrets "github.com/Vidalee/FishyKeys/gen/secrets"
 	"testing"
+
+	gensecrets "github.com/Vidalee/FishyKeys/gen/secrets"
 
 	"github.com/Vidalee/FishyKeys/internal/crypto"
 	"github.com/Vidalee/FishyKeys/internal/testutil"
@@ -91,13 +92,13 @@ func TestSecretsService_CreateSecret(t *testing.T) {
 			require.NoError(t, err, "failed to create user2")
 			roleID1, err := service.rolesRepository.CreateRole(ctx, "role1", "#FFFFFF")
 			require.NoError(t, err, "failed to create role1")
-			roleID2, err := service.rolesRepository.CreateRole(ctx, "role2", "#000000")
-			require.NoError(t, err, "failed to create role2")
+			err = service.userRolesRepository.AssignRoleToUser(ctx, userID2, roleID1)
+			require.NoError(t, err, "failed to assign role1 to user2")
 
 			var roles []int
 			var users []int
 			if tt.addCreatedUsersAndRoles {
-				roles = []int{roleID1, roleID2}
+				roles = []int{roleID1}
 				users = []int{userID1, userID2}
 			}
 
@@ -354,4 +355,77 @@ func TestSecretsService_GetSecret(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSecretsService_ListSecrets(t *testing.T) {
+	service := setupSecretsTestService(t)
+	ctx := context.Background()
+	clearSecretsServiceTables(t, ctx)
+
+	userID1, err := service.usersRepository.CreateUser(ctx, "user1", "password1")
+	require.NoError(t, err, "failed to create user1")
+	userID2, err := service.usersRepository.CreateUser(ctx, "user2", "password2")
+	require.NoError(t, err, "failed to create user2")
+	userID3, err := service.usersRepository.CreateUser(ctx, "user3", "password3")
+	require.NoError(t, err, "failed to create user3")
+	roleID1, err := service.rolesRepository.CreateRole(ctx, "role1", "#FFFFFF")
+	require.NoError(t, err, "failed to create role1")
+	err = service.userRolesRepository.AssignRoleToUser(ctx, userID3, roleID1)
+	require.NoError(t, err, "failed to assign role1 to user3")
+
+	_, err = service.secretsRepository.CreateSecret(ctx, service.keyManager, "/owned/secret", userID1, "owned_value")
+	require.NoError(t, err, "failed to create owned secret")
+	_, err = service.secretsRepository.CreateSecret(ctx, service.keyManager, "/user/secret", userID1, "user_value")
+	require.NoError(t, err, "failed to create user secret")
+	_, err = service.secretsRepository.CreateSecret(ctx, service.keyManager, "/role/secret", userID1, "role_value")
+	require.NoError(t, err, "failed to create role secret")
+
+	err = service.secretsAccessRepository.GrantUserAccess(ctx, "/user/secret", userID2)
+	require.NoError(t, err, "failed to grant user2 access to /user/secret")
+	err = service.secretsAccessRepository.GrantRoleAccess(ctx, "/role/secret", roleID1)
+	require.NoError(t, err, "failed to grant role1 access to /role/secret")
+
+	t.Run("owner sees all their secrets", func(t *testing.T) {
+		ctxWithToken := context.WithValue(ctx, "token", &JwtClaims{UserID: userID1})
+		result, err := service.ListSecrets(ctxWithToken)
+		assert.NoError(t, err)
+		assert.NotNil(t, result)
+		paths := make([]string, 0, len(result.Secrets))
+		for _, s := range result.Secrets {
+			paths = append(paths, s.Path)
+		}
+		assert.ElementsMatch(t, []string{"/owned/secret", "/user/secret", "/role/secret"}, paths)
+	})
+
+	t.Run("user with direct access sees only authorized secret", func(t *testing.T) {
+		ctxWithToken := context.WithValue(ctx, "token", &JwtClaims{UserID: userID2})
+		result, err := service.ListSecrets(ctxWithToken)
+		assert.NoError(t, err)
+		assert.NotNil(t, result)
+		paths := make([]string, 0, len(result.Secrets))
+		for _, s := range result.Secrets {
+			paths = append(paths, s.Path)
+		}
+		assert.ElementsMatch(t, []string{"/user/secret"}, paths)
+	})
+
+	t.Run("user with role access sees only role secret", func(t *testing.T) {
+		ctxWithToken := context.WithValue(ctx, "token", &JwtClaims{UserID: userID3})
+		result, err := service.ListSecrets(ctxWithToken)
+		assert.NoError(t, err)
+		assert.NotNil(t, result)
+		paths := make([]string, 0, len(result.Secrets))
+		for _, s := range result.Secrets {
+			paths = append(paths, s.Path)
+		}
+		assert.ElementsMatch(t, []string{"/role/secret"}, paths)
+	})
+
+	t.Run("user with no access sees nothing", func(t *testing.T) {
+		ctxWithToken := context.WithValue(ctx, "token", &JwtClaims{UserID: 9999}) // non-existent user
+		result, err := service.ListSecrets(ctxWithToken)
+		assert.NoError(t, err)
+		assert.NotNil(t, result)
+		assert.Empty(t, result.Secrets)
+	})
 }

@@ -27,6 +27,13 @@ type CreateSecretRequestBody struct {
 	AuthorizedRoles []int `form:"authorized_roles" json:"authorized_roles" xml:"authorized_roles"`
 }
 
+// ListSecretsResponseBody is the type of the "secrets" service "list secrets"
+// endpoint HTTP response body.
+type ListSecretsResponseBody struct {
+	// List of secrets you have access to
+	Secrets []*SecretInfoSummaryResponseBody `form:"secrets,omitempty" json:"secrets,omitempty" xml:"secrets,omitempty"`
+}
+
 // GetSecretValueResponseBody is the type of the "secrets" service "get secret
 // value" endpoint HTTP response body.
 type GetSecretValueResponseBody struct {
@@ -51,6 +58,60 @@ type GetSecretResponseBody struct {
 	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Last update timestamp of the secret
 	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+}
+
+// ListSecretsUnauthorizedResponseBody is the type of the "secrets" service
+// "list secrets" endpoint HTTP response body for the "unauthorized" error.
+type ListSecretsUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListSecretsForbiddenResponseBody is the type of the "secrets" service "list
+// secrets" endpoint HTTP response body for the "forbidden" error.
+type ListSecretsForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListSecretsInternalErrorResponseBody is the type of the "secrets" service
+// "list secrets" endpoint HTTP response body for the "internal_error" error.
+type ListSecretsInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
 // GetSecretValueSecretNotFoundResponseBody is the type of the "secrets"
@@ -309,6 +370,19 @@ type CreateSecretInternalErrorResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// SecretInfoSummaryResponseBody is used to define fields on response body
+// types.
+type SecretInfoSummaryResponseBody struct {
+	// The original path of the secret
+	Path *string `form:"path,omitempty" json:"path,omitempty" xml:"path,omitempty"`
+	// The owner of the secret
+	Owner *UserResponseBody `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
+	// Creation timestamp of the secret
+	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	// Last update timestamp of the secret
+	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+}
+
 // UserResponseBody is used to define fields on response body types.
 type UserResponseBody struct {
 	// Unique identifier for the user
@@ -353,6 +427,65 @@ func NewCreateSecretRequestBody(p *secrets.CreateSecretPayload) *CreateSecretReq
 		body.AuthorizedRoles = []int{}
 	}
 	return body
+}
+
+// NewListSecretsResultOK builds a "secrets" service "list secrets" endpoint
+// result from a HTTP "OK" response.
+func NewListSecretsResultOK(body *ListSecretsResponseBody) *secrets.ListSecretsResult {
+	v := &secrets.ListSecretsResult{}
+	if body.Secrets != nil {
+		v.Secrets = make([]*secrets.SecretInfoSummary, len(body.Secrets))
+		for i, val := range body.Secrets {
+			v.Secrets[i] = unmarshalSecretInfoSummaryResponseBodyToSecretsSecretInfoSummary(val)
+		}
+	}
+
+	return v
+}
+
+// NewListSecretsUnauthorized builds a secrets service list secrets endpoint
+// unauthorized error.
+func NewListSecretsUnauthorized(body *ListSecretsUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListSecretsForbidden builds a secrets service list secrets endpoint
+// forbidden error.
+func NewListSecretsForbidden(body *ListSecretsForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListSecretsInternalError builds a secrets service list secrets endpoint
+// internal_error error.
+func NewListSecretsInternalError(body *ListSecretsInternalErrorResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
 }
 
 // NewGetSecretValueResultOK builds a "secrets" service "get secret value"
@@ -597,6 +730,19 @@ func NewCreateSecretInternalError(body *CreateSecretInternalErrorResponseBody) *
 	return v
 }
 
+// ValidateListSecretsResponseBody runs the validations defined on List
+// SecretsResponseBody
+func ValidateListSecretsResponseBody(body *ListSecretsResponseBody) (err error) {
+	for _, e := range body.Secrets {
+		if e != nil {
+			if err2 := ValidateSecretInfoSummaryResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // ValidateGetSecretResponseBody runs the validations defined on Get
 // SecretResponseBody
 func ValidateGetSecretResponseBody(body *GetSecretResponseBody) (err error) {
@@ -636,6 +782,78 @@ func ValidateGetSecretResponseBody(body *GetSecretResponseBody) (err error) {
 				err = goa.MergeErrors(err, err2)
 			}
 		}
+	}
+	return
+}
+
+// ValidateListSecretsUnauthorizedResponseBody runs the validations defined on
+// list secrets_unauthorized_response_body
+func ValidateListSecretsUnauthorizedResponseBody(body *ListSecretsUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListSecretsForbiddenResponseBody runs the validations defined on
+// list secrets_forbidden_response_body
+func ValidateListSecretsForbiddenResponseBody(body *ListSecretsForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListSecretsInternalErrorResponseBody runs the validations defined on
+// list secrets_internal_error_response_body
+func ValidateListSecretsInternalErrorResponseBody(body *ListSecretsInternalErrorResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
 	}
 	return
 }
@@ -972,6 +1190,29 @@ func ValidateCreateSecretInternalErrorResponseBody(body *CreateSecretInternalErr
 	}
 	if body.Fault == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateSecretInfoSummaryResponseBody runs the validations defined on
+// SecretInfoSummaryResponseBody
+func ValidateSecretInfoSummaryResponseBody(body *SecretInfoSummaryResponseBody) (err error) {
+	if body.Path == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("path", "body"))
+	}
+	if body.Owner == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("owner", "body"))
+	}
+	if body.CreatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("created_at", "body"))
+	}
+	if body.UpdatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updated_at", "body"))
+	}
+	if body.Owner != nil {
+		if err2 := ValidateUserResponseBody(body.Owner); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }

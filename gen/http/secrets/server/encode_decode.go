@@ -19,6 +19,73 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// EncodeListSecretsResponse returns an encoder for responses returned by the
+// secrets list secrets endpoint.
+func EncodeListSecretsResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+	return func(ctx context.Context, w http.ResponseWriter, v any) error {
+		res, _ := v.(*secrets.ListSecretsResult)
+		enc := encoder(ctx, w)
+		body := NewListSecretsResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// EncodeListSecretsError returns an encoder for errors returned by the list
+// secrets secrets endpoint.
+func EncodeListSecretsError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en goa.GoaErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.GoaErrorName() {
+		case "unauthorized":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewListSecretsUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		case "forbidden":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewListSecretsForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "internal_error":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewListSecretsInternalErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // EncodeGetSecretValueResponse returns an encoder for responses returned by
 // the secrets get secret value endpoint.
 func EncodeGetSecretValueResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
@@ -355,6 +422,25 @@ func EncodeCreateSecretError(encoder func(context.Context, http.ResponseWriter) 
 			return encodeError(ctx, w, v)
 		}
 	}
+}
+
+// marshalSecretsSecretInfoSummaryToSecretInfoSummaryResponseBody builds a
+// value of type *SecretInfoSummaryResponseBody from a value of type
+// *secrets.SecretInfoSummary.
+func marshalSecretsSecretInfoSummaryToSecretInfoSummaryResponseBody(v *secrets.SecretInfoSummary) *SecretInfoSummaryResponseBody {
+	if v == nil {
+		return nil
+	}
+	res := &SecretInfoSummaryResponseBody{
+		Path:      v.Path,
+		CreatedAt: v.CreatedAt,
+		UpdatedAt: v.UpdatedAt,
+	}
+	if v.Owner != nil {
+		res.Owner = marshalSecretsUserToUserResponseBody(v.Owner)
+	}
+
+	return res
 }
 
 // marshalSecretsUserToUserResponseBody builds a value of type

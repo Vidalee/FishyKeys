@@ -15,6 +15,7 @@ import (
 
 // Endpoints wraps the "secrets" service endpoints.
 type Endpoints struct {
+	ListSecrets    goa.Endpoint
 	GetSecretValue goa.Endpoint
 	GetSecret      goa.Endpoint
 	CreateSecret   goa.Endpoint
@@ -23,10 +24,12 @@ type Endpoints struct {
 // NewEndpoints wraps the methods of the "secrets" service with endpoints.
 func NewEndpoints(s Service, si ServerInterceptors) *Endpoints {
 	endpoints := &Endpoints{
+		ListSecrets:    NewListSecretsEndpoint(s),
 		GetSecretValue: NewGetSecretValueEndpoint(s),
 		GetSecret:      NewGetSecretEndpoint(s),
 		CreateSecret:   NewCreateSecretEndpoint(s),
 	}
+	endpoints.ListSecrets = WrapListSecretsEndpoint(endpoints.ListSecrets, si)
 	endpoints.GetSecretValue = WrapGetSecretValueEndpoint(endpoints.GetSecretValue, si)
 	endpoints.GetSecret = WrapGetSecretEndpoint(endpoints.GetSecret, si)
 	endpoints.CreateSecret = WrapCreateSecretEndpoint(endpoints.CreateSecret, si)
@@ -35,9 +38,18 @@ func NewEndpoints(s Service, si ServerInterceptors) *Endpoints {
 
 // Use applies the given middleware to all the "secrets" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
+	e.ListSecrets = m(e.ListSecrets)
 	e.GetSecretValue = m(e.GetSecretValue)
 	e.GetSecret = m(e.GetSecret)
 	e.CreateSecret = m(e.CreateSecret)
+}
+
+// NewListSecretsEndpoint returns an endpoint function that calls the method
+// "list secrets" of service "secrets".
+func NewListSecretsEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		return s.ListSecrets(ctx)
+	}
 }
 
 // NewGetSecretValueEndpoint returns an endpoint function that calls the method

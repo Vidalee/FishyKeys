@@ -15,6 +15,8 @@ import (
 
 // User service manages user accounts and authentication
 type Service interface {
+	// Retrieve all secrets you have access to
+	ListSecrets(context.Context) (res *ListSecretsResult, err error)
 	// Retrieve a secret value
 	GetSecretValue(context.Context, *GetSecretValuePayload) (res *GetSecretValueResult, err error)
 	// Retrieve a secret's information
@@ -37,7 +39,7 @@ const ServiceName = "secrets"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [3]string{"get secret value", "get secret", "create secret"}
+var MethodNames = [4]string{"list secrets", "get secret value", "get secret", "create secret"}
 
 // CreateSecretPayload is the payload type of the secrets service create secret
 // method.
@@ -75,6 +77,13 @@ type GetSecretValueResult struct {
 	Path *string
 }
 
+// ListSecretsResult is the result type of the secrets service list secrets
+// method.
+type ListSecretsResult struct {
+	// List of secrets you have access to
+	Secrets []*SecretInfoSummary
+}
+
 type RoleType struct {
 	// Unique identifier for the role
 	ID int
@@ -92,6 +101,17 @@ type SecretInfo struct {
 	AuthorizedUsers []*User
 	// Roles authorized to access the secret
 	AuthorizedRoles []*RoleType
+	// Creation timestamp of the secret
+	CreatedAt string
+	// Last update timestamp of the secret
+	UpdatedAt string
+}
+
+type SecretInfoSummary struct {
+	// The original path of the secret
+	Path string
+	// The owner of the secret
+	Owner *User
 	// Creation timestamp of the secret
 	CreatedAt string
 	// Last update timestamp of the secret

@@ -15,18 +15,37 @@ import (
 
 // Client is the "secrets" service client.
 type Client struct {
+	ListSecretsEndpoint    goa.Endpoint
 	GetSecretValueEndpoint goa.Endpoint
 	GetSecretEndpoint      goa.Endpoint
 	CreateSecretEndpoint   goa.Endpoint
 }
 
 // NewClient initializes a "secrets" service client given the endpoints.
-func NewClient(getSecretValue, getSecret, createSecret goa.Endpoint) *Client {
+func NewClient(listSecrets, getSecretValue, getSecret, createSecret goa.Endpoint) *Client {
 	return &Client{
+		ListSecretsEndpoint:    listSecrets,
 		GetSecretValueEndpoint: getSecretValue,
 		GetSecretEndpoint:      getSecret,
 		CreateSecretEndpoint:   createSecret,
 	}
+}
+
+// ListSecrets calls the "list secrets" endpoint of the "secrets" service.
+// ListSecrets may return the following errors:
+//   - "secret_not_found" (type *goa.ServiceError): Secret not found
+//   - "invalid_parameters" (type *goa.ServiceError): Invalid token path
+//   - "unauthorized" (type *goa.ServiceError): Unauthorized access
+//   - "forbidden" (type *goa.ServiceError): Forbidden access
+//   - "internal_error" (type *goa.ServiceError): Internal server error
+//   - error: internal error
+func (c *Client) ListSecrets(ctx context.Context) (res *ListSecretsResult, err error) {
+	var ires any
+	ires, err = c.ListSecretsEndpoint(ctx, nil)
+	if err != nil {
+		return
+	}
+	return ires.(*ListSecretsResult), nil
 }
 
 // GetSecretValue calls the "get secret value" endpoint of the "secrets"
