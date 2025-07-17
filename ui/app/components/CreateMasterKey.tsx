@@ -40,9 +40,9 @@ export default function CreateMasterKey({ onCreatingKey }: CreateMasterKeyProps)
         console.log(err.body)
         if (err.body.name === 'invalid_parameters') {
           errorMessage = err.body.message
-        } else if (err.body === 'key_already_exists') {
+        } else if (err.body.message === 'key_already_exists') {
           errorMessage = 'A master key already exists'
-        } else if (err.body === 'internal_error') {
+        } else if (err.body.message === 'internal_error') {
           errorMessage = 'Internal server error occurred'
         }
       }

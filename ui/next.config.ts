@@ -13,6 +13,14 @@ const nextConfig: NextConfig = {
         source: '/users/:path*',
         destination: `${process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'}/users/:path*`,
       },
+        {
+            source: '/secrets/:path*',
+            destination: `${process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'}/secrets/:path*`,
+        },
+        {
+            source: '/roles/:path*',
+            destination: `${process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'}/roles/:path*`,
+        },
     ]
   },
 };
