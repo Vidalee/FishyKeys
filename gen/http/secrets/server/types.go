@@ -50,7 +50,7 @@ type GetSecretResponseBody struct {
 	// Members authorized to access the secret
 	AuthorizedUsers []*UserResponseBody `form:"authorized_users" json:"authorized_users" xml:"authorized_users"`
 	// Roles authorized to access the secret
-	AuthorizedRoles []*RoleTypeResponseBody `form:"authorized_roles" json:"authorized_roles" xml:"authorized_roles"`
+	AuthorizedRoles []*RoleResponseBody `form:"authorized_roles" json:"authorized_roles" xml:"authorized_roles"`
 	// Creation timestamp of the secret
 	CreatedAt string `form:"created_at" json:"created_at" xml:"created_at"`
 	// Last update timestamp of the secret
@@ -403,12 +403,20 @@ type UserResponseBody struct {
 	UpdatedAt string `form:"updated_at" json:"updated_at" xml:"updated_at"`
 }
 
-// RoleTypeResponseBody is used to define fields on response body types.
-type RoleTypeResponseBody struct {
+// RoleResponseBody is used to define fields on response body types.
+type RoleResponseBody struct {
 	// Unique identifier for the role
 	ID int `form:"id" json:"id" xml:"id"`
 	// Name of the role
 	Name string `form:"name" json:"name" xml:"name"`
+	// Color associated with the role
+	Color string `form:"color" json:"color" xml:"color"`
+	// Is this role an admin role?
+	Admin bool `form:"admin" json:"admin" xml:"admin"`
+	// Role creation timestamp
+	CreatedAt string `form:"created_at" json:"created_at" xml:"created_at"`
+	// Role last update timestamp
+	UpdatedAt string `form:"updated_at" json:"updated_at" xml:"updated_at"`
 }
 
 // NewListSecretsResponseBody builds the HTTP response body from the result of
@@ -451,12 +459,12 @@ func NewGetSecretResponseBody(res *secrets.SecretInfo) *GetSecretResponseBody {
 		body.AuthorizedUsers = []*UserResponseBody{}
 	}
 	if res.AuthorizedRoles != nil {
-		body.AuthorizedRoles = make([]*RoleTypeResponseBody, len(res.AuthorizedRoles))
+		body.AuthorizedRoles = make([]*RoleResponseBody, len(res.AuthorizedRoles))
 		for i, val := range res.AuthorizedRoles {
-			body.AuthorizedRoles[i] = marshalSecretsRoleTypeToRoleTypeResponseBody(val)
+			body.AuthorizedRoles[i] = marshalSecretsRoleToRoleResponseBody(val)
 		}
 	} else {
-		body.AuthorizedRoles = []*RoleTypeResponseBody{}
+		body.AuthorizedRoles = []*RoleResponseBody{}
 	}
 	return body
 }

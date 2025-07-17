@@ -206,11 +206,15 @@ func (s *SecretsService) GetSecret(ctx context.Context, payload *gensecrets.GetS
 	if err != nil {
 		return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving authorized roles: %w", err))
 	}
-	var authorizedRolesPayload []*gensecrets.RoleType
+	var authorizedRolesPayload []*gensecrets.Role
 	for _, role := range authorizedRoles {
-		authorizedRolesPayload = append(authorizedRolesPayload, &gensecrets.RoleType{
-			ID:   role.ID,
-			Name: role.Name,
+		authorizedRolesPayload = append(authorizedRolesPayload, &gensecrets.Role{
+			ID:        role.ID,
+			Name:      role.Name,
+			Color:     role.Color,
+			Admin:     role.Admin,
+			CreatedAt: role.CreatedAt.Format("2006-01-02T15:04:05Z"),
+			UpdatedAt: role.UpdatedAt.Format("2006-01-02T15:04:05Z"),
 		})
 	}
 

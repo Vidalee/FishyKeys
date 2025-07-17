@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/Vidalee/FishyKeys/gen/roles"
 	"github.com/Vidalee/FishyKeys/gen/secrets"
 	"github.com/Vidalee/FishyKeys/gen/users"
 	"github.com/Vidalee/FishyKeys/repository"
@@ -61,6 +62,19 @@ type ServerSecretsInterceptors struct {
 }
 
 func (i *ServerSecretsInterceptors) Authentified(ctx context.Context, info *secrets.AuthentifiedInfo, next goa.Endpoint) (any, error) {
+	token := ctx.Value("token")
+	if token == nil {
+		return nil, secrets.MakeUnauthorized(fmt.Errorf("you need to be authenticated to access this endpoint"))
+	}
+	return next(ctx, info.RawPayload())
+}
+
+type ServerRolesInterceptors struct {
+	rolesRepository     repository.RolesRepository
+	userRolesRepository repository.UserRolesRepository
+}
+
+func (i *ServerRolesInterceptors) Authentified(ctx context.Context, info *roles.AuthentifiedInfo, next goa.Endpoint) (any, error) {
 	token := ctx.Value("token")
 	if token == nil {
 		return nil, secrets.MakeUnauthorized(fmt.Errorf("you need to be authenticated to access this endpoint"))

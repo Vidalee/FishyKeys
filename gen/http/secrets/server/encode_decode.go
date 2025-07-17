@@ -466,12 +466,16 @@ func marshalSecretsUserToUserResponseBody(v *secrets.User) *UserResponseBody {
 	return res
 }
 
-// marshalSecretsRoleTypeToRoleTypeResponseBody builds a value of type
-// *RoleTypeResponseBody from a value of type *secrets.RoleType.
-func marshalSecretsRoleTypeToRoleTypeResponseBody(v *secrets.RoleType) *RoleTypeResponseBody {
-	res := &RoleTypeResponseBody{
-		ID:   v.ID,
-		Name: v.Name,
+// marshalSecretsRoleToRoleResponseBody builds a value of type
+// *RoleResponseBody from a value of type *secrets.Role.
+func marshalSecretsRoleToRoleResponseBody(v *secrets.Role) *RoleResponseBody {
+	res := &RoleResponseBody{
+		ID:        v.ID,
+		Name:      v.Name,
+		Color:     v.Color,
+		Admin:     v.Admin,
+		CreatedAt: v.CreatedAt,
+		UpdatedAt: v.UpdatedAt,
 	}
 
 	return res

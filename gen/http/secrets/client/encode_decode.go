@@ -567,12 +567,16 @@ func unmarshalUserResponseBodyToSecretsUser(v *UserResponseBody) *secrets.User {
 	return res
 }
 
-// unmarshalRoleTypeResponseBodyToSecretsRoleType builds a value of type
-// *secrets.RoleType from a value of type *RoleTypeResponseBody.
-func unmarshalRoleTypeResponseBodyToSecretsRoleType(v *RoleTypeResponseBody) *secrets.RoleType {
-	res := &secrets.RoleType{
-		ID:   *v.ID,
-		Name: *v.Name,
+// unmarshalRoleResponseBodyToSecretsRole builds a value of type *secrets.Role
+// from a value of type *RoleResponseBody.
+func unmarshalRoleResponseBodyToSecretsRole(v *RoleResponseBody) *secrets.Role {
+	res := &secrets.Role{
+		ID:        *v.ID,
+		Name:      *v.Name,
+		Color:     *v.Color,
+		Admin:     *v.Admin,
+		CreatedAt: *v.CreatedAt,
+		UpdatedAt: *v.UpdatedAt,
 	}
 
 	return res

@@ -50,7 +50,7 @@ type GetSecretResponseBody struct {
 	// Members authorized to access the secret
 	AuthorizedUsers []*UserResponseBody `form:"authorized_users,omitempty" json:"authorized_users,omitempty" xml:"authorized_users,omitempty"`
 	// Roles authorized to access the secret
-	AuthorizedRoles []*RoleTypeResponseBody `form:"authorized_roles,omitempty" json:"authorized_roles,omitempty" xml:"authorized_roles,omitempty"`
+	AuthorizedRoles []*RoleResponseBody `form:"authorized_roles,omitempty" json:"authorized_roles,omitempty" xml:"authorized_roles,omitempty"`
 	// Creation timestamp of the secret
 	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Last update timestamp of the secret
@@ -403,12 +403,20 @@ type UserResponseBody struct {
 	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 }
 
-// RoleTypeResponseBody is used to define fields on response body types.
-type RoleTypeResponseBody struct {
+// RoleResponseBody is used to define fields on response body types.
+type RoleResponseBody struct {
 	// Unique identifier for the role
 	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// Name of the role
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// Color associated with the role
+	Color *string `form:"color,omitempty" json:"color,omitempty" xml:"color,omitempty"`
+	// Is this role an admin role?
+	Admin *bool `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	// Role creation timestamp
+	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	// Role last update timestamp
+	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 }
 
 // NewCreateSecretRequestBody builds the HTTP request body from the payload of
@@ -592,9 +600,9 @@ func NewGetSecretSecretInfoOK(body *GetSecretResponseBody) *secrets.SecretInfo {
 	for i, val := range body.AuthorizedUsers {
 		v.AuthorizedUsers[i] = unmarshalUserResponseBodyToSecretsUser(val)
 	}
-	v.AuthorizedRoles = make([]*secrets.RoleType, len(body.AuthorizedRoles))
+	v.AuthorizedRoles = make([]*secrets.Role, len(body.AuthorizedRoles))
 	for i, val := range body.AuthorizedRoles {
-		v.AuthorizedRoles[i] = unmarshalRoleTypeResponseBodyToSecretsRoleType(val)
+		v.AuthorizedRoles[i] = unmarshalRoleResponseBodyToSecretsRole(val)
 	}
 
 	return v
@@ -770,7 +778,7 @@ func ValidateGetSecretResponseBody(body *GetSecretResponseBody) (err error) {
 	}
 	for _, e := range body.AuthorizedRoles {
 		if e != nil {
-			if err2 := ValidateRoleTypeResponseBody(e); err2 != nil {
+			if err2 := ValidateRoleResponseBody(e); err2 != nil {
 				err = goa.MergeErrors(err, err2)
 			}
 		}
@@ -1253,14 +1261,25 @@ func ValidateUserResponseBody(body *UserResponseBody) (err error) {
 	return
 }
 
-// ValidateRoleTypeResponseBody runs the validations defined on
-// RoleTypeResponseBody
-func ValidateRoleTypeResponseBody(body *RoleTypeResponseBody) (err error) {
+// ValidateRoleResponseBody runs the validations defined on RoleResponseBody
+func ValidateRoleResponseBody(body *RoleResponseBody) (err error) {
 	if body.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
 	}
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Color == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("color", "body"))
+	}
+	if body.Admin == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("admin", "body"))
+	}
+	if body.CreatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("created_at", "body"))
+	}
+	if body.UpdatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updated_at", "body"))
 	}
 	return
 }

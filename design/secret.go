@@ -4,17 +4,6 @@ import (
 	. "goa.design/goa/v3/dsl"
 )
 
-var RoleType = Type("RoleType", func() {
-	Attribute("id", Int, "Unique identifier for the role", func() {
-		Example(1)
-	})
-	Attribute("name", String, "Name of the role", func() {
-		Example("admin")
-	})
-
-	Required("id", "name")
-})
-
 var SecretInfoType = Type("SecretInfo", func() {
 	Attribute("path", String, "The original path of the secret", func() {
 		Example("customers/google/api_key")

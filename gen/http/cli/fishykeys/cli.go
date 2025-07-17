@@ -14,6 +14,7 @@ import (
 	"os"
 
 	keymanagementc "github.com/Vidalee/FishyKeys/gen/http/key_management/client"
+	rolesc "github.com/Vidalee/FishyKeys/gen/http/roles/client"
 	secretsc "github.com/Vidalee/FishyKeys/gen/http/secrets/client"
 	usersc "github.com/Vidalee/FishyKeys/gen/http/users/client"
 	goahttp "goa.design/goa/v3/http"
@@ -25,6 +26,7 @@ import (
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
 	return `key-management (create-master-key|get-key-status|add-share|delete-share)
+roles list-roles
 secrets (list-secrets|get-secret-value|get-secret|create-secret)
 users (create-user|list-users|delete-user|auth-user)
 `
@@ -38,6 +40,7 @@ func UsageExamples() string {
       "min_shares": 3,
       "total_shares": 5
    }'` + "\n" +
+		os.Args[0] + ` roles list-roles` + "\n" +
 		os.Args[0] + ` secrets list-secrets` + "\n" +
 		os.Args[0] + ` users create-user --body '{
       "password": "s3cr3t",
@@ -68,6 +71,10 @@ func ParseEndpoint(
 
 		keyManagementDeleteShareFlags    = flag.NewFlagSet("delete-share", flag.ExitOnError)
 		keyManagementDeleteShareBodyFlag = keyManagementDeleteShareFlags.String("body", "REQUIRED", "")
+
+		rolesFlags = flag.NewFlagSet("roles", flag.ContinueOnError)
+
+		rolesListRolesFlags = flag.NewFlagSet("list-roles", flag.ExitOnError)
 
 		secretsFlags = flag.NewFlagSet("secrets", flag.ContinueOnError)
 
@@ -101,6 +108,9 @@ func ParseEndpoint(
 	keyManagementAddShareFlags.Usage = keyManagementAddShareUsage
 	keyManagementDeleteShareFlags.Usage = keyManagementDeleteShareUsage
 
+	rolesFlags.Usage = rolesUsage
+	rolesListRolesFlags.Usage = rolesListRolesUsage
+
 	secretsFlags.Usage = secretsUsage
 	secretsListSecretsFlags.Usage = secretsListSecretsUsage
 	secretsGetSecretValueFlags.Usage = secretsGetSecretValueUsage
@@ -130,6 +140,8 @@ func ParseEndpoint(
 		switch svcn {
 		case "key-management":
 			svcf = keyManagementFlags
+		case "roles":
+			svcf = rolesFlags
 		case "secrets":
 			svcf = secretsFlags
 		case "users":
@@ -162,6 +174,13 @@ func ParseEndpoint(
 
 			case "delete-share":
 				epf = keyManagementDeleteShareFlags
+
+			}
+
+		case "roles":
+			switch epn {
+			case "list-roles":
+				epf = rolesListRolesFlags
 
 			}
 
@@ -231,6 +250,12 @@ func ParseEndpoint(
 			case "delete-share":
 				endpoint = c.DeleteShare()
 				data, err = keymanagementc.BuildDeleteSharePayload(*keyManagementDeleteShareBodyFlag)
+			}
+		case "roles":
+			c := rolesc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "list-roles":
+				endpoint = c.ListRoles()
 			}
 		case "secrets":
 			c := secretsc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -337,6 +362,29 @@ Example:
     %[1]s key-management delete-share --body '{
       "index": 1
    }'
+`, os.Args[0])
+}
+
+// rolesUsage displays the usage of the roles command and its subcommands.
+func rolesUsage() {
+	fmt.Fprintf(os.Stderr, `Roles service manages roles
+Usage:
+    %[1]s [globalflags] roles COMMAND [flags]
+
+COMMAND:
+    list-roles: List all roles
+
+Additional help:
+    %[1]s roles COMMAND --help
+`, os.Args[0])
+}
+func rolesListRolesUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] roles list-roles
+
+List all roles
+
+Example:
+    %[1]s roles list-roles
 `, os.Args[0])
 }
 

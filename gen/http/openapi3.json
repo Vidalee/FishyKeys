@@ -183,8 +183,8 @@
                   "$ref": "#/components/schemas/AddShareResponseBody"
                 },
                 "example": {
-                  "index": 6938986088863093119,
-                  "unlocked": false
+                  "index": 4689996537036155328,
+                  "unlocked": true
                 }
               }
             }
@@ -249,16 +249,105 @@
                   "$ref": "#/components/schemas/GetKeyStatusResponseBody"
                 },
                 "example": {
-                  "current_shares": 2038305493491334832,
+                  "current_shares": 382474295782307311,
                   "is_locked": true,
-                  "min_shares": 8155372107292265134,
-                  "total_shares": 382474295782307311
+                  "min_shares": 5117056083765439164,
+                  "total_shares": 908568140735950639
                 }
               }
             }
           },
           "404": {
             "description": "no_key_set: No master key has been set",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error: Internal server error",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/roles": {
+      "get": {
+        "tags": [
+          "roles"
+        ],
+        "summary": "list roles roles",
+        "description": "List all roles",
+        "operationId": "roles#list roles",
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Role"
+                  },
+                  "example": [
+                    {
+                      "admin": true,
+                      "color": "#FF5733",
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "id": 1,
+                      "name": "admin",
+                      "updated_at": "2025-06-30T15:00:00Z"
+                    },
+                    {
+                      "admin": true,
+                      "color": "#FF5733",
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "id": 1,
+                      "name": "admin",
+                      "updated_at": "2025-06-30T15:00:00Z"
+                    }
+                  ]
+                },
+                "example": [
+                  {
+                    "admin": true,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": true,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": true,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  }
+                ]
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized: Unauthorized access",
             "content": {
               "application/vnd.goa.error": {
                 "schema": {
@@ -321,10 +410,54 @@
                       },
                       "path": "customers/google/api_key",
                       "updated_at": "2025-06-30T15:00:00Z"
+                    },
+                    {
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "owner": {
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "updated_at": "2025-06-30T15:00:00Z",
+                        "username": "alice"
+                      },
+                      "path": "customers/google/api_key",
+                      "updated_at": "2025-06-30T15:00:00Z"
+                    },
+                    {
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "owner": {
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "updated_at": "2025-06-30T15:00:00Z",
+                        "username": "alice"
+                      },
+                      "path": "customers/google/api_key",
+                      "updated_at": "2025-06-30T15:00:00Z"
                     }
                   ]
                 },
                 "example": [
+                  {
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "owner": {
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "id": 1,
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "username": "alice"
+                    },
+                    "path": "customers/google/api_key",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "owner": {
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "id": 1,
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "username": "alice"
+                    },
+                    "path": "customers/google/api_key",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
                   {
                     "created_at": "2025-06-30T12:00:00Z",
                     "owner": {
@@ -494,16 +627,28 @@
                 "example": {
                   "authorized_roles": [
                     {
+                      "admin": false,
+                      "color": "#FF5733",
+                      "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
-                      "name": "admin"
+                      "name": "admin",
+                      "updated_at": "2025-06-30T15:00:00Z"
                     },
                     {
+                      "admin": false,
+                      "color": "#FF5733",
+                      "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
-                      "name": "admin"
+                      "name": "admin",
+                      "updated_at": "2025-06-30T15:00:00Z"
                     },
                     {
+                      "admin": false,
+                      "color": "#FF5733",
+                      "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
-                      "name": "admin"
+                      "name": "admin",
+                      "updated_at": "2025-06-30T15:00:00Z"
                     }
                   ],
                   "authorized_users": [
@@ -998,7 +1143,7 @@
           "index": {
             "type": "integer",
             "description": "The index of the share added",
-            "example": 958628220671558567,
+            "example": 2804251276007726417,
             "format": "int64"
           },
           "unlocked": {
@@ -1008,8 +1153,8 @@
           }
         },
         "example": {
-          "index": 64506126104031387,
-          "unlocked": true
+          "index": 8405355850990433405,
+          "unlocked": false
         },
         "required": [
           "index",
@@ -1109,7 +1254,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "example": "Asperiores repudiandae deleniti sit rerum eveniet porro."
+              "example": "Reiciendis distinctio sint ipsa debitis voluptatum."
             },
             "description": "The generated key shares",
             "example": [
@@ -1135,7 +1280,7 @@
             "type": "array",
             "items": {
               "type": "integer",
-              "example": 6968612373047234931,
+              "example": 4605138811280809006,
               "format": "int64"
             },
             "description": "Role IDs authorized to access the secret",
@@ -1148,7 +1293,7 @@
             "type": "array",
             "items": {
               "type": "integer",
-              "example": 8195776877282613048,
+              "example": 7032392647712366511,
               "format": "int64"
             },
             "description": "Users IDs authorized to access the secret",
@@ -1258,7 +1403,7 @@
           "fault": {
             "type": "boolean",
             "description": "Is the error a server-side fault?",
-            "example": true
+            "example": false
           },
           "id": {
             "type": "string",
@@ -1293,7 +1438,7 @@
           "message": "parameter 'p' must be an integer",
           "name": "bad_request",
           "temporary": false,
-          "timeout": true
+          "timeout": false
         },
         "required": [
           "name",
@@ -1310,32 +1455,32 @@
           "current_shares": {
             "type": "integer",
             "description": "Number of shares currently held",
-            "example": 235252295903838320,
+            "example": 5249063332152861252,
             "format": "int64"
           },
           "is_locked": {
             "type": "boolean",
             "description": "Whether the key is currently locked",
-            "example": true
+            "example": false
           },
           "min_shares": {
             "type": "integer",
             "description": "Minimum number of shares required",
-            "example": 1715167286671607405,
+            "example": 4468759149788095379,
             "format": "int64"
           },
           "total_shares": {
             "type": "integer",
             "description": "Total number of shares",
-            "example": 4018948085197412564,
+            "example": 4833138617745985457,
             "format": "int64"
           }
         },
         "example": {
-          "current_shares": 8608123971190228394,
-          "is_locked": true,
-          "min_shares": 9060306552527090875,
-          "total_shares": 2094362827874485604
+          "current_shares": 1741392137154913574,
+          "is_locked": false,
+          "min_shares": 1081155919994856112,
+          "total_shares": 261592986439172219
         },
         "required": [
           "is_locked",
@@ -1363,9 +1508,25 @@
           "value": "SECRET_API_KEY"
         }
       },
-      "RoleType": {
+      "Role": {
         "type": "object",
         "properties": {
+          "admin": {
+            "type": "boolean",
+            "description": "Is this role an admin role?",
+            "default": false,
+            "example": false
+          },
+          "color": {
+            "type": "string",
+            "description": "Color associated with the role",
+            "example": "#FF5733"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Role creation timestamp",
+            "example": "2025-06-30T12:00:00Z"
+          },
           "id": {
             "type": "integer",
             "description": "Unique identifier for the role",
@@ -1376,15 +1537,28 @@
             "type": "string",
             "description": "Name of the role",
             "example": "admin"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Role last update timestamp",
+            "example": "2025-06-30T15:00:00Z"
           }
         },
         "example": {
+          "admin": true,
+          "color": "#FF5733",
+          "created_at": "2025-06-30T12:00:00Z",
           "id": 1,
-          "name": "admin"
+          "name": "admin",
+          "updated_at": "2025-06-30T15:00:00Z"
         },
         "required": [
           "id",
-          "name"
+          "name",
+          "color",
+          "admin",
+          "created_at",
+          "updated_at"
         ]
       },
       "SecretInfo": {
@@ -1393,21 +1567,25 @@
           "authorized_roles": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RoleType"
+              "$ref": "#/components/schemas/Role"
             },
             "description": "Roles authorized to access the secret",
             "example": [
               {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
                 "id": 1,
-                "name": "admin"
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
               },
               {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
                 "id": 1,
-                "name": "admin"
-              },
-              {
-                "id": 1,
-                "name": "admin"
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
               }
             ]
           },
@@ -1454,31 +1632,23 @@
         "example": {
           "authorized_roles": [
             {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
               "id": 1,
-              "name": "admin"
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
             },
             {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
               "id": 1,
-              "name": "admin"
-            },
-            {
-              "id": 1,
-              "name": "admin"
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
             }
           ],
           "authorized_users": [
-            {
-              "created_at": "2025-06-30T12:00:00Z",
-              "id": 1,
-              "updated_at": "2025-06-30T15:00:00Z",
-              "username": "alice"
-            },
-            {
-              "created_at": "2025-06-30T12:00:00Z",
-              "id": 1,
-              "updated_at": "2025-06-30T15:00:00Z",
-              "username": "alice"
-            },
             {
               "created_at": "2025-06-30T12:00:00Z",
               "id": 1,
@@ -1596,6 +1766,10 @@
     {
       "name": "key_management",
       "description": "The FishyKeys server handles master key operations"
+    },
+    {
+      "name": "roles",
+      "description": "Roles service manages roles"
     },
     {
       "name": "secrets",
