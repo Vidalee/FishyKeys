@@ -189,33 +189,44 @@ paths:
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/ListSecretsResponseBody'
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/SecretInfoSummary'
+                  description: List of secrets you have access to
+                  example:
+                    - created_at: "2025-06-30T12:00:00Z"
+                      owner:
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        updated_at: "2025-06-30T15:00:00Z"
+                        username: alice
+                      path: customers/google/api_key
+                      updated_at: "2025-06-30T15:00:00Z"
+                    - created_at: "2025-06-30T12:00:00Z"
+                      owner:
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        updated_at: "2025-06-30T15:00:00Z"
+                        username: alice
+                      path: customers/google/api_key
+                      updated_at: "2025-06-30T15:00:00Z"
                 example:
-                  secrets:
-                    - created_at: "2025-06-30T12:00:00Z"
-                      owner:
-                        created_at: "2025-06-30T12:00:00Z"
-                        id: 1
-                        updated_at: "2025-06-30T15:00:00Z"
-                        username: alice
-                      path: customers/google/api_key
+                  - created_at: "2025-06-30T12:00:00Z"
+                    owner:
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
                       updated_at: "2025-06-30T15:00:00Z"
-                    - created_at: "2025-06-30T12:00:00Z"
-                      owner:
-                        created_at: "2025-06-30T12:00:00Z"
-                        id: 1
-                        updated_at: "2025-06-30T15:00:00Z"
-                        username: alice
-                      path: customers/google/api_key
+                      username: alice
+                    path: customers/google/api_key
+                    updated_at: "2025-06-30T15:00:00Z"
+                  - created_at: "2025-06-30T12:00:00Z"
+                    owner:
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
                       updated_at: "2025-06-30T15:00:00Z"
-                    - created_at: "2025-06-30T12:00:00Z"
-                      owner:
-                        created_at: "2025-06-30T12:00:00Z"
-                        id: 1
-                        updated_at: "2025-06-30T15:00:00Z"
-                        username: alice
-                      path: customers/google/api_key
-                      updated_at: "2025-06-30T15:00:00Z"
+                      username: alice
+                    path: customers/google/api_key
+                    updated_at: "2025-06-30T15:00:00Z"
           "401":
             description: 'unauthorized: Unauthorized access'
             content:
@@ -314,11 +325,9 @@ paths:
                                   name: admin
                                 - id: 1
                                   name: admin
+                                - id: 1
+                                  name: admin
                               authorized_users:
-                                    - created_at: "2025-06-30T12:00:00Z"
-                                      id: 1
-                                      updated_at: "2025-06-30T15:00:00Z"
-                                      username: alice
                                     - created_at: "2025-06-30T12:00:00Z"
                                       id: 1
                                       updated_at: "2025-06-30T15:00:00Z"
@@ -449,6 +458,10 @@ paths:
                                       updated_at: "2025-06-30T15:00:00Z"
                                       username: alice
                             example:
+                              - created_at: "2025-06-30T12:00:00Z"
+                                id: 1
+                                updated_at: "2025-06-30T15:00:00Z"
+                                username: alice
                                 - created_at: "2025-06-30T12:00:00Z"
                                   id: 1
                                   updated_at: "2025-06-30T15:00:00Z"
@@ -625,14 +638,14 @@ components:
                 index:
                     type: integer
                     description: The index of the share added
-                    example: 1761516349162541318
+                    example: 958628220671558567
                     format: int64
                 unlocked:
                     type: boolean
                     description: Whether the master key has been unlocked
                     example: true
             example:
-              index: 9060306552527090875
+              index: 64506126104031387
               unlocked: true
             required:
                 - index
@@ -710,7 +723,7 @@ components:
                     type: array
                     items:
                         type: string
-                        example: Assumenda sint asperiores repudiandae deleniti.
+                        example: Asperiores repudiandae deleniti sit rerum eveniet porro.
                     description: The generated key shares
                     example:
                         - EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0
@@ -729,7 +742,7 @@ components:
                     type: array
                     items:
                         type: integer
-                        example: 1140763715867927262
+                        example: 6968612373047234931
                         format: int64
                     description: Role IDs authorized to access the secret
                     example:
@@ -739,7 +752,7 @@ components:
                     type: array
                     items:
                         type: integer
-                        example: 64506126104031387
+                        example: 8195776877282613048
                         format: int64
                     description: Users IDs authorized to access the secret
                     example:
@@ -842,7 +855,7 @@ components:
                 timeout:
                     type: boolean
                     description: Is the error a timeout?
-                    example: false
+                    example: true
             description: Invalid parameters provided
             example:
                 fault: true
@@ -850,7 +863,7 @@ components:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: false
+                timeout: true
             required:
                 - name
                 - id
@@ -864,7 +877,7 @@ components:
                 current_shares:
                     type: integer
                     description: Number of shares currently held
-                    example: 91005950870362265
+                    example: 235252295903838320
                     format: int64
                 is_locked:
                     type: boolean
@@ -873,18 +886,18 @@ components:
                 min_shares:
                     type: integer
                     description: Minimum number of shares required
-                    example: 299516104386074996
+                    example: 1715167286671607405
                     format: int64
                 total_shares:
                     type: integer
                     description: Total number of shares
-                    example: 3336649369025367754
+                    example: 4018948085197412564
                     format: int64
             example:
-              current_shares: 235252295903838320
+              current_shares: 8608123971190228394
                 is_locked: true
-              min_shares: 1715167286671607405
-              total_shares: 4018948085197412564
+              min_shares: 9060306552527090875
+              total_shares: 2094362827874485604
             required:
                 - is_locked
                 - current_shares
@@ -904,65 +917,6 @@ components:
             example:
                 path: customers/google/api_key
                 value: SECRET_API_KEY
-        ListSecretsResponseBody:
-          type: object
-          properties:
-            secrets:
-              type: array
-              items:
-                $ref: '#/components/schemas/SecretInfoSummary'
-              description: List of secrets you have access to
-              example:
-                - created_at: "2025-06-30T12:00:00Z"
-                  owner:
-                    created_at: "2025-06-30T12:00:00Z"
-                    id: 1
-                    updated_at: "2025-06-30T15:00:00Z"
-                    username: alice
-                  path: customers/google/api_key
-                  updated_at: "2025-06-30T15:00:00Z"
-                - created_at: "2025-06-30T12:00:00Z"
-                  owner:
-                    created_at: "2025-06-30T12:00:00Z"
-                    id: 1
-                    updated_at: "2025-06-30T15:00:00Z"
-                    username: alice
-                  path: customers/google/api_key
-                  updated_at: "2025-06-30T15:00:00Z"
-                - created_at: "2025-06-30T12:00:00Z"
-                  owner:
-                    created_at: "2025-06-30T12:00:00Z"
-                    id: 1
-                    updated_at: "2025-06-30T15:00:00Z"
-                    username: alice
-                  path: customers/google/api_key
-                  updated_at: "2025-06-30T15:00:00Z"
-                - created_at: "2025-06-30T12:00:00Z"
-                  owner:
-                    created_at: "2025-06-30T12:00:00Z"
-                    id: 1
-                    updated_at: "2025-06-30T15:00:00Z"
-                    username: alice
-                  path: customers/google/api_key
-                  updated_at: "2025-06-30T15:00:00Z"
-          example:
-            secrets:
-              - created_at: "2025-06-30T12:00:00Z"
-                owner:
-                  created_at: "2025-06-30T12:00:00Z"
-                  id: 1
-                  updated_at: "2025-06-30T15:00:00Z"
-                  username: alice
-                path: customers/google/api_key
-                updated_at: "2025-06-30T15:00:00Z"
-              - created_at: "2025-06-30T12:00:00Z"
-                owner:
-                  created_at: "2025-06-30T12:00:00Z"
-                  id: 1
-                  updated_at: "2025-06-30T15:00:00Z"
-                  username: alice
-                path: customers/google/api_key
-                updated_at: "2025-06-30T15:00:00Z"
         RoleType:
             type: object
             properties:
@@ -990,6 +944,8 @@ components:
                         $ref: '#/components/schemas/RoleType'
                     description: Roles authorized to access the secret
                     example:
+                      - id: 1
+                        name: admin
                         - id: 1
                           name: admin
                         - id: 1
@@ -1000,14 +956,6 @@ components:
                     $ref: '#/components/schemas/User'
                   description: Members authorized to access the secret
                   example:
-                    - created_at: "2025-06-30T12:00:00Z"
-                      id: 1
-                      updated_at: "2025-06-30T15:00:00Z"
-                      username: alice
-                    - created_at: "2025-06-30T12:00:00Z"
-                      id: 1
-                      updated_at: "2025-06-30T15:00:00Z"
-                      username: alice
                     - created_at: "2025-06-30T12:00:00Z"
                       id: 1
                       updated_at: "2025-06-30T15:00:00Z"
@@ -1039,6 +987,14 @@ components:
                     - id: 1
                       name: admin
                 authorized_users:
+                  - created_at: "2025-06-30T12:00:00Z"
+                    id: 1
+                    updated_at: "2025-06-30T15:00:00Z"
+                    username: alice
+                  - created_at: "2025-06-30T12:00:00Z"
+                    id: 1
+                    updated_at: "2025-06-30T15:00:00Z"
+                    username: alice
                   - created_at: "2025-06-30T12:00:00Z"
                     id: 1
                     updated_at: "2025-06-30T15:00:00Z"

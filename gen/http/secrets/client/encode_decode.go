@@ -16,6 +16,7 @@ import (
 
 	secrets "github.com/Vidalee/FishyKeys/gen/secrets"
 	goahttp "goa.design/goa/v3/http"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildListSecretsRequest instantiates a HTTP request object with method and
@@ -65,11 +66,17 @@ func DecodeListSecretsResponse(decoder func(*http.Response) goahttp.Decoder, res
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("secrets", "list secrets", err)
 			}
-			err = ValidateListSecretsResponseBody(&body)
+			for _, e := range body {
+				if e != nil {
+					if err2 := ValidateSecretInfoSummaryResponse(e); err2 != nil {
+						err = goa.MergeErrors(err, err2)
+					}
+				}
+			}
 			if err != nil {
 				return nil, goahttp.ErrValidationError("secrets", "list secrets", err)
 			}
-			res := NewListSecretsResultOK(&body)
+			res := NewListSecretsSecretInfoSummaryOK(body)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (
@@ -520,19 +527,29 @@ func DecodeCreateSecretResponse(decoder func(*http.Response) goahttp.Decoder, re
 	}
 }
 
-// unmarshalSecretInfoSummaryResponseBodyToSecretsSecretInfoSummary builds a
-// value of type *secrets.SecretInfoSummary from a value of type
-// *SecretInfoSummaryResponseBody.
-func unmarshalSecretInfoSummaryResponseBodyToSecretsSecretInfoSummary(v *SecretInfoSummaryResponseBody) *secrets.SecretInfoSummary {
-	if v == nil {
-		return nil
-	}
+// unmarshalSecretInfoSummaryResponseToSecretsSecretInfoSummary builds a value
+// of type *secrets.SecretInfoSummary from a value of type
+// *SecretInfoSummaryResponse.
+func unmarshalSecretInfoSummaryResponseToSecretsSecretInfoSummary(v *SecretInfoSummaryResponse) *secrets.SecretInfoSummary {
 	res := &secrets.SecretInfoSummary{
 		Path:      *v.Path,
 		CreatedAt: *v.CreatedAt,
 		UpdatedAt: *v.UpdatedAt,
 	}
-	res.Owner = unmarshalUserResponseBodyToSecretsUser(v.Owner)
+	res.Owner = unmarshalUserResponseToSecretsUser(v.Owner)
+
+	return res
+}
+
+// unmarshalUserResponseToSecretsUser builds a value of type *secrets.User from
+// a value of type *UserResponse.
+func unmarshalUserResponseToSecretsUser(v *UserResponse) *secrets.User {
+	res := &secrets.User{
+		ID:        *v.ID,
+		Username:  *v.Username,
+		CreatedAt: *v.CreatedAt,
+		UpdatedAt: *v.UpdatedAt,
+	}
 
 	return res
 }

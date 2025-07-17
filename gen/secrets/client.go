@@ -39,13 +39,13 @@ func NewClient(listSecrets, getSecretValue, getSecret, createSecret goa.Endpoint
 //   - "forbidden" (type *goa.ServiceError): Forbidden access
 //   - "internal_error" (type *goa.ServiceError): Internal server error
 //   - error: internal error
-func (c *Client) ListSecrets(ctx context.Context) (res *ListSecretsResult, err error) {
+func (c *Client) ListSecrets(ctx context.Context) (res []*SecretInfoSummary, err error) {
 	var ires any
 	ires, err = c.ListSecretsEndpoint(ctx, nil)
 	if err != nil {
 		return
 	}
-	return ires.(*ListSecretsResult), nil
+	return ires.([]*SecretInfoSummary), nil
 }
 
 // GetSecretValue calls the "get secret value" endpoint of the "secrets"

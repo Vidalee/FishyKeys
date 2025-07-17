@@ -61,9 +61,7 @@ var _ = Service("secrets", func() {
 		ServerInterceptor(Authentified)
 
 		Description("Retrieve all secrets you have access to")
-		Result(func() {
-			Attribute("secrets", ArrayOf(SecretInfoSummaryType), "List of secrets you have access to")
-		})
+		Result(ArrayOf(SecretInfoSummaryType), "List of secrets you have access to")
 		Error("secret_not_found", ErrorResult, "Secret not found")
 		HTTP(func() {
 			GET("/secrets")

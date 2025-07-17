@@ -29,10 +29,7 @@ type CreateSecretRequestBody struct {
 
 // ListSecretsResponseBody is the type of the "secrets" service "list secrets"
 // endpoint HTTP response body.
-type ListSecretsResponseBody struct {
-	// List of secrets you have access to
-	Secrets []*SecretInfoSummaryResponseBody `form:"secrets,omitempty" json:"secrets,omitempty" xml:"secrets,omitempty"`
-}
+type ListSecretsResponseBody []*SecretInfoSummaryResponse
 
 // GetSecretValueResponseBody is the type of the "secrets" service "get secret
 // value" endpoint HTTP response body.
@@ -370,16 +367,27 @@ type CreateSecretInternalErrorResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// SecretInfoSummaryResponseBody is used to define fields on response body
-// types.
-type SecretInfoSummaryResponseBody struct {
+// SecretInfoSummaryResponse is used to define fields on response body types.
+type SecretInfoSummaryResponse struct {
 	// The original path of the secret
 	Path string `form:"path" json:"path" xml:"path"`
 	// The owner of the secret
-	Owner *UserResponseBody `form:"owner" json:"owner" xml:"owner"`
+	Owner *UserResponse `form:"owner" json:"owner" xml:"owner"`
 	// Creation timestamp of the secret
 	CreatedAt string `form:"created_at" json:"created_at" xml:"created_at"`
 	// Last update timestamp of the secret
+	UpdatedAt string `form:"updated_at" json:"updated_at" xml:"updated_at"`
+}
+
+// UserResponse is used to define fields on response body types.
+type UserResponse struct {
+	// Unique identifier for the user
+	ID int `form:"id" json:"id" xml:"id"`
+	// The username
+	Username string `form:"username" json:"username" xml:"username"`
+	// User creation timestamp
+	CreatedAt string `form:"created_at" json:"created_at" xml:"created_at"`
+	// User last update timestamp
 	UpdatedAt string `form:"updated_at" json:"updated_at" xml:"updated_at"`
 }
 
@@ -405,13 +413,10 @@ type RoleTypeResponseBody struct {
 
 // NewListSecretsResponseBody builds the HTTP response body from the result of
 // the "list secrets" endpoint of the "secrets" service.
-func NewListSecretsResponseBody(res *secrets.ListSecretsResult) *ListSecretsResponseBody {
-	body := &ListSecretsResponseBody{}
-	if res.Secrets != nil {
-		body.Secrets = make([]*SecretInfoSummaryResponseBody, len(res.Secrets))
-		for i, val := range res.Secrets {
-			body.Secrets[i] = marshalSecretsSecretInfoSummaryToSecretInfoSummaryResponseBody(val)
-		}
+func NewListSecretsResponseBody(res []*secrets.SecretInfoSummary) ListSecretsResponseBody {
+	body := make([]*SecretInfoSummaryResponse, len(res))
+	for i, val := range res {
+		body[i] = marshalSecretsSecretInfoSummaryToSecretInfoSummaryResponse(val)
 	}
 	return body
 }

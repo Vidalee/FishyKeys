@@ -387,11 +387,11 @@ func TestSecretsService_ListSecrets(t *testing.T) {
 
 	t.Run("owner sees all their secrets", func(t *testing.T) {
 		ctxWithToken := context.WithValue(ctx, "token", &JwtClaims{UserID: userID1})
-		result, err := service.ListSecrets(ctxWithToken)
+		secrets, err := service.ListSecrets(ctxWithToken)
 		assert.NoError(t, err)
-		assert.NotNil(t, result)
-		paths := make([]string, 0, len(result.Secrets))
-		for _, s := range result.Secrets {
+		assert.NotNil(t, secrets)
+		paths := make([]string, 0, len(secrets))
+		for _, s := range secrets {
 			paths = append(paths, s.Path)
 		}
 		assert.ElementsMatch(t, []string{"/owned/secret", "/user/secret", "/role/secret"}, paths)
@@ -399,11 +399,11 @@ func TestSecretsService_ListSecrets(t *testing.T) {
 
 	t.Run("user with direct access sees only authorized secret", func(t *testing.T) {
 		ctxWithToken := context.WithValue(ctx, "token", &JwtClaims{UserID: userID2})
-		result, err := service.ListSecrets(ctxWithToken)
+		secrets, err := service.ListSecrets(ctxWithToken)
 		assert.NoError(t, err)
-		assert.NotNil(t, result)
-		paths := make([]string, 0, len(result.Secrets))
-		for _, s := range result.Secrets {
+		assert.NotNil(t, secrets)
+		paths := make([]string, 0, len(secrets))
+		for _, s := range secrets {
 			paths = append(paths, s.Path)
 		}
 		assert.ElementsMatch(t, []string{"/user/secret"}, paths)
@@ -411,11 +411,11 @@ func TestSecretsService_ListSecrets(t *testing.T) {
 
 	t.Run("user with role access sees only role secret", func(t *testing.T) {
 		ctxWithToken := context.WithValue(ctx, "token", &JwtClaims{UserID: userID3})
-		result, err := service.ListSecrets(ctxWithToken)
+		secrets, err := service.ListSecrets(ctxWithToken)
 		assert.NoError(t, err)
-		assert.NotNil(t, result)
-		paths := make([]string, 0, len(result.Secrets))
-		for _, s := range result.Secrets {
+		assert.NotNil(t, secrets)
+		paths := make([]string, 0, len(secrets))
+		for _, s := range secrets {
 			paths = append(paths, s.Path)
 		}
 		assert.ElementsMatch(t, []string{"/role/secret"}, paths)
@@ -423,9 +423,9 @@ func TestSecretsService_ListSecrets(t *testing.T) {
 
 	t.Run("user with no access sees nothing", func(t *testing.T) {
 		ctxWithToken := context.WithValue(ctx, "token", &JwtClaims{UserID: 9999}) // non-existent user
-		result, err := service.ListSecrets(ctxWithToken)
+		secrets, err := service.ListSecrets(ctxWithToken)
 		assert.NoError(t, err)
-		assert.NotNil(t, result)
-		assert.Empty(t, result.Secrets)
+		assert.NotNil(t, secrets)
+		assert.Empty(t, secrets)
 	})
 }

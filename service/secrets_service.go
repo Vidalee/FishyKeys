@@ -41,7 +41,7 @@ func NewSecretsService(
 	}
 }
 
-func (s *SecretsService) ListSecrets(ctx context.Context) (res *gensecrets.ListSecretsResult, err error) {
+func (s *SecretsService) ListSecrets(ctx context.Context) (res []*gensecrets.SecretInfoSummary, err error) {
 	// Guaranteed by the Authentified interceptor
 	jwtClaims := ctx.Value("token").(*JwtClaims)
 
@@ -70,9 +70,7 @@ func (s *SecretsService) ListSecrets(ctx context.Context) (res *gensecrets.ListS
 		})
 	}
 
-	return &gensecrets.ListSecretsResult{
-		Secrets: secretInfos,
-	}, nil
+	return secretInfos, nil
 }
 
 func (s *SecretsService) CreateSecret(ctx context.Context, payload *gensecrets.CreateSecretPayload) error {

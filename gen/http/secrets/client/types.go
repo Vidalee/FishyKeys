@@ -29,10 +29,7 @@ type CreateSecretRequestBody struct {
 
 // ListSecretsResponseBody is the type of the "secrets" service "list secrets"
 // endpoint HTTP response body.
-type ListSecretsResponseBody struct {
-	// List of secrets you have access to
-	Secrets []*SecretInfoSummaryResponseBody `form:"secrets,omitempty" json:"secrets,omitempty" xml:"secrets,omitempty"`
-}
+type ListSecretsResponseBody []*SecretInfoSummaryResponse
 
 // GetSecretValueResponseBody is the type of the "secrets" service "get secret
 // value" endpoint HTTP response body.
@@ -370,16 +367,27 @@ type CreateSecretInternalErrorResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
-// SecretInfoSummaryResponseBody is used to define fields on response body
-// types.
-type SecretInfoSummaryResponseBody struct {
+// SecretInfoSummaryResponse is used to define fields on response body types.
+type SecretInfoSummaryResponse struct {
 	// The original path of the secret
 	Path *string `form:"path,omitempty" json:"path,omitempty" xml:"path,omitempty"`
 	// The owner of the secret
-	Owner *UserResponseBody `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
+	Owner *UserResponse `form:"owner,omitempty" json:"owner,omitempty" xml:"owner,omitempty"`
 	// Creation timestamp of the secret
 	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Last update timestamp of the secret
+	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+}
+
+// UserResponse is used to define fields on response body types.
+type UserResponse struct {
+	// Unique identifier for the user
+	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// The username
+	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
+	// User creation timestamp
+	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	// User last update timestamp
 	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 }
 
@@ -429,15 +437,12 @@ func NewCreateSecretRequestBody(p *secrets.CreateSecretPayload) *CreateSecretReq
 	return body
 }
 
-// NewListSecretsResultOK builds a "secrets" service "list secrets" endpoint
-// result from a HTTP "OK" response.
-func NewListSecretsResultOK(body *ListSecretsResponseBody) *secrets.ListSecretsResult {
-	v := &secrets.ListSecretsResult{}
-	if body.Secrets != nil {
-		v.Secrets = make([]*secrets.SecretInfoSummary, len(body.Secrets))
-		for i, val := range body.Secrets {
-			v.Secrets[i] = unmarshalSecretInfoSummaryResponseBodyToSecretsSecretInfoSummary(val)
-		}
+// NewListSecretsSecretInfoSummaryOK builds a "secrets" service "list secrets"
+// endpoint result from a HTTP "OK" response.
+func NewListSecretsSecretInfoSummaryOK(body []*SecretInfoSummaryResponse) []*secrets.SecretInfoSummary {
+	v := make([]*secrets.SecretInfoSummary, len(body))
+	for i, val := range body {
+		v[i] = unmarshalSecretInfoSummaryResponseToSecretsSecretInfoSummary(val)
 	}
 
 	return v
@@ -728,19 +733,6 @@ func NewCreateSecretInternalError(body *CreateSecretInternalErrorResponseBody) *
 	}
 
 	return v
-}
-
-// ValidateListSecretsResponseBody runs the validations defined on List
-// SecretsResponseBody
-func ValidateListSecretsResponseBody(body *ListSecretsResponseBody) (err error) {
-	for _, e := range body.Secrets {
-		if e != nil {
-			if err2 := ValidateSecretInfoSummaryResponseBody(e); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
 }
 
 // ValidateGetSecretResponseBody runs the validations defined on Get
@@ -1194,9 +1186,9 @@ func ValidateCreateSecretInternalErrorResponseBody(body *CreateSecretInternalErr
 	return
 }
 
-// ValidateSecretInfoSummaryResponseBody runs the validations defined on
-// SecretInfoSummaryResponseBody
-func ValidateSecretInfoSummaryResponseBody(body *SecretInfoSummaryResponseBody) (err error) {
+// ValidateSecretInfoSummaryResponse runs the validations defined on
+// SecretInfoSummaryResponse
+func ValidateSecretInfoSummaryResponse(body *SecretInfoSummaryResponse) (err error) {
 	if body.Path == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("path", "body"))
 	}
@@ -1210,8 +1202,30 @@ func ValidateSecretInfoSummaryResponseBody(body *SecretInfoSummaryResponseBody) 
 		err = goa.MergeErrors(err, goa.MissingFieldError("updated_at", "body"))
 	}
 	if body.Owner != nil {
-		if err2 := ValidateUserResponseBody(body.Owner); err2 != nil {
+		if err2 := ValidateUserResponse(body.Owner); err2 != nil {
 			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateUserResponse runs the validations defined on UserResponse
+func ValidateUserResponse(body *UserResponse) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Username == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("username", "body"))
+	}
+	if body.CreatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("created_at", "body"))
+	}
+	if body.UpdatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updated_at", "body"))
+	}
+	if body.Username != nil {
+		if utf8.RuneCountInString(*body.Username) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.username", *body.Username, utf8.RuneCountInString(*body.Username), 3, true))
 		}
 	}
 	return

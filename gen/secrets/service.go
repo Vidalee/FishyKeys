@@ -16,7 +16,7 @@ import (
 // User service manages user accounts and authentication
 type Service interface {
 	// Retrieve all secrets you have access to
-	ListSecrets(context.Context) (res *ListSecretsResult, err error)
+	ListSecrets(context.Context) (res []*SecretInfoSummary, err error)
 	// Retrieve a secret value
 	GetSecretValue(context.Context, *GetSecretValuePayload) (res *GetSecretValueResult, err error)
 	// Retrieve a secret's information
@@ -75,13 +75,6 @@ type GetSecretValueResult struct {
 	Value *string
 	// The original path of the secret
 	Path *string
-}
-
-// ListSecretsResult is the result type of the secrets service list secrets
-// method.
-type ListSecretsResult struct {
-	// List of secrets you have access to
-	Secrets []*SecretInfoSummary
 }
 
 type RoleType struct {

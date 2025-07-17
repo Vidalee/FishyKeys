@@ -23,7 +23,7 @@ import (
 // secrets list secrets endpoint.
 func EncodeListSecretsResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
 	return func(ctx context.Context, w http.ResponseWriter, v any) error {
-		res, _ := v.(*secrets.ListSecretsResult)
+		res, _ := v.([]*secrets.SecretInfoSummary)
 		enc := encoder(ctx, w)
 		body := NewListSecretsResponseBody(res)
 		w.WriteHeader(http.StatusOK)
@@ -424,20 +424,30 @@ func EncodeCreateSecretError(encoder func(context.Context, http.ResponseWriter) 
 	}
 }
 
-// marshalSecretsSecretInfoSummaryToSecretInfoSummaryResponseBody builds a
-// value of type *SecretInfoSummaryResponseBody from a value of type
+// marshalSecretsSecretInfoSummaryToSecretInfoSummaryResponse builds a value of
+// type *SecretInfoSummaryResponse from a value of type
 // *secrets.SecretInfoSummary.
-func marshalSecretsSecretInfoSummaryToSecretInfoSummaryResponseBody(v *secrets.SecretInfoSummary) *SecretInfoSummaryResponseBody {
-	if v == nil {
-		return nil
-	}
-	res := &SecretInfoSummaryResponseBody{
+func marshalSecretsSecretInfoSummaryToSecretInfoSummaryResponse(v *secrets.SecretInfoSummary) *SecretInfoSummaryResponse {
+	res := &SecretInfoSummaryResponse{
 		Path:      v.Path,
 		CreatedAt: v.CreatedAt,
 		UpdatedAt: v.UpdatedAt,
 	}
 	if v.Owner != nil {
-		res.Owner = marshalSecretsUserToUserResponseBody(v.Owner)
+		res.Owner = marshalSecretsUserToUserResponse(v.Owner)
+	}
+
+	return res
+}
+
+// marshalSecretsUserToUserResponse builds a value of type *UserResponse from a
+// value of type *secrets.User.
+func marshalSecretsUserToUserResponse(v *secrets.User) *UserResponse {
+	res := &UserResponse{
+		ID:        v.ID,
+		Username:  v.Username,
+		CreatedAt: v.CreatedAt,
+		UpdatedAt: v.UpdatedAt,
 	}
 
 	return res
