@@ -66,7 +66,7 @@ func (s *UsersService) CreateUser(ctx context.Context, payload *genusers.CreateU
 		return nil, genusers.MakeInternalError(fmt.Errorf("could not create user: %w", err))
 	}
 
-	return &genusers.CreateUserResult{Username: &payload.Username, ID: &userId}, nil
+	return &genusers.CreateUserResult{Username: payload.Username, ID: userId}, nil
 }
 
 func (s *UsersService) AuthUser(ctx context.Context, payload *genusers.AuthUserPayload) (*genusers.AuthUserResult, error) {
@@ -129,6 +129,7 @@ func (s *UsersService) ListUsers(ctx context.Context) ([]*genusers.User, error) 
 	result := make([]*genusers.User, 0, len(users))
 	for _, u := range users {
 		result = append(result, &genusers.User{
+			ID:        u.ID,
 			Username:  u.Username,
 			CreatedAt: u.CreatedAt.Format("2006-01-02T15:04:05Z"),
 			UpdatedAt: u.UpdatedAt.Format("2006-01-02T15:04:05Z"),

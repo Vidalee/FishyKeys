@@ -104,7 +104,7 @@ func TestUsersService_CreateUser(t *testing.T) {
 				assert.NoError(t, err)
 				assert.NotNil(t, result)
 				assert.NotNil(t, result.Username)
-				assert.Equal(t, tt.username, *result.Username)
+				assert.Equal(t, tt.username, result.Username)
 
 				user, err := service.usersRepository.GetUserByUsername(ctx, tt.username)
 				assert.NoError(t, err)
@@ -236,7 +236,7 @@ func TestUsersService_AuthUser(t *testing.T) {
 				claims, ok := token.Claims.(*JwtClaims)
 				assert.True(t, ok, "claims should be of type JwtClaims")
 				assert.Equal(t, tt.username, claims.Username, "username in claims should match")
-				assert.Equal(t, *createUserResult.ID, claims.UserID, "user ID in token should match created user ID")
+				assert.Equal(t, createUserResult.ID, claims.UserID, "user ID in token should match created user ID")
 			}
 		})
 	}
@@ -251,27 +251,37 @@ func TestUsersService_ListUsers(t *testing.T) {
 	users, err := service.ListUsers(ctx)
 	assert.NoError(t, err)
 	// 1 since there is a system user
-	assert.Len(t, users, 1, "expected no users after clearing table")
+	assert.Len(t, users, 1, "expected only the system user after clearing table")
 
-	testUsers := []genusers.CreateUserPayload{
+	testUsers := []struct {
+		Username string
+		Password string
+		ID       int
+	}{
 		{Username: "user1", Password: "password1"},
 		{Username: "user2", Password: "password2"},
 	}
 
-	for _, user := range testUsers {
-		_, err := service.CreateUser(ctx, &user)
-		assert.NoError(t, err, "failed to create test user")
+	for i := range testUsers {
+		payload := genusers.CreateUserPayload{
+			Username: testUsers[i].Username,
+			Password: testUsers[i].Password,
+		}
+		user, err := service.CreateUser(ctx, &payload)
+		require.NoError(t, err, "failed to create user: %s", payload.Username)
+		testUsers[i].ID = user.ID
 	}
 
 	users, err = service.ListUsers(ctx)
 	assert.NoError(t, err, "failed to list users")
-	// +1 since there is a system user
-	assert.Len(t, users, len(testUsers)+1, "expected to find all test users")
 
-	// Skip the system user at index 0
-	for i := 1; i < len(users); i++ {
-		user := users[i]
-		assert.Equal(t, testUsers[i-1].Username, user.Username, "usernames should match")
+	expectedCount := 1 + len(testUsers) // 1 for the system user
+	assert.Len(t, users, expectedCount, "unexpected number of users")
+
+	for i, u := range testUsers {
+		user := users[i+1]
+		assert.Equal(t, u.ID, user.ID, "ID mismatch for user %s", u.Username)
+		assert.Equal(t, u.Username, user.Username, "username mismatch for user %s", u.Username)
 	}
 }
 

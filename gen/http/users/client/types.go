@@ -324,8 +324,8 @@ func NewAuthUserRequestBody(p *users.AuthUserPayload) *AuthUserRequestBody {
 // result from a HTTP "Created" response.
 func NewCreateUserResultCreated(body *CreateUserResponseBody) *users.CreateUserResult {
 	v := &users.CreateUserResult{
-		Username: body.Username,
-		ID:       body.ID,
+		Username: *body.Username,
+		ID:       *body.ID,
 	}
 
 	return v
@@ -546,6 +546,18 @@ func NewAuthUserInternalError(body *AuthUserInternalErrorResponseBody) *goa.Serv
 	}
 
 	return v
+}
+
+// ValidateCreateUserResponseBody runs the validations defined on Create
+// UserResponseBody
+func ValidateCreateUserResponseBody(body *CreateUserResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Username == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("username", "body"))
+	}
+	return
 }
 
 // ValidateCreateUserUsernameTakenResponseBody runs the validations defined on

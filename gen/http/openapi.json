@@ -550,7 +550,11 @@
           "201": {
             "description": "Created response.",
             "schema": {
-              "$ref": "#/definitions/UsersCreateUserResponseBody"
+              "$ref": "#/definitions/UsersCreateUserResponseBody",
+              "required": [
+                "id",
+                "username"
+              ]
             }
           },
           "400": {
@@ -3449,7 +3453,11 @@
       "example": {
         "id": 2,
         "username": "alice"
-      }
+      },
+      "required": [
+        "id",
+        "username"
+      ]
     },
     "UsersCreateUserUsernameTakenResponseBody": {
       "title": "Mediatype identifier: application/vnd.goa.error; view=default",

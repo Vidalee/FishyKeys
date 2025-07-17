@@ -43,6 +43,8 @@ var _ = Service("users", func() {
 			Attribute("id", Int, "Unique identifier for the user", func() {
 				Example(2)
 			})
+
+			Required("id", "username")
 		})
 		Error("username_taken", ErrorResult, "Username already exists")
 		Error("invalid_parameters", ErrorResult, "Invalid input")

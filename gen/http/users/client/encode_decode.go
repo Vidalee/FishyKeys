@@ -82,6 +82,10 @@ func DecodeCreateUserResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("users", "create user", err)
 			}
+			err = ValidateCreateUserResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "create user", err)
+			}
 			res := NewCreateUserResultCreated(&body)
 			return res, nil
 		case http.StatusConflict:

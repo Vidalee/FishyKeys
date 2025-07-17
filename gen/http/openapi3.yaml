@@ -921,6 +921,9 @@ components:
             example:
                 id: 2
                 username: alice
+            required:
+              - id
+              - username
         DeleteShareRequestBody:
             type: object
             properties:

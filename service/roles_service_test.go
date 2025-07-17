@@ -30,7 +30,6 @@ func TestUsersService_ListRoles(t *testing.T) {
 	// 1 since there is a system role
 	assert.Len(t, roles, 1, "expected no roles after clearing table")
 
-	// Define roles to test
 	testRoles := []struct {
 		Name  string
 		Color string
@@ -41,20 +40,17 @@ func TestUsersService_ListRoles(t *testing.T) {
 
 	var createdRoleIDs []int
 
-	// Create roles
 	for _, r := range testRoles {
 		roleID, err := service.rolesRepository.CreateRole(ctx, r.Name, r.Color)
 		require.NoError(t, err, "failed to create role: %s", r.Name)
 		createdRoleIDs = append(createdRoleIDs, roleID)
 	}
 
-	// Fetch all roles and verify
 	roles, err = service.ListRoles(ctx)
 	assert.NoError(t, err, "failed to list roles")
 	expectedCount := 1 + len(testRoles) // 1 for the system role
 	assert.Len(t, roles, expectedCount, "unexpected number of roles")
 
-	// Verify each created role (skip index 0 assuming it's the system role)
 	for i, r := range testRoles {
 		role := roles[i+1]
 		assert.Equal(t, createdRoleIDs[i], role.ID, "ID mismatch for role %s", r.Name)

@@ -36,9 +36,9 @@ type AuthUserRequestBody struct {
 // endpoint HTTP response body.
 type CreateUserResponseBody struct {
 	// The username of the created user
-	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
+	Username string `form:"username" json:"username" xml:"username"`
 	// Unique identifier for the user
-	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	ID int `form:"id" json:"id" xml:"id"`
 }
 
 // ListUsersResponseBody is the type of the "users" service "list users"

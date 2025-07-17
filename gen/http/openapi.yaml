@@ -376,6 +376,9 @@ paths:
                     description: Created response.
                     schema:
                         $ref: '#/definitions/UsersCreateUserResponseBody'
+                        required:
+                          - id
+                          - username
                 "400":
                     description: Bad Request response.
                     schema:
@@ -2675,6 +2678,9 @@ definitions:
         example:
           id: 2
           username: alice
+        required:
+          - id
+          - username
     UsersCreateUserUsernameTakenResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
