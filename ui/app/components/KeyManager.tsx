@@ -18,11 +18,13 @@ export default function KeyManager() {
     if (isCreatingKey) return
     try {
       const status = await getKeyStatus()
+        console.log("no error!")
       setKeyStatus(status)
       setNoKey(false)
       setError(null)
     } catch (err: any) {
-      if (err.status === 404 && err.body === 'master key not set') {
+        console.log("err:", err)
+        if (err.status === 404 && err.body.message === 'master key not set') {
         setNoKey(true)
         setKeyStatus(null)
         setError(null)

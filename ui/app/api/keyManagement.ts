@@ -4,9 +4,8 @@ const API_BASE = "/key_management"
 
 
 export async function getKeyStatus(): Promise<KeyStatus> {
-  console.log(API_BASE, process.env.NEXT_PUBLIC_API_BASE)
-
   const response = await fetch(`${API_BASE}/status`);
+    console.log("resp:", response.ok)
   if (!response.ok) {
     let errorBody: any = null;
     try {
@@ -14,6 +13,7 @@ export async function getKeyStatus(): Promise<KeyStatus> {
       try {
         errorBody = JSON.parse(errorBody);
       } catch {}
+        console.log("errorBody:", errorBody)
     } catch {}
     throw { status: response.status, body: errorBody };
   }
