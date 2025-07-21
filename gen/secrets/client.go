@@ -15,19 +15,21 @@ import (
 
 // Client is the "secrets" service client.
 type Client struct {
-	ListSecretsEndpoint    goa.Endpoint
-	GetSecretValueEndpoint goa.Endpoint
-	GetSecretEndpoint      goa.Endpoint
-	CreateSecretEndpoint   goa.Endpoint
+	ListSecretsEndpoint            goa.Endpoint
+	GetSecretValueEndpoint         goa.Endpoint
+	OperatorGetSecretValueEndpoint goa.Endpoint
+	GetSecretEndpoint              goa.Endpoint
+	CreateSecretEndpoint           goa.Endpoint
 }
 
 // NewClient initializes a "secrets" service client given the endpoints.
-func NewClient(listSecrets, getSecretValue, getSecret, createSecret goa.Endpoint) *Client {
+func NewClient(listSecrets, getSecretValue, operatorGetSecretValue, getSecret, createSecret goa.Endpoint) *Client {
 	return &Client{
-		ListSecretsEndpoint:    listSecrets,
-		GetSecretValueEndpoint: getSecretValue,
-		GetSecretEndpoint:      getSecret,
-		CreateSecretEndpoint:   createSecret,
+		ListSecretsEndpoint:            listSecrets,
+		GetSecretValueEndpoint:         getSecretValue,
+		OperatorGetSecretValueEndpoint: operatorGetSecretValue,
+		GetSecretEndpoint:              getSecret,
+		CreateSecretEndpoint:           createSecret,
 	}
 }
 
@@ -64,6 +66,24 @@ func (c *Client) GetSecretValue(ctx context.Context, p *GetSecretValuePayload) (
 		return
 	}
 	return ires.(*GetSecretValueResult), nil
+}
+
+// OperatorGetSecretValue calls the "operator get secret value" endpoint of the
+// "secrets" service.
+// OperatorGetSecretValue may return the following errors:
+//   - "secret_not_found" (type *goa.ServiceError): Secret not found
+//   - "invalid_parameters" (type *goa.ServiceError): Invalid token path
+//   - "unauthorized" (type *goa.ServiceError): Unauthorized access
+//   - "forbidden" (type *goa.ServiceError): Forbidden access
+//   - "internal_error" (type *goa.ServiceError): Internal server error
+//   - error: internal error
+func (c *Client) OperatorGetSecretValue(ctx context.Context, p *OperatorGetSecretValuePayload) (res *OperatorGetSecretValueResult, err error) {
+	var ires any
+	ires, err = c.OperatorGetSecretValueEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*OperatorGetSecretValueResult), nil
 }
 
 // GetSecret calls the "get secret" endpoint of the "secrets" service.

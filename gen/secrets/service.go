@@ -19,6 +19,8 @@ type Service interface {
 	ListSecrets(context.Context) (res []*SecretInfoSummary, err error)
 	// Retrieve a secret value
 	GetSecretValue(context.Context, *GetSecretValuePayload) (res *GetSecretValueResult, err error)
+	// Retrieve a secret value using GRPC
+	OperatorGetSecretValue(context.Context, *OperatorGetSecretValuePayload) (res *OperatorGetSecretValueResult, err error)
 	// Retrieve a secret's information
 	GetSecret(context.Context, *GetSecretPayload) (res *SecretInfo, err error)
 	// Create a secret
@@ -39,7 +41,7 @@ const ServiceName = "secrets"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [4]string{"list secrets", "get secret value", "get secret", "create secret"}
+var MethodNames = [5]string{"list secrets", "get secret value", "operator get secret value", "get secret", "create secret"}
 
 // CreateSecretPayload is the payload type of the secrets service create secret
 // method.
@@ -71,6 +73,22 @@ type GetSecretValuePayload struct {
 // GetSecretValueResult is the result type of the secrets service get secret
 // value method.
 type GetSecretValueResult struct {
+	// The secret value
+	Value *string
+	// The original path of the secret
+	Path *string
+}
+
+// OperatorGetSecretValuePayload is the payload type of the secrets service
+// operator get secret value method.
+type OperatorGetSecretValuePayload struct {
+	// Base64 encoded secret's path
+	Path string
+}
+
+// OperatorGetSecretValueResult is the result type of the secrets service
+// operator get secret value method.
+type OperatorGetSecretValueResult struct {
 	// The secret value
 	Value *string
 	// The original path of the secret

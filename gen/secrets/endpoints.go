@@ -15,19 +15,21 @@ import (
 
 // Endpoints wraps the "secrets" service endpoints.
 type Endpoints struct {
-	ListSecrets    goa.Endpoint
-	GetSecretValue goa.Endpoint
-	GetSecret      goa.Endpoint
-	CreateSecret   goa.Endpoint
+	ListSecrets            goa.Endpoint
+	GetSecretValue         goa.Endpoint
+	OperatorGetSecretValue goa.Endpoint
+	GetSecret              goa.Endpoint
+	CreateSecret           goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "secrets" service with endpoints.
 func NewEndpoints(s Service, si ServerInterceptors) *Endpoints {
 	endpoints := &Endpoints{
-		ListSecrets:    NewListSecretsEndpoint(s),
-		GetSecretValue: NewGetSecretValueEndpoint(s),
-		GetSecret:      NewGetSecretEndpoint(s),
-		CreateSecret:   NewCreateSecretEndpoint(s),
+		ListSecrets:            NewListSecretsEndpoint(s),
+		GetSecretValue:         NewGetSecretValueEndpoint(s),
+		OperatorGetSecretValue: NewOperatorGetSecretValueEndpoint(s),
+		GetSecret:              NewGetSecretEndpoint(s),
+		CreateSecret:           NewCreateSecretEndpoint(s),
 	}
 	endpoints.ListSecrets = WrapListSecretsEndpoint(endpoints.ListSecrets, si)
 	endpoints.GetSecretValue = WrapGetSecretValueEndpoint(endpoints.GetSecretValue, si)
@@ -40,6 +42,7 @@ func NewEndpoints(s Service, si ServerInterceptors) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.ListSecrets = m(e.ListSecrets)
 	e.GetSecretValue = m(e.GetSecretValue)
+	e.OperatorGetSecretValue = m(e.OperatorGetSecretValue)
 	e.GetSecret = m(e.GetSecret)
 	e.CreateSecret = m(e.CreateSecret)
 }
@@ -58,6 +61,15 @@ func NewGetSecretValueEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*GetSecretValuePayload)
 		return s.GetSecretValue(ctx, p)
+	}
+}
+
+// NewOperatorGetSecretValueEndpoint returns an endpoint function that calls
+// the method "operator get secret value" of service "secrets".
+func NewOperatorGetSecretValueEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*OperatorGetSecretValuePayload)
+		return s.OperatorGetSecretValue(ctx, p)
 	}
 }
 

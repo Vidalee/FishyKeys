@@ -92,6 +92,35 @@ var _ = Service("secrets", func() {
 		})
 	})
 
+	Method("operator get secret value", func() {
+		Description("Retrieve a secret value using GRPC")
+		Payload(func() {
+			Field(1, "path", String, "Base64 encoded secret's path", func() {
+				Example("L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==")
+				MinLength(2)
+			})
+			Required("path")
+		})
+		Result(func() {
+			Field(1, "value", String, "The secret value", func() {
+				Example("SECRET_API_KEY")
+			})
+			Field(2, "path", String, "The original path of the secret", func() {
+				Example("customers/google/api_key")
+			})
+		})
+		Error("secret_not_found", ErrorResult, "Secret not found")
+
+		GRPC(func() {
+			Response(CodeOK)
+			Response("secret_not_found", CodeNotFound)
+			Response("invalid_parameters", CodeInvalidArgument)
+			Response("unauthorized", CodeUnauthenticated)
+			Response("forbidden", CodePermissionDenied)
+			Response("internal_error", CodeInternal)
+		})
+	})
+
 	Method("get secret", func() {
 		ServerInterceptor(Authentified)
 
