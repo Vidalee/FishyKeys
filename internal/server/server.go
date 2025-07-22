@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	gensecretspb "github.com/Vidalee/FishyKeys/gen/grpc/secrets/pb"
 	gensecretsserver "github.com/Vidalee/FishyKeys/gen/grpc/secrets/server"
