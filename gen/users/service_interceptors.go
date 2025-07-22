@@ -18,7 +18,7 @@ import (
 // payload is sent to the service. The implementation is responsible for calling
 // next to complete the request.
 type ServerInterceptors interface {
-	// Server-side interceptor that validates JWT token and tenant ID
+	// Server-side interceptor that validates JWT token for HTTP services
 	Authentified(ctx context.Context, info *AuthentifiedInfo, next goa.Endpoint) (any, error)
 	// Server-side interceptor that checks if the user has admin privileges
 	IsAdmin(ctx context.Context, info *IsAdminInfo, next goa.Endpoint) (any, error)

@@ -5,7 +5,7 @@ import (
 )
 
 var Authentified = Interceptor("Authentified", func() {
-	Description("Server-side interceptor that validates JWT token and tenant ID")
+	Description("Server-side interceptor that validates JWT token for HTTP services")
 })
 
 var IsAdmin = Interceptor("IsAdmin", func() {

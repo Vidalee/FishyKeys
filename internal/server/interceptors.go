@@ -56,10 +56,7 @@ func (i *ServerUsersInterceptors) IsAdmin(ctx context.Context, info *users.IsAdm
 	return nil, users.MakeForbidden(fmt.Errorf("you need to be an admin to access this endpoint"))
 }
 
-type ServerSecretsInterceptors struct {
-	rolesRepository     repository.RolesRepository
-	userRolesRepository repository.UserRolesRepository
-}
+type ServerSecretsInterceptors struct{}
 
 func (i *ServerSecretsInterceptors) Authentified(ctx context.Context, info *secrets.AuthentifiedInfo, next goa.Endpoint) (any, error) {
 	token := ctx.Value("token")
@@ -69,10 +66,7 @@ func (i *ServerSecretsInterceptors) Authentified(ctx context.Context, info *secr
 	return next(ctx, info.RawPayload())
 }
 
-type ServerRolesInterceptors struct {
-	rolesRepository     repository.RolesRepository
-	userRolesRepository repository.UserRolesRepository
-}
+type ServerRolesInterceptors struct{}
 
 func (i *ServerRolesInterceptors) Authentified(ctx context.Context, info *roles.AuthentifiedInfo, next goa.Endpoint) (any, error) {
 	token := ctx.Value("token")

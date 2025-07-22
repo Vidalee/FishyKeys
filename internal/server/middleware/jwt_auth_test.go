@@ -103,6 +103,7 @@ func TestJWTMiddleware_InvalidTokenSignature(t *testing.T) {
 	secret := []byte(jwtTestToken + "invalid")
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &service.JwtClaims{
 		Username: "test_user",
+		UserID:   1,
 	})
 
 	assert.NoError(t, err)
@@ -139,6 +140,7 @@ func TestJWTMiddleware_ValidToken(t *testing.T) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &service.JwtClaims{
 		Username: "test_user",
+		UserID:   1,
 	})
 
 	secret := []byte(jwtTestToken)
@@ -156,6 +158,7 @@ func TestJWTMiddleware_ValidToken(t *testing.T) {
 		assert.True(t, ok)
 		assert.NotNil(t, claims)
 		assert.Equal(t, "test_user", claims.Username)
+		assert.Equal(t, 1, claims.UserID)
 		w.WriteHeader(http.StatusOK)
 	})
 
@@ -180,6 +183,7 @@ func TestJWTMiddleware_RepositoryError(t *testing.T) {
 	secret := []byte(jwtTestToken)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &service.JwtClaims{
 		Username: "test_user",
+		UserID:   1,
 	})
 
 	tokenString, err := token.SignedString(secret)

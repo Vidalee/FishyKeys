@@ -20,7 +20,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	goahttp "goa.design/goa/v3/http"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"net/http"
 )
@@ -45,14 +44,8 @@ func NewServers(pool *pgxpool.Pool) (http.Handler, *grpc.Server) {
 		userRolesRepository: userRolesRepo,
 		rolesRepository:     rolesRepo,
 	})
-	secretsEndpoints := secrets.NewEndpoints(secretsService, &ServerSecretsInterceptors{
-		userRolesRepository: userRolesRepo,
-		rolesRepository:     rolesRepo,
-	})
-	rolesEndpoints := roles.NewEndpoints(rolesService, &ServerRolesInterceptors{
-		userRolesRepository: userRolesRepo,
-		rolesRepository:     rolesRepo,
-	})
+	secretsEndpoints := secrets.NewEndpoints(secretsService, &ServerSecretsInterceptors{})
+	rolesEndpoints := roles.NewEndpoints(rolesService, &ServerRolesInterceptors{})
 
 	mux := goahttp.NewMuxer()
 	requestDecoder := goahttp.RequestDecoder
@@ -70,25 +63,15 @@ func NewServers(pool *pgxpool.Pool) (http.Handler, *grpc.Server) {
 	secretssvvr.Mount(mux, secretsHandler)
 	rolessvvr.Mount(mux, rolesHandler)
 
-	grpcSrv := grpc.NewServer(grpc.UnaryInterceptor(loggingInterceptor))
+	grpcSrv := grpc.NewServer(grpc.UnaryInterceptor(
+		(&GrpcServerInterceptors{
+			usersRepository:   usersRepo,
+			secretsRepository: secretsRepo,
+			keyManager:        keyManager,
+		}).GrpcAuthentifiedInterceptor),
+	)
 	gensecretspb.RegisterSecretsServer(grpcSrv, gensecretsserver.New(secretsEndpoints, nil))
 	reflection.Register(grpcSrv)
 
 	return mux, grpcSrv
-}
-
-func loggingInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	fmt.Printf("Handling %s\n", info.FullMethod)
-
-	md, ok := metadata.FromIncomingContext(ctx)
-	if ok {
-		fmt.Println("Metadata received:")
-		for key, values := range md {
-			fmt.Printf("  %s: %v\n", key, values)
-		}
-	} else {
-		fmt.Println("No metadata found in context")
-	}
-
-	return handler(ctx, req)
 }
