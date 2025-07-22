@@ -1,8 +1,6 @@
 package server
 
 import (
-	"context"
-	"fmt"
 	gensecretspb "github.com/Vidalee/FishyKeys/gen/grpc/secrets/pb"
 	gensecretsserver "github.com/Vidalee/FishyKeys/gen/grpc/secrets/server"
 	keysvvr "github.com/Vidalee/FishyKeys/gen/http/key_management/server"
