@@ -232,3 +232,8 @@ func (s *SecretsService) GetSecret(ctx context.Context, payload *gensecrets.GetS
 		UpdatedAt:       decryptedSecret.UpdatedAt.Format("2006-01-02T15:04:05Z"),
 	}, nil
 }
+
+// grpcurl -plaintext -H header1:value1 -d '{"path": "/folder/secret"}' 172.19.32.1:8090 secrets.Secrets/OperatorGetSecretValue
+func (s *SecretsService) OperatorGetSecretValue(ctx context.Context, payload *gensecrets.OperatorGetSecretValuePayload) (res *gensecrets.OperatorGetSecretValueResult, err error) {
+	return nil, gensecrets.MakeInternalError(fmt.Errorf("OperatorGetSecretValue is not implemented yet"))
+}

@@ -1,6 +1,11 @@
 package server
 
 import (
+	"context"
+	"encoding/base64"
+	"fmt"
+	gensecretspb "github.com/Vidalee/FishyKeys/gen/grpc/secrets/pb"
+	gensecretsserver "github.com/Vidalee/FishyKeys/gen/grpc/secrets/server"
 	keysvvr "github.com/Vidalee/FishyKeys/gen/http/key_management/server"
 	rolessvvr "github.com/Vidalee/FishyKeys/gen/http/roles/server"
 	secretssvvr "github.com/Vidalee/FishyKeys/gen/http/secrets/server"
@@ -15,10 +20,13 @@ import (
 	"github.com/Vidalee/FishyKeys/service"
 	"github.com/jackc/pgx/v5/pgxpool"
 	goahttp "goa.design/goa/v3/http"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/reflection"
 	"net/http"
 )
 
-func NewServer(pool *pgxpool.Pool) http.Handler {
+func NewServers(pool *pgxpool.Pool) (http.Handler, *grpc.Server) {
 	keyManager := crypto.GetDefaultKeyManager()
 
 	globalSettingsRepo := repository.NewGlobalSettingsRepository(pool)
@@ -63,5 +71,25 @@ func NewServer(pool *pgxpool.Pool) http.Handler {
 	secretssvvr.Mount(mux, secretsHandler)
 	rolessvvr.Mount(mux, rolesHandler)
 
+	grpcSrv := grpc.NewServer(grpc.UnaryInterceptor(loggingInterceptor))
+	gensecretspb.RegisterSecretsServer(grpcSrv, gensecretsserver.New(secretsEndpoints, nil))
+	reflection.Register(grpcSrv)
+
 	return mux
+}
+
+func loggingInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	fmt.Printf("Handling %s\n", info.FullMethod)
+
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok {
+		fmt.Println("Metadata received:")
+		for key, values := range md {
+			fmt.Printf("  %s: %v\n", key, values)
+		}
+	} else {
+		fmt.Println("No metadata found in context")
+	}
+
+	return handler(ctx, req)
 }

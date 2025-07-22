@@ -8,8 +8,12 @@ import (
 	"github.com/Vidalee/FishyKeys/internal/migration"
 	"github.com/Vidalee/FishyKeys/internal/server"
 	"log"
+	"net"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -49,16 +53,48 @@ var rootCmd = &cobra.Command{
 		serverAddress := getConfigValue("server.address", serverAddr)
 		serverPort := getConfigPort("server.port", serverPort)
 
-		goaServer := server.NewServer(db.Pool())
+		goaServer, grpcServer := server.NewServers(db.Pool())
+
 		httpServer := &http.Server{
 			Addr:    fmt.Sprintf("%s:%s", serverAddress, serverPort),
 			Handler: goaServer,
 		}
 
-		log.Printf("Starting server on %s:%s", serverAddress, serverPort)
-		if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Fatalf("failed to start server: %v", err)
+		// Start HTTP server
+		go func() {
+			log.Printf("Starting HTTP server on %s:%s", serverAddress, serverPort)
+			if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+				log.Fatalf("failed to start HTTP server: %v", err)
+			}
+		}()
+
+		// Start gRPC server
+		go func() {
+			lis, err := net.Listen("tcp", ":8090")
+			if err != nil {
+				log.Fatalf("failed to listen: %v", err)
+			}
+			log.Printf("gRPC server listening on :8090")
+			if err := grpcServer.Serve(lis); err != nil {
+				log.Fatalf("failed to serve: %v", err)
+			}
+		}()
+
+		sigCh := make(chan os.Signal, 1)
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+		<-sigCh
+		log.Println("Shutdown signal received")
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := httpServer.Shutdown(ctx); err != nil {
+			log.Printf("HTTP server shutdown error: %v", err)
+		} else {
+			log.Println("HTTP server shutdown gracefully")
 		}
+
+		log.Println("Shutting down gRPC server...")
+		grpcServer.GracefulStop()
 	},
 }
 
