@@ -113,44 +113,6 @@ func (s *SecretsService) CreateSecret(ctx context.Context, payload *gensecrets.C
 	return nil
 }
 
-func (s *SecretsService) GetSecretValue(ctx context.Context, payload *gensecrets.GetSecretValuePayload) (res *gensecrets.GetSecretValueResult, err error) {
-	// Guaranteed by the Authentified interceptor
-	jwtClaims := ctx.Value("token").(*JwtClaims)
-
-	roleIDs, err := s.userRolesRepository.GetUserRoleIDs(ctx, jwtClaims.UserID)
-	if err != nil {
-		return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving user roles: %w", err))
-	}
-
-	decodedPath, err := base64.StdEncoding.DecodeString(payload.Path)
-	if err != nil {
-		return nil, gensecrets.MakeInvalidParameters(fmt.Errorf("invalid path encoding: %w", err))
-	}
-	decodedPathStr := string(decodedPath)
-
-	hasAccess, err := s.secretsRepository.HasAccess(ctx, decodedPathStr, &jwtClaims.UserID, roleIDs)
-	if err != nil {
-		return nil, gensecrets.MakeInternalError(fmt.Errorf("error checking access to secret: %w", err))
-	}
-
-	if !hasAccess {
-		return nil, gensecrets.MakeForbidden(fmt.Errorf("you do not have access to this secret"))
-	}
-
-	decryptedSecret, err := s.secretsRepository.GetSecretByPath(ctx, s.keyManager, decodedPathStr)
-	if err != nil {
-		if errors.Is(err, repository.ErrSecretNotFound) {
-			return nil, gensecrets.MakeSecretNotFound(fmt.Errorf("secret not found at path: %s", decodedPathStr))
-		}
-		return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving secret: %w", err))
-	}
-
-	return &gensecrets.GetSecretValueResult{
-		Value: &decryptedSecret.DecryptedValue,
-		Path:  &decryptedSecret.Path,
-	}, nil
-}
-
 func (s *SecretsService) GetSecret(ctx context.Context, payload *gensecrets.GetSecretPayload) (res *gensecrets.SecretInfo, err error) {
 	// Guaranteed by the Authentified interceptor
 	jwtClaims := ctx.Value("token").(*JwtClaims)
@@ -233,7 +195,65 @@ func (s *SecretsService) GetSecret(ctx context.Context, payload *gensecrets.GetS
 	}, nil
 }
 
-// grpcurl -plaintext -H header1:value1 -d '{"path": "/folder/secret"}' 172.19.32.1:8090 secrets.Secrets/OperatorGetSecretValue
+func (s *SecretsService) GetSecretValue(ctx context.Context, payload *gensecrets.GetSecretValuePayload) (res *gensecrets.GetSecretValueResult, err error) {
+	// Guaranteed by the Authentified interceptor
+	jwtClaims := ctx.Value("token").(*JwtClaims)
+
+	decryptedValue, decodedPath, err := s.getSecretValue(ctx, jwtClaims.UserID, payload.Path)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gensecrets.GetSecretValueResult{
+		Value: &decryptedValue,
+		Path:  &decodedPath,
+	}, nil
+}
+
+// grpcurl -plaintext -H metadata:token -d '{"path": "/folder/secret"}' 172.19.32.1:8090 secrets.Secrets/OperatorGetSecretValue
 func (s *SecretsService) OperatorGetSecretValue(ctx context.Context, payload *gensecrets.OperatorGetSecretValuePayload) (res *gensecrets.OperatorGetSecretValueResult, err error) {
-	return nil, gensecrets.MakeInternalError(fmt.Errorf("OperatorGetSecretValue is not implemented yet"))
+	// Guaranteed by the Authentified interceptor
+	jwtClaims := ctx.Value("token").(*JwtClaims)
+
+	decryptedValue, decodedPath, err := s.getSecretValue(ctx, jwtClaims.UserID, payload.Path)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gensecrets.OperatorGetSecretValueResult{
+		Value: &decryptedValue,
+		Path:  &decodedPath,
+	}, nil
+}
+
+func (s *SecretsService) getSecretValue(ctx context.Context, userID int, path string) (string, string, error) {
+	roleIDs, err := s.userRolesRepository.GetUserRoleIDs(ctx, userID)
+	if err != nil {
+		return "", "", gensecrets.MakeInternalError(fmt.Errorf("error retrieving user roles: %w", err))
+	}
+
+	decodedPath, err := base64.StdEncoding.DecodeString(path)
+	if err != nil {
+		return "", "", gensecrets.MakeInvalidParameters(fmt.Errorf("invalid path encoding: %w", err))
+	}
+	decodedPathStr := string(decodedPath)
+
+	hasAccess, err := s.secretsRepository.HasAccess(ctx, decodedPathStr, &userID, roleIDs)
+	if err != nil {
+		return "", "", gensecrets.MakeInternalError(fmt.Errorf("error checking access to secret: %w", err))
+	}
+
+	if !hasAccess {
+		return "", "", gensecrets.MakeForbidden(fmt.Errorf("you do not have access to this secret"))
+	}
+
+	decryptedSecret, err := s.secretsRepository.GetSecretByPath(ctx, s.keyManager, decodedPathStr)
+	if err != nil {
+		if errors.Is(err, repository.ErrSecretNotFound) {
+			return "", "", gensecrets.MakeSecretNotFound(fmt.Errorf("secret not found at path: %s", decodedPathStr))
+		}
+		return "", "", gensecrets.MakeInternalError(fmt.Errorf("error retrieving secret: %w", err))
+	}
+
+	return decryptedSecret.DecryptedValue, decodedPathStr, nil
 }

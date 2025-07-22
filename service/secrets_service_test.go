@@ -223,11 +223,11 @@ func TestSecretsService_GetSecretValue(t *testing.T) {
 				UserID: users[tt.accessAsUserNumber],
 			})
 
-			payload := &gensecrets.GetSecretValuePayload{
+			payload := &gensecrets.OperatorGetSecretValuePayload{
 				Path: base64.StdEncoding.EncodeToString([]byte(tt.path)),
 			}
 
-			getSecretValueResultPayload, err := service.GetSecretValue(ctx, payload)
+			getSecretValueResultPayload, err := service.OperatorGetSecretValue(ctx, payload)
 
 			if tt.expectedError {
 				assert.Error(t, err)
