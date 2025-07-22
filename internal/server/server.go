@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	gensecretspb "github.com/Vidalee/FishyKeys/gen/grpc/secrets/pb"
 	gensecretsserver "github.com/Vidalee/FishyKeys/gen/grpc/secrets/server"
@@ -75,7 +74,7 @@ func NewServers(pool *pgxpool.Pool) (http.Handler, *grpc.Server) {
 	gensecretspb.RegisterSecretsServer(grpcSrv, gensecretsserver.New(secretsEndpoints, nil))
 	reflection.Register(grpcSrv)
 
-	return mux
+	return mux, grpcSrv
 }
 
 func loggingInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
