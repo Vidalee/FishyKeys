@@ -30,3 +30,8 @@ func DeleteUserUsersPath(username string) string {
 func AuthUserUsersPath() string {
 	return "/users/auth"
 }
+
+// GetOperatorTokenUsersPath returns the URL path to the users service get operator token HTTP endpoint.
+func GetOperatorTokenUsersPath() string {
+	return "/users/operator-token"
+}

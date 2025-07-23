@@ -19,12 +19,13 @@ import (
 
 // Server lists the users service endpoint HTTP handlers.
 type Server struct {
-	Mounts     []*MountPoint
-	CreateUser http.Handler
-	ListUsers  http.Handler
-	DeleteUser http.Handler
-	AuthUser   http.Handler
-	CORS       http.Handler
+	Mounts           []*MountPoint
+	CreateUser       http.Handler
+	ListUsers        http.Handler
+	DeleteUser       http.Handler
+	AuthUser         http.Handler
+	GetOperatorToken http.Handler
+	CORS             http.Handler
 }
 
 // MountPoint holds information about the mounted endpoints.
@@ -58,15 +59,18 @@ func New(
 			{"ListUsers", "GET", "/users"},
 			{"DeleteUser", "DELETE", "/users/{username}"},
 			{"AuthUser", "POST", "/users/auth"},
+			{"GetOperatorToken", "POST", "/users/operator-token"},
 			{"CORS", "OPTIONS", "/users"},
 			{"CORS", "OPTIONS", "/users/{username}"},
 			{"CORS", "OPTIONS", "/users/auth"},
+			{"CORS", "OPTIONS", "/users/operator-token"},
 		},
-		CreateUser: NewCreateUserHandler(e.CreateUser, mux, decoder, encoder, errhandler, formatter),
-		ListUsers:  NewListUsersHandler(e.ListUsers, mux, decoder, encoder, errhandler, formatter),
-		DeleteUser: NewDeleteUserHandler(e.DeleteUser, mux, decoder, encoder, errhandler, formatter),
-		AuthUser:   NewAuthUserHandler(e.AuthUser, mux, decoder, encoder, errhandler, formatter),
-		CORS:       NewCORSHandler(),
+		CreateUser:       NewCreateUserHandler(e.CreateUser, mux, decoder, encoder, errhandler, formatter),
+		ListUsers:        NewListUsersHandler(e.ListUsers, mux, decoder, encoder, errhandler, formatter),
+		DeleteUser:       NewDeleteUserHandler(e.DeleteUser, mux, decoder, encoder, errhandler, formatter),
+		AuthUser:         NewAuthUserHandler(e.AuthUser, mux, decoder, encoder, errhandler, formatter),
+		GetOperatorToken: NewGetOperatorTokenHandler(e.GetOperatorToken, mux, decoder, encoder, errhandler, formatter),
+		CORS:             NewCORSHandler(),
 	}
 }
 
@@ -79,6 +83,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.ListUsers = m(s.ListUsers)
 	s.DeleteUser = m(s.DeleteUser)
 	s.AuthUser = m(s.AuthUser)
+	s.GetOperatorToken = m(s.GetOperatorToken)
 	s.CORS = m(s.CORS)
 }
 
@@ -91,6 +96,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountListUsersHandler(mux, h.ListUsers)
 	MountDeleteUserHandler(mux, h.DeleteUser)
 	MountAuthUserHandler(mux, h.AuthUser)
+	MountGetOperatorTokenHandler(mux, h.GetOperatorToken)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -296,6 +302,50 @@ func NewAuthUserHandler(
 	})
 }
 
+// MountGetOperatorTokenHandler configures the mux to serve the "users" service
+// "get operator token" endpoint.
+func MountGetOperatorTokenHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := HandleUsersOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/users/operator-token", f)
+}
+
+// NewGetOperatorTokenHandler creates a HTTP handler which loads the HTTP
+// request and calls the "users" service "get operator token" endpoint.
+func NewGetOperatorTokenHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		encodeResponse = EncodeGetOperatorTokenResponse(encoder)
+		encodeError    = EncodeGetOperatorTokenError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "get operator token")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "users")
+		var err error
+		res, err := endpoint(ctx, nil)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service users.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -303,6 +353,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/users", h.ServeHTTP)
 	mux.Handle("OPTIONS", "/users/{username}", h.ServeHTTP)
 	mux.Handle("OPTIONS", "/users/auth", h.ServeHTTP)
+	mux.Handle("OPTIONS", "/users/operator-token", h.ServeHTTP)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 204 response.

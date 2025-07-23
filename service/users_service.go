@@ -120,6 +120,39 @@ func (s *UsersService) AuthUser(ctx context.Context, payload *genusers.AuthUserP
 	}, nil
 }
 
+func (s *UsersService) GetOperatorToken(ctx context.Context) (*genusers.GetOperatorTokenResult, error) {
+	// Guaranteed by the Authentified interceptor
+	jwtClaims := ctx.Value("token").(*JwtClaims)
+
+	decryptedSecret, err := s.secretsRepository.GetSecretByPath(ctx, s.keyManager, "internal/jwt_signing_key")
+	if err != nil {
+		return nil, genusers.MakeInternalError(fmt.Errorf("could not retrieve JWT signing key: %w", err))
+	}
+	decodedSecret, err := base64.StdEncoding.DecodeString(decryptedSecret.DecryptedValue)
+	if err != nil {
+		return nil, genusers.MakeInternalError(fmt.Errorf("could not decode JWT signing key: %w", err))
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"iss":      "FishyKeys",
+		"sub":      jwtClaims.Username + "-operator",
+		"iat":      jwt.NewNumericDate(time.Now()),
+		"username": jwtClaims.Username,
+		"exp":      jwt.NewNumericDate(time.Now().Add(10 * 365 * 24 * time.Hour)), // Not the best idea but will suffice for now
+		"userid":   jwtClaims.UserID,
+	})
+
+	tokenString, err := token.SignedString(decodedSecret)
+	if err != nil {
+		return nil, genusers.MakeInternalError(fmt.Errorf("could not sign JWT token: %w", err))
+	}
+
+	return &genusers.GetOperatorTokenResult{
+		Token:    &tokenString,
+		Username: &jwtClaims.Username,
+	}, nil
+}
+
 func (s *UsersService) ListUsers(ctx context.Context) ([]*genusers.User, error) {
 	users, err := s.usersRepository.ListUsers(ctx)
 	if err != nil {

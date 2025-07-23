@@ -15,19 +15,21 @@ import (
 
 // Client is the "users" service client.
 type Client struct {
-	CreateUserEndpoint goa.Endpoint
-	ListUsersEndpoint  goa.Endpoint
-	DeleteUserEndpoint goa.Endpoint
-	AuthUserEndpoint   goa.Endpoint
+	CreateUserEndpoint       goa.Endpoint
+	ListUsersEndpoint        goa.Endpoint
+	DeleteUserEndpoint       goa.Endpoint
+	AuthUserEndpoint         goa.Endpoint
+	GetOperatorTokenEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "users" service client given the endpoints.
-func NewClient(createUser, listUsers, deleteUser, authUser goa.Endpoint) *Client {
+func NewClient(createUser, listUsers, deleteUser, authUser, getOperatorToken goa.Endpoint) *Client {
 	return &Client{
-		CreateUserEndpoint: createUser,
-		ListUsersEndpoint:  listUsers,
-		DeleteUserEndpoint: deleteUser,
-		AuthUserEndpoint:   authUser,
+		CreateUserEndpoint:       createUser,
+		ListUsersEndpoint:        listUsers,
+		DeleteUserEndpoint:       deleteUser,
+		AuthUserEndpoint:         authUser,
+		GetOperatorTokenEndpoint: getOperatorToken,
 	}
 }
 
@@ -86,4 +88,18 @@ func (c *Client) AuthUser(ctx context.Context, p *AuthUserPayload) (res *AuthUse
 		return
 	}
 	return ires.(*AuthUserResult), nil
+}
+
+// GetOperatorToken calls the "get operator token" endpoint of the "users"
+// service.
+// GetOperatorToken may return the following errors:
+//   - "internal_error" (type *goa.ServiceError): Internal server error
+//   - error: internal error
+func (c *Client) GetOperatorToken(ctx context.Context) (res *GetOperatorTokenResult, err error) {
+	var ires any
+	ires, err = c.GetOperatorTokenEndpoint(ctx, nil)
+	if err != nil {
+		return
+	}
+	return ires.(*GetOperatorTokenResult), nil
 }

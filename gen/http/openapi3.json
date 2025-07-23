@@ -314,6 +314,14 @@
                       "id": 1,
                       "name": "admin",
                       "updated_at": "2025-06-30T15:00:00Z"
+                    },
+                    {
+                      "admin": true,
+                      "color": "#FF5733",
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "id": 1,
+                      "name": "admin",
+                      "updated_at": "2025-06-30T15:00:00Z"
                     }
                   ]
                 },
@@ -410,54 +418,10 @@
                       },
                       "path": "customers/google/api_key",
                       "updated_at": "2025-06-30T15:00:00Z"
-                    },
-                    {
-                      "created_at": "2025-06-30T12:00:00Z",
-                      "owner": {
-                        "created_at": "2025-06-30T12:00:00Z",
-                        "id": 1,
-                        "updated_at": "2025-06-30T15:00:00Z",
-                        "username": "alice"
-                      },
-                      "path": "customers/google/api_key",
-                      "updated_at": "2025-06-30T15:00:00Z"
-                    },
-                    {
-                      "created_at": "2025-06-30T12:00:00Z",
-                      "owner": {
-                        "created_at": "2025-06-30T12:00:00Z",
-                        "id": 1,
-                        "updated_at": "2025-06-30T15:00:00Z",
-                        "username": "alice"
-                      },
-                      "path": "customers/google/api_key",
-                      "updated_at": "2025-06-30T15:00:00Z"
                     }
                   ]
                 },
                 "example": [
-                  {
-                    "created_at": "2025-06-30T12:00:00Z",
-                    "owner": {
-                      "created_at": "2025-06-30T12:00:00Z",
-                      "id": 1,
-                      "updated_at": "2025-06-30T15:00:00Z",
-                      "username": "alice"
-                    },
-                    "path": "customers/google/api_key",
-                    "updated_at": "2025-06-30T15:00:00Z"
-                  },
-                  {
-                    "created_at": "2025-06-30T12:00:00Z",
-                    "owner": {
-                      "created_at": "2025-06-30T12:00:00Z",
-                      "id": 1,
-                      "updated_at": "2025-06-30T15:00:00Z",
-                      "username": "alice"
-                    },
-                    "path": "customers/google/api_key",
-                    "updated_at": "2025-06-30T15:00:00Z"
-                  },
                   {
                     "created_at": "2025-06-30T12:00:00Z",
                     "owner": {
@@ -852,6 +816,12 @@
                       "id": 1,
                       "updated_at": "2025-06-30T15:00:00Z",
                       "username": "alice"
+                    },
+                    {
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "id": 1,
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "username": "alice"
                     }
                   ]
                 },
@@ -1039,6 +1009,42 @@
         }
       }
     },
+    "/users/operator-token": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "get operator token users",
+        "description": "Retrieve a JWT token that doesn't expire for operator use, corresponding to your user",
+        "operationId": "users#get operator token",
+        "responses": {
+          "200": {
+            "description": "OK response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthUserResponseBody"
+                },
+                "example": {
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "username": "alice"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error: Internal server error",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/users/{username}": {
       "delete": {
         "tags": [
@@ -1143,17 +1149,17 @@
           "index": {
             "type": "integer",
             "description": "The index of the share added",
-            "example": 2804251276007726417,
+            "example": 4746837444423522907,
             "format": "int64"
           },
           "unlocked": {
             "type": "boolean",
             "description": "Whether the master key has been unlocked",
-            "example": true
+            "example": false
           }
         },
         "example": {
-          "index": 8405355850990433405,
+          "index": 1534199350079676293,
           "unlocked": false
         },
         "required": [
@@ -1254,7 +1260,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "example": "Reiciendis distinctio sint ipsa debitis voluptatum."
+              "example": "Voluptatum non ducimus natus."
             },
             "description": "The generated key shares",
             "example": [
@@ -1280,7 +1286,7 @@
             "type": "array",
             "items": {
               "type": "integer",
-              "example": 4605138811280809006,
+              "example": 5993626676017206569,
               "format": "int64"
             },
             "description": "Role IDs authorized to access the secret",
@@ -1293,7 +1299,7 @@
             "type": "array",
             "items": {
               "type": "integer",
-              "example": 7032392647712366511,
+              "example": 3661786480120339291,
               "format": "int64"
             },
             "description": "Users IDs authorized to access the secret",
@@ -1407,7 +1413,7 @@
           "fault": {
             "type": "boolean",
             "description": "Is the error a server-side fault?",
-            "example": false
+            "example": true
           },
           "id": {
             "type": "string",
@@ -1432,17 +1438,17 @@
           "timeout": {
             "type": "boolean",
             "description": "Is the error a timeout?",
-            "example": true
+            "example": false
           }
         },
         "description": "Invalid parameters provided",
         "example": {
-          "fault": true,
+          "fault": false,
           "id": "123abc",
           "message": "parameter 'p' must be an integer",
           "name": "bad_request",
           "temporary": false,
-          "timeout": false
+          "timeout": true
         },
         "required": [
           "name",
@@ -1459,7 +1465,7 @@
           "current_shares": {
             "type": "integer",
             "description": "Number of shares currently held",
-            "example": 5249063332152861252,
+            "example": 2787524579937080077,
             "format": "int64"
           },
           "is_locked": {
@@ -1470,21 +1476,21 @@
           "min_shares": {
             "type": "integer",
             "description": "Minimum number of shares required",
-            "example": 4468759149788095379,
+            "example": 1741392137154913574,
             "format": "int64"
           },
           "total_shares": {
             "type": "integer",
             "description": "Total number of shares",
-            "example": 4833138617745985457,
+            "example": 1081155919994856112,
             "format": "int64"
           }
         },
         "example": {
-          "current_shares": 1741392137154913574,
+          "current_shares": 2804251276007726417,
           "is_locked": false,
-          "min_shares": 1081155919994856112,
-          "total_shares": 261592986439172219
+          "min_shares": 6899294025665174510,
+          "total_shares": 8405355850990433405
         },
         "required": [
           "is_locked",
@@ -1519,7 +1525,7 @@
             "type": "boolean",
             "description": "Is this role an admin role?",
             "default": false,
-            "example": false
+            "example": true
           },
           "color": {
             "type": "string",
@@ -1549,7 +1555,7 @@
           }
         },
         "example": {
-          "admin": true,
+          "admin": false,
           "color": "#FF5733",
           "created_at": "2025-06-30T12:00:00Z",
           "id": 1,
@@ -1650,9 +1656,31 @@
               "id": 1,
               "name": "admin",
               "updated_at": "2025-06-30T15:00:00Z"
+            },
+            {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            },
+            {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
             }
           ],
           "authorized_users": [
+            {
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "updated_at": "2025-06-30T15:00:00Z",
+              "username": "alice"
+            },
             {
               "created_at": "2025-06-30T12:00:00Z",
               "id": 1,

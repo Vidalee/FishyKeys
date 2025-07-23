@@ -23,6 +23,9 @@ type Service interface {
 	DeleteUser(context.Context, *DeleteUserPayload) (err error)
 	// Authenticate a user with username and password
 	AuthUser(context.Context, *AuthUserPayload) (res *AuthUserResult, err error)
+	// Retrieve a JWT token that doesn't expire for operator use, corresponding to
+	// your user
+	GetOperatorToken(context.Context) (res *GetOperatorTokenResult, err error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -39,7 +42,7 @@ const ServiceName = "users"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [4]string{"create user", "list users", "delete user", "auth user"}
+var MethodNames = [5]string{"create user", "list users", "delete user", "auth user", "get operator token"}
 
 // AuthUserPayload is the payload type of the users service auth user method.
 type AuthUserPayload struct {
@@ -79,6 +82,15 @@ type CreateUserResult struct {
 type DeleteUserPayload struct {
 	// Username of the user to delete
 	Username string
+}
+
+// GetOperatorTokenResult is the result type of the users service get operator
+// token method.
+type GetOperatorTokenResult struct {
+	// The username of the account corresponding to the token
+	Username *string
+	// JWT or session token
+	Token *string
 }
 
 type User struct {

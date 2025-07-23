@@ -41,7 +41,7 @@ func NewSecretsService(
 	}
 }
 
-func (s *SecretsService) ListSecrets(ctx context.Context) (res []*gensecrets.SecretInfoSummary, err error) {
+func (s *SecretsService) ListSecrets(ctx context.Context) ([]*gensecrets.SecretInfoSummary, error) {
 	// Guaranteed by the Authentified interceptor
 	jwtClaims := ctx.Value("token").(*JwtClaims)
 
@@ -113,7 +113,7 @@ func (s *SecretsService) CreateSecret(ctx context.Context, payload *gensecrets.C
 	return nil
 }
 
-func (s *SecretsService) GetSecret(ctx context.Context, payload *gensecrets.GetSecretPayload) (res *gensecrets.SecretInfo, err error) {
+func (s *SecretsService) GetSecret(ctx context.Context, payload *gensecrets.GetSecretPayload) (*gensecrets.SecretInfo, error) {
 	// Guaranteed by the Authentified interceptor
 	jwtClaims := ctx.Value("token").(*JwtClaims)
 
@@ -211,7 +211,7 @@ func (s *SecretsService) GetSecretValue(ctx context.Context, payload *gensecrets
 }
 
 // grpcurl -plaintext -H metadata:token -d '{"path": "/folder/secret"}' 172.19.32.1:8090 secrets.Secrets/OperatorGetSecretValue
-func (s *SecretsService) OperatorGetSecretValue(ctx context.Context, payload *gensecrets.OperatorGetSecretValuePayload) (res *gensecrets.OperatorGetSecretValueResult, err error) {
+func (s *SecretsService) OperatorGetSecretValue(ctx context.Context, payload *gensecrets.OperatorGetSecretValuePayload) (*gensecrets.OperatorGetSecretValueResult, error) {
 	// Guaranteed by the Authentified interceptor
 	jwtClaims := ctx.Value("token").(*JwtClaims)
 

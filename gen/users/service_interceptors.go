@@ -58,6 +58,13 @@ func WrapDeleteUserEndpoint(endpoint goa.Endpoint, i ServerInterceptors) goa.End
 	return endpoint
 }
 
+// WrapGetOperatorTokenEndpoint wraps the get operator token endpoint with the
+// server-side interceptors defined in the design.
+func WrapGetOperatorTokenEndpoint(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	endpoint = wrapGetOperatorTokenAuthentified(endpoint, i)
+	return endpoint
+}
+
 // Public accessor methods for Info types
 
 // Service returns the name of the service handling the request.

@@ -370,6 +370,47 @@ func EncodeAuthUserError(encoder func(context.Context, http.ResponseWriter) goah
 	}
 }
 
+// EncodeGetOperatorTokenResponse returns an encoder for responses returned by
+// the users get operator token endpoint.
+func EncodeGetOperatorTokenResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+	return func(ctx context.Context, w http.ResponseWriter, v any) error {
+		res, _ := v.(*users.GetOperatorTokenResult)
+		enc := encoder(ctx, w)
+		body := NewGetOperatorTokenResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// EncodeGetOperatorTokenError returns an encoder for errors returned by the
+// get operator token users endpoint.
+func EncodeGetOperatorTokenError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en goa.GoaErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.GoaErrorName() {
+		case "internal_error":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewGetOperatorTokenInternalErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // marshalUsersUserToUserResponse builds a value of type *UserResponse from a
 // value of type *users.User.
 func marshalUsersUserToUserResponse(v *users.User) *UserResponse {

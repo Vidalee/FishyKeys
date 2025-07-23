@@ -473,6 +473,74 @@ func DecodeAuthUserResponse(decoder func(*http.Response) goahttp.Decoder, restor
 	}
 }
 
+// BuildGetOperatorTokenRequest instantiates a HTTP request object with method
+// and path set to call the "users" service "get operator token" endpoint
+func (c *Client) BuildGetOperatorTokenRequest(ctx context.Context, v any) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetOperatorTokenUsersPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("users", "get operator token", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// DecodeGetOperatorTokenResponse returns a decoder for responses returned by
+// the users get operator token endpoint. restoreBody controls whether the
+// response body should be restored after having been read.
+// DecodeGetOperatorTokenResponse may return the following errors:
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
+//   - error: internal error
+func DecodeGetOperatorTokenResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body GetOperatorTokenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("users", "get operator token", err)
+			}
+			res := NewGetOperatorTokenResultOK(&body)
+			return res, nil
+		case http.StatusInternalServerError:
+			var (
+				body GetOperatorTokenInternalErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("users", "get operator token", err)
+			}
+			err = ValidateGetOperatorTokenInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("users", "get operator token", err)
+			}
+			return nil, NewGetOperatorTokenInternalError(&body)
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("users", "get operator token", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalUserResponseToUsersUser builds a value of type *users.User from a
 // value of type *UserResponse.
 func unmarshalUserResponseToUsersUser(v *UserResponse) *users.User {

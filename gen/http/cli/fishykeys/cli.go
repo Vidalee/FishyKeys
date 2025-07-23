@@ -28,7 +28,7 @@ func UsageCommands() string {
 	return `key-management (create-master-key|get-key-status|add-share|delete-share)
 roles list-roles
 secrets (list-secrets|get-secret-value|get-secret|create-secret)
-users (create-user|list-users|delete-user|auth-user)
+users (create-user|list-users|delete-user|auth-user|get-operator-token)
 `
 }
 
@@ -101,6 +101,8 @@ func ParseEndpoint(
 
 		usersAuthUserFlags    = flag.NewFlagSet("auth-user", flag.ExitOnError)
 		usersAuthUserBodyFlag = usersAuthUserFlags.String("body", "REQUIRED", "")
+
+		usersGetOperatorTokenFlags = flag.NewFlagSet("get-operator-token", flag.ExitOnError)
 	)
 	keyManagementFlags.Usage = keyManagementUsage
 	keyManagementCreateMasterKeyFlags.Usage = keyManagementCreateMasterKeyUsage
@@ -122,6 +124,7 @@ func ParseEndpoint(
 	usersListUsersFlags.Usage = usersListUsersUsage
 	usersDeleteUserFlags.Usage = usersDeleteUserUsage
 	usersAuthUserFlags.Usage = usersAuthUserUsage
+	usersGetOperatorTokenFlags.Usage = usersGetOperatorTokenUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -214,6 +217,9 @@ func ParseEndpoint(
 			case "auth-user":
 				epf = usersAuthUserFlags
 
+			case "get-operator-token":
+				epf = usersGetOperatorTokenFlags
+
 			}
 
 		}
@@ -286,6 +292,8 @@ func ParseEndpoint(
 			case "auth-user":
 				endpoint = c.AuthUser()
 				data, err = usersc.BuildAuthUserPayload(*usersAuthUserBodyFlag)
+			case "get-operator-token":
+				endpoint = c.GetOperatorToken()
 			}
 		}
 	}
@@ -470,6 +478,7 @@ COMMAND:
     list-users: List all users
     delete-user: Delete a user by username
     auth-user: Authenticate a user with username and password
+    get-operator-token: Retrieve a JWT token that doesn't expire for operator use, corresponding to your user
 
 Additional help:
     %[1]s users COMMAND --help
@@ -521,5 +530,15 @@ Example:
       "password": "s3cr3t",
       "username": "alice"
    }'
+`, os.Args[0])
+}
+
+func usersGetOperatorTokenUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] users get-operator-token
+
+Retrieve a JWT token that doesn't expire for operator use, corresponding to your user
+
+Example:
+    %[1]s users get-operator-token
 `, os.Args[0])
 }

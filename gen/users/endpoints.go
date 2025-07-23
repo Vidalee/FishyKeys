@@ -15,22 +15,25 @@ import (
 
 // Endpoints wraps the "users" service endpoints.
 type Endpoints struct {
-	CreateUser goa.Endpoint
-	ListUsers  goa.Endpoint
-	DeleteUser goa.Endpoint
-	AuthUser   goa.Endpoint
+	CreateUser       goa.Endpoint
+	ListUsers        goa.Endpoint
+	DeleteUser       goa.Endpoint
+	AuthUser         goa.Endpoint
+	GetOperatorToken goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "users" service with endpoints.
 func NewEndpoints(s Service, si ServerInterceptors) *Endpoints {
 	endpoints := &Endpoints{
-		CreateUser: NewCreateUserEndpoint(s),
-		ListUsers:  NewListUsersEndpoint(s),
-		DeleteUser: NewDeleteUserEndpoint(s),
-		AuthUser:   NewAuthUserEndpoint(s),
+		CreateUser:       NewCreateUserEndpoint(s),
+		ListUsers:        NewListUsersEndpoint(s),
+		DeleteUser:       NewDeleteUserEndpoint(s),
+		AuthUser:         NewAuthUserEndpoint(s),
+		GetOperatorToken: NewGetOperatorTokenEndpoint(s),
 	}
 	endpoints.ListUsers = WrapListUsersEndpoint(endpoints.ListUsers, si)
 	endpoints.DeleteUser = WrapDeleteUserEndpoint(endpoints.DeleteUser, si)
+	endpoints.GetOperatorToken = WrapGetOperatorTokenEndpoint(endpoints.GetOperatorToken, si)
 	return endpoints
 }
 
@@ -40,6 +43,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.ListUsers = m(e.ListUsers)
 	e.DeleteUser = m(e.DeleteUser)
 	e.AuthUser = m(e.AuthUser)
+	e.GetOperatorToken = m(e.GetOperatorToken)
 }
 
 // NewCreateUserEndpoint returns an endpoint function that calls the method
@@ -74,5 +78,13 @@ func NewAuthUserEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*AuthUserPayload)
 		return s.AuthUser(ctx, p)
+	}
+}
+
+// NewGetOperatorTokenEndpoint returns an endpoint function that calls the
+// method "get operator token" of service "users".
+func NewGetOperatorTokenEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		return s.GetOperatorToken(ctx)
 	}
 }

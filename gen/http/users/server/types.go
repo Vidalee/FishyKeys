@@ -54,6 +54,15 @@ type AuthUserResponseBody struct {
 	Token *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
 }
 
+// GetOperatorTokenResponseBody is the type of the "users" service "get
+// operator token" endpoint HTTP response body.
+type GetOperatorTokenResponseBody struct {
+	// The username of the account corresponding to the token
+	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username,omitempty"`
+	// JWT or session token
+	Token *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
+}
+
 // CreateUserUsernameTakenResponseBody is the type of the "users" service
 // "create user" endpoint HTTP response body for the "username_taken" error.
 type CreateUserUsernameTakenResponseBody struct {
@@ -288,6 +297,25 @@ type AuthUserInternalErrorResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// GetOperatorTokenInternalErrorResponseBody is the type of the "users" service
+// "get operator token" endpoint HTTP response body for the "internal_error"
+// error.
+type GetOperatorTokenInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // UserResponse is used to define fields on response body types.
 type UserResponse struct {
 	// Unique identifier for the user
@@ -324,6 +352,16 @@ func NewListUsersResponseBody(res []*users.User) ListUsersResponseBody {
 // "auth user" endpoint of the "users" service.
 func NewAuthUserResponseBody(res *users.AuthUserResult) *AuthUserResponseBody {
 	body := &AuthUserResponseBody{
+		Username: res.Username,
+		Token:    res.Token,
+	}
+	return body
+}
+
+// NewGetOperatorTokenResponseBody builds the HTTP response body from the
+// result of the "get operator token" endpoint of the "users" service.
+func NewGetOperatorTokenResponseBody(res *users.GetOperatorTokenResult) *GetOperatorTokenResponseBody {
+	body := &GetOperatorTokenResponseBody{
 		Username: res.Username,
 		Token:    res.Token,
 	}
@@ -502,6 +540,20 @@ func NewAuthUserInvalidParametersResponseBody(res *goa.ServiceError) *AuthUserIn
 // result of the "auth user" endpoint of the "users" service.
 func NewAuthUserInternalErrorResponseBody(res *goa.ServiceError) *AuthUserInternalErrorResponseBody {
 	body := &AuthUserInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetOperatorTokenInternalErrorResponseBody builds the HTTP response body
+// from the result of the "get operator token" endpoint of the "users" service.
+func NewGetOperatorTokenInternalErrorResponseBody(res *goa.ServiceError) *GetOperatorTokenInternalErrorResponseBody {
+	body := &GetOperatorTokenInternalErrorResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,

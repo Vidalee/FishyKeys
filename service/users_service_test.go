@@ -242,6 +242,53 @@ func TestUsersService_AuthUser(t *testing.T) {
 	}
 }
 
+func TestUsersService_GetOperatorToken(t *testing.T) {
+	service := setupUsersTestService(t)
+	ctx := context.Background()
+	clearUsersServiceTables(t, ctx)
+
+	username := "admin"
+	password := "password"
+
+	createMasterKeyPayload := &genkey.CreateMasterKeyPayload{
+		TotalShares:   3,
+		MinShares:     2,
+		AdminUsername: username,
+		AdminPassword: password,
+	}
+
+	keyService := setupKeyTestServiceWithKeyManager(service.keyManager)
+	_, err := keyService.CreateMasterKey(ctx, createMasterKeyPayload)
+	require.NoError(t, err, "failed to create master key for auth test")
+
+	ctx = context.WithValue(ctx, "token", &JwtClaims{
+		UserID:   1,
+		Username: username,
+	})
+
+	result, err := service.GetOperatorToken(ctx)
+	require.NoError(t, err, "failed to get operator token")
+	assert.NotNil(t, result, "operator token should not be nil")
+	token, err := jwt.ParseWithClaims(*result.Token, &JwtClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		decryptedSecret, err := service.secretsRepository.GetSecretByPath(ctx, service.keyManager, "internal/jwt_signing_key")
+		if err != nil {
+			return nil, fmt.Errorf("could not retrieve JWT signing key: %w", err)
+		}
+
+		return base64.StdEncoding.DecodeString(decryptedSecret.DecryptedValue)
+	})
+
+	require.NoError(t, err, "failed to parse JWT token")
+	assert.True(t, token.Valid, "token should be valid")
+	claims, ok := token.Claims.(*JwtClaims)
+	require.True(t, ok, "claims should be of type JwtClaims")
+	assert.Equal(t, username, claims.Username, "username in claims should match")
+	assert.Equal(t, 1, claims.UserID, "user ID in token should match created user ID")
+}
+
 func TestUsersService_ListUsers(t *testing.T) {
 	service := setupUsersTestService(t)
 	ctx := context.Background()

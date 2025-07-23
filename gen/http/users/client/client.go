@@ -33,6 +33,10 @@ type Client struct {
 	// endpoint.
 	AuthUserDoer goahttp.Doer
 
+	// GetOperatorToken Doer is the HTTP client used to make requests to the get
+	// operator token endpoint.
+	GetOperatorTokenDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -56,16 +60,17 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		CreateUserDoer:      doer,
-		ListUsersDoer:       doer,
-		DeleteUserDoer:      doer,
-		AuthUserDoer:        doer,
-		CORSDoer:            doer,
-		RestoreResponseBody: restoreBody,
-		scheme:              scheme,
-		host:                host,
-		decoder:             dec,
-		encoder:             enc,
+		CreateUserDoer:       doer,
+		ListUsersDoer:        doer,
+		DeleteUserDoer:       doer,
+		AuthUserDoer:         doer,
+		GetOperatorTokenDoer: doer,
+		CORSDoer:             doer,
+		RestoreResponseBody:  restoreBody,
+		scheme:               scheme,
+		host:                 host,
+		decoder:              dec,
+		encoder:              enc,
 	}
 }
 
@@ -150,6 +155,25 @@ func (c *Client) AuthUser() goa.Endpoint {
 		resp, err := c.AuthUserDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("users", "auth user", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// GetOperatorToken returns an endpoint that makes HTTP requests to the users
+// service get operator token server.
+func (c *Client) GetOperatorToken() goa.Endpoint {
+	var (
+		decodeResponse = DecodeGetOperatorTokenResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildGetOperatorTokenRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.GetOperatorTokenDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("users", "get operator token", err)
 		}
 		return decodeResponse(resp)
 	}

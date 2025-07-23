@@ -129,4 +129,24 @@ var _ = Service("users", func() {
 			Response("internal_error", StatusInternalServerError)
 		})
 	})
+
+	Method("get operator token", func() {
+		ServerInterceptor(Authentified)
+
+		Description("Retrieve a JWT token that doesn't expire for operator use, corresponding to your user")
+		Result(func() {
+			Attribute("username", String, "The username of the account corresponding to the token", func() {
+				Example("alice")
+			})
+			Attribute("token", String, "JWT or session token", func() {
+				Example("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+			})
+		})
+		Error("internal_error", ErrorResult, "Internal server error")
+		HTTP(func() {
+			POST("/users/operator-token")
+			Response(StatusOK)
+			Response("internal_error", StatusInternalServerError)
+		})
+	})
 })

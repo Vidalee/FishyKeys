@@ -27,6 +27,20 @@ func wrapListUsersAuthentified(endpoint goa.Endpoint, i ServerInterceptors) goa.
 	}
 }
 
+// wrapAuthentifiedGetOperatorToken applies the Authentified server interceptor
+// to endpoints.
+func wrapGetOperatorTokenAuthentified(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		info := &AuthentifiedInfo{
+			service:    "users",
+			method:     "GetOperatorToken",
+			callType:   goa.InterceptorUnary,
+			rawPayload: req,
+		}
+		return i.Authentified(ctx, info, endpoint)
+	}
+}
+
 // wrapIsAdminDeleteUser applies the IsAdmin server interceptor to endpoints.
 func wrapDeleteUserIsAdmin(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
