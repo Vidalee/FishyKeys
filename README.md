@@ -30,17 +30,25 @@ Keep in mind frontend was not the main focus of this project, so it is focused o
 
 *Create a master key, shown on first startup.*
 
+---
+
 ![master key shares](./ui/public/demo/master_key_shares.png)
 
 *Save the shares securely and distributes them to your team.*
+
+---
 
 ![master key unlocking](./ui/public/demo/master_key_unlocking.png)
 
 *Unlock the master key using the shares, this is a live collaborative page as you can see others adding their shares live.*
 
+---
+
 ![secrets dashboard](./ui/public/demo/secrets_dashboard.png)
 
 *Dashboard showing all the secrets you have access to, with the secret `/cat/key_1` selected.*
+
+---
 
 ![create secret](./ui/public/demo/create_secret.png)
 
