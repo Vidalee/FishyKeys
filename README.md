@@ -1,4 +1,4 @@
-# FishyKeys
+# FishyKeys [![Tests](https://github.com/Vidalee/FishyKeys/actions/workflows/test.yaml/badge.svg)](https://github.com/Vidalee/FishyKeys/actions/workflows/test.yaml)
 
 ⚠ This project is still a work in progress, which is why there is no installation instructions ⚠
 
