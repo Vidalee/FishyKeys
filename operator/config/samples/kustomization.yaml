@@ -1,0 +1,4 @@
+## Append samples of your project ##
+resources:
+- fishykeys_v1alpha1_fishysecret.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples

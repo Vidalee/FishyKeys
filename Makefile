@@ -7,6 +7,6 @@ test:
 	go test ./...
 
 build:
-	go build -o fishykeys ./
+	go build ./
 
 .PHONY: gen test

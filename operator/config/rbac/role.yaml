@@ -1,0 +1,32 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+- apiGroups:
+  - fishykeys.2v.pm
+  resources:
+  - fishysecrets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - fishykeys.2v.pm
+  resources:
+  - fishysecrets/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - fishykeys.2v.pm
+  resources:
+  - fishysecrets/status
+  verbs:
+  - get
+  - patch
+  - update
