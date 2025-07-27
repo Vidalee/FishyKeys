@@ -22,6 +22,13 @@ Is it quite similar to HashiCorp's Vault but with less features as it's mainly a
 - Hierarchical secret paths (secrets can be organized in folders)
 - Using PostgreSQL for data storage
 
+## Next steps
+
+- Finish the Kubernetes operator
+- Do some trivial CRUD endpoints (mainly for roles)
+- Optimize DB requests, since we don't use an ORM let's do a few more join tables :)
+- Make FishyKeys distributed using Raft protocol
+
 ## Screenshots
 
 Keep in mind frontend was not the main focus of this project, so it is focused on functionality rather than "design".
