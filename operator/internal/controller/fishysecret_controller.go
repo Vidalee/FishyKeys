@@ -64,7 +64,7 @@ func (r *FishySecretReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		value, err := fetchSecretFromManager(fishySecret.Spec.Server, fishySecret.Spec.Token, mapping.SecretPath)
 		if err != nil {
 			log.Error(err, "failed to fetch from secret manager", "path", mapping.SecretPath)
-			setStatusCondition(&fishySecret, "Ready", "FetchError", err.Error())
+			setStatusCondition(&fishySecret, "Ready", metav1.ConditionFalse, "FetchError", err.Error())
 			_ = r.Status().Update(ctx, &fishySecret)
 			return ctrl.Result{}, err
 		}
@@ -107,7 +107,7 @@ func (r *FishySecretReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, err
 	}
 
-	setStatusCondition(&fishySecret, "Ready", "SecretSynced", "Secret successfully synced")
+	setStatusCondition(&fishySecret, "Ready", metav1.ConditionTrue, "SecretSynced", "Secret successfully synced")
 	fishySecret.Status.LastSyncedTime = &metav1.Time{Time: time.Now()}
 	if err := r.Status().Update(ctx, &fishySecret); err != nil {
 		log.Error(err, "failed to update FishySecret status")
@@ -125,10 +125,10 @@ func (r *FishySecretReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func setStatusCondition(f *fishykeysv1alpha1.FishySecret, status string, reason string, msg string) {
+func setStatusCondition(f *fishykeysv1alpha1.FishySecret, conditionType string, status metav1.ConditionStatus, reason string, msg string) {
 	meta.SetStatusCondition(&f.Status.Conditions, metav1.Condition{
-		Type:               "Ready",
-		Status:             metav1.ConditionStatus(status),
+		Type:               conditionType,
+		Status:             status,
 		Reason:             reason,
 		Message:            msg,
 		LastTransitionTime: metav1.Now(),
