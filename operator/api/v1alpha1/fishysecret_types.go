@@ -25,17 +25,43 @@ import (
 
 // FishySecretSpec defines the desired state of FishySecret.
 type FishySecretSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Token used to authenticate to the external secret manager
+	Token string `json:"token,omitempty"`
 
-	// Foo is an example field of FishySecret. Edit fishysecret_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// Server is the endpoint of the external secret manager
+	Server string `json:"server"`
+
+	// Target defines the Kubernetes Secret to create
+	Target SecretTarget `json:"target"`
+
+	// Data is the list of key-paths to fetch from the secret manager
+	// Each item becomes a key in the resulting Kubernetes Secret
+	Data []SecretKeyMapping `json:"data"`
+}
+
+// SecretTarget defines where to create the Kubernetes Secret
+type SecretTarget struct {
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
+}
+
+// SecretKeyMapping defines a mapping between a key in the secret manager
+// and a key in the resulting Kubernetes Secret
+type SecretKeyMapping struct {
+	// SecretPath is the path in the secret manager
+	SecretPath string `json:"secretPath"`
+
+	// SecretKeyName is the field name in the resulting K8s Secret
+	SecretKeyName string `json:"secretKeyName"`
 }
 
 // FishySecretStatus defines the observed state of FishySecret.
 type FishySecretStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Conditions represent the latest available observations of the FishySecret's state
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
+
+	// LastSyncedTime is the last time the secret was successfully synced
+	LastSyncedTime *metav1.Time `json:"lastSyncedTime,omitempty"`
 }
 
 // +kubebuilder:object:root=true
