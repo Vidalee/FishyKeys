@@ -1,4 +1,4 @@
-# FishyKeys [![Tests](https://github.com/Vidalee/FishyKeys/actions/workflows/test.yaml/badge.svg)](https://github.com/Vidalee/FishyKeys/actions/workflows/test.yaml)
+# FishyKeys [![Tests](https://github.com/Vidalee/FishyKeys/actions/workflows/test.yaml/badge.svg)](https://github.com/Vidalee/FishyKeys/actions/workflows/test.yaml) [![Operator Tests](https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test.yml/badge.svg)](https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test.yml) [![Operator E2E Tests](https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test-e2e.yml/badge.svg)](https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test-e2e.yml)
 
 ⚠ This project is still a work in progress, which is why there is no installation instructions ⚠
 
@@ -60,3 +60,4 @@ Keep in mind frontend was not the main focus of this project, so it is focused o
 ![create secret](./ui/public/demo/create_secret.png)
 
 *Create a secret, you can add metadata and set the access roles.*
+
