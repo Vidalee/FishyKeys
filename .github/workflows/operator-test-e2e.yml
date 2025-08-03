@@ -1,4 +1,4 @@
-name: E2E Tests
+name: Operator E2E Tests
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: go.mod
+          go-version-file: operator/go.mod
 
       - name: Install the latest version of kind
         run: |
@@ -27,6 +27,7 @@ jobs:
         run: kind version
 
       - name: Running Test e2e
+        working-directory: operator
         run: |
           go mod tidy
           make test-e2e
