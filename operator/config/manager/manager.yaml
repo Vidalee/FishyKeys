@@ -66,6 +66,7 @@ spec:
         image: controller:latest
         name: manager
         ports: []
+        env: []
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
