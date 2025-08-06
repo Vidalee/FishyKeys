@@ -18,12 +18,14 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	fishykeysv1alpha1 "github.com/Vidalee/FishyKeys/operator/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"os"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -53,8 +55,23 @@ func (r *FishySecretReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	}
 
 	secretData := make(map[string][]byte)
+
+	serverUrl, err := getFishyKeysServerUrl(ctx, r)
+	if err != nil {
+		log.Error(err, "failed to get FishyKeys server URL")
+		setStatusCondition(&fishySecret, "Ready", metav1.ConditionFalse, "ServerUrlError", err.Error())
+		return ctrl.Result{}, err
+	}
+
+	token, err := getFishyKeysToken(ctx, r)
+	if err != nil {
+		log.Error(err, "failed to get FishyKeys token")
+		setStatusCondition(&fishySecret, "Ready", metav1.ConditionFalse, "TokenError", err.Error())
+		return ctrl.Result{}, err
+	}
+
 	for _, mapping := range fishySecret.Spec.Data {
-		value, err := fetchSecretFromManager(fishySecret.Spec.Server, fishySecret.Spec.Token, mapping.SecretPath)
+		value, err := fetchSecretFromManager(serverUrl, token, mapping.SecretPath)
 		if err != nil {
 			log.Error(err, "failed to fetch from secret manager", "path", mapping.SecretPath)
 			setStatusCondition(&fishySecret, "Ready", metav1.ConditionFalse, "FetchError", err.Error())
@@ -79,7 +96,7 @@ func (r *FishySecretReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	}
 
 	var existingSecret corev1.Secret
-	err := r.Get(ctx, client.ObjectKeyFromObject(desiredSecret), &existingSecret)
+	err = r.Get(ctx, client.ObjectKeyFromObject(desiredSecret), &existingSecret)
 	if err != nil && apierrors.IsNotFound(err) {
 		if err := r.Create(ctx, desiredSecret); err != nil {
 			log.Error(err, "failed to create Secret")
@@ -133,4 +150,39 @@ func setStatusCondition(f *fishykeysv1alpha1.FishySecret, conditionType string, 
 
 func fetchSecretFromManager(server string, token string, path string) (string, error) {
 	return "dummy", nil
+}
+
+func getFishyKeysServerUrl(ctx context.Context, r *FishySecretReconciler) (string, error) {
+	serverUrl := os.Getenv("FISHYKEYS_SERVER_URL")
+	if serverUrl == "" {
+		return "", fmt.Errorf("FISHYKEYS_SERVER_URL environment variable is not set")
+	}
+	return serverUrl, nil
+}
+
+func getFishyKeysToken(ctx context.Context, r *FishySecretReconciler) (string, error) {
+	operatorNamespace := os.Getenv("POD_NAMESPACE")
+	if operatorNamespace == "" {
+		if os.Getenv("ENV") == "DEV" {
+			operatorNamespace = "default"
+		} else {
+			return "", fmt.Errorf("POD_NAMESPACE environment variable is not set")
+		}
+	}
+
+	var tokenSecret corev1.Secret
+	if err := r.Get(ctx, client.ObjectKey{
+		Name:      "fishysecret-token",
+		Namespace: operatorNamespace,
+	}, &tokenSecret); err != nil {
+		return "", fmt.Errorf("unable to get token secret in namespace %s: %w. Please create it", operatorNamespace, err)
+	}
+
+	tokenBytes, ok := tokenSecret.Data["token"]
+	if !ok {
+		return "", fmt.Errorf("invalid token secret: missing 'token' key in Secret fishysecret-token")
+	}
+
+	token := string(tokenBytes)
+	return token, nil
 }

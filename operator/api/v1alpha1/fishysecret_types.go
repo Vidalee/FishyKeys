@@ -25,12 +25,6 @@ import (
 
 // FishySecretSpec defines the desired state of FishySecret.
 type FishySecretSpec struct {
-	// Token used to authenticate to the external secret manager
-	Token string `json:"token,omitempty"`
-
-	// Server is the endpoint of the external secret manager
-	Server string `json:"server"`
-
 	// Target defines the Kubernetes Secret to create
 	Target SecretTarget `json:"target"`
 

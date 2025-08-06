@@ -52,8 +52,6 @@ var _ = Describe("FishySecret Controller", func() {
 						Namespace: "default",
 					},
 					Spec: fishykeysv1alpha1.FishySecretSpec{
-						Token:  "token",
-						Server: "https://fishysecret.com",
 						Target: fishykeysv1alpha1.SecretTarget{
 							Name:      "test-secret",
 							Namespace: "default",
