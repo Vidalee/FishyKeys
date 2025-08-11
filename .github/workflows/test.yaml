@@ -1,4 +1,4 @@
-name: Tests
+name: Backend Tests
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Backend Tests
+    name: Run on Ubuntu
     runs-on: ubuntu-latest
 
     steps:
