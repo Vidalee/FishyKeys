@@ -41,6 +41,19 @@ var _ = Describe("FishySecret Controller", func() {
 		}
 
 		BeforeEach(func() {
+			By("creating fishysecret-config Secret")
+			secret := &corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "fishysecret-config",
+					Namespace: typeNamespacedName.Namespace,
+				},
+				Data: map[string][]byte{
+					"token": []byte("token"),
+					"url":   []byte("http://localhost:8080"),
+				},
+			}
+			Expect(k8sClient.Create(ctx, secret)).To(Succeed())
+
 			By("creating a FishySecret resource")
 			fishySecret := &fishykeysv1alpha1.FishySecret{}
 			err := k8sClient.Get(ctx, typeNamespacedName, fishySecret)

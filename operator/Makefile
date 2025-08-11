@@ -162,7 +162,6 @@ build: manifests generate fmt vet ## Build manager binary.
 .PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
 	export ENV=DEV; \
-	export FISHYKEYS_SERVER_URL=http://localhost:8080; \
 	go run ./cmd/main.go
 
 # If you wish to build the manager image targeting other platforms you can use the --platform flag.
