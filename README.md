@@ -24,7 +24,7 @@ Is it quite similar to HashiCorp's Vault but with less features as it's mainly a
 
 ## Next steps
 
-- Finish the Kubernetes operator
+- Finish the Kubernetes operator tests
 - Do some trivial CRUD endpoints (mainly for roles)
 - Optimize DB requests, since we don't use an ORM let's do a few more join tables :)
 - Make FishyKeys distributed using Raft protocol

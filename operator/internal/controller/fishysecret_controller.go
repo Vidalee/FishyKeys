@@ -18,8 +18,13 @@ package controller
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	fishykeysv1alpha1 "github.com/Vidalee/FishyKeys/operator/api/v1alpha1"
+	pb "github.com/Vidalee/FishyKeys/operator/gen/pb"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -140,9 +145,35 @@ func setStatusCondition(f *fishykeysv1alpha1.FishySecret, conditionType string, 
 		LastTransitionTime: metav1.Now(),
 	})
 }
-
 func fetchSecretFromManager(server string, token string, path string) (string, error) {
-	return "dummy", nil
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	conn, err := grpc.NewClient(
+		server,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		return "", fmt.Errorf("failed to connect: %w", err)
+	}
+	defer conn.Close()
+
+	secretsClient := pb.NewSecretsClient(conn)
+
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(
+		"authorization", token,
+	))
+
+	encodedPath := base64.StdEncoding.EncodeToString([]byte(path))
+
+	resp, err := secretsClient.OperatorGetSecretValue(ctx, &pb.OperatorGetSecretValueRequest{
+		Path: encodedPath,
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to get secret value: %w", err)
+	}
+
+	return resp.GetValue(), nil
 }
 
 func getFishyKeysUrlAndToken(ctx context.Context, r *FishySecretReconciler) (string, string, error) {

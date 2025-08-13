@@ -19,19 +19,45 @@ package controller
 import (
 	"context"
 	fishykeysv1alpha1 "github.com/Vidalee/FishyKeys/operator/api/v1alpha1"
+	pb "github.com/Vidalee/FishyKeys/operator/gen/pb"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"net"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"testing"
+	"time"
 )
+
+type mockSecretsServer struct {
+	pb.UnimplementedSecretsServer
+	t                   *testing.T
+	expectedToken       string
+	expectedPath        string
+	expectedSecretValue string
+}
+
+func (s *mockSecretsServer) OperatorGetSecretValue(ctx context.Context, req *pb.OperatorGetSecretValueRequest) (*pb.OperatorGetSecretValueResponse, error) {
+	defer GinkgoRecover()
+
+	md, _ := metadata.FromIncomingContext(ctx)
+	Expect(md.Get("authorization")).To(ContainElement(s.expectedToken))
+	Expect(req.Path).To(Equal(s.expectedPath))
+
+	return &pb.OperatorGetSecretValueResponse{Value: &s.expectedSecretValue}, nil
+}
 
 var _ = Describe("FishySecret Controller", func() {
 	Context("When reconciling a resource", func() {
 		const fishySecretName = "test-fishysecret"
+		expectedServer := "localhost:8090"
+		expectedToken := "secret token!"
 
 		ctx := context.Background()
 
@@ -48,8 +74,8 @@ var _ = Describe("FishySecret Controller", func() {
 					Namespace: typeNamespacedName.Namespace,
 				},
 				Data: map[string][]byte{
-					"token": []byte("token"),
-					"url":   []byte("http://localhost:8080"),
+					"token": []byte(expectedToken),
+					"url":   []byte(expectedServer),
 				},
 			}
 			Expect(k8sClient.Create(ctx, secret)).To(Succeed())
@@ -71,12 +97,8 @@ var _ = Describe("FishySecret Controller", func() {
 						},
 						Data: []fishykeysv1alpha1.SecretKeyMapping{
 							{
-								SecretPath:    "db/user",
+								SecretPath:    "/db/user",
 								SecretKeyName: "DB_USER",
-							},
-							{
-								SecretPath:    "db/password",
-								SecretKeyName: "DB_PASSWORD",
 							},
 						},
 					},
@@ -110,7 +132,26 @@ var _ = Describe("FishySecret Controller", func() {
 				Scheme: k8sClient.Scheme(),
 			}
 
-			_, err := controllerReconciler.Reconcile(ctx, reconcile.Request{
+			expectedPath := "L2RiL3VzZXI=" // encoded /db/user
+			expectedSecretValue := "secret value :p"
+
+			srv := grpc.NewServer()
+			pb.RegisterSecretsServer(srv, &mockSecretsServer{
+				expectedToken:       expectedToken,
+				expectedPath:        expectedPath,
+				expectedSecretValue: expectedSecretValue,
+			})
+			listener, err := net.Listen("tcp", expectedServer)
+			Expect(err).ToNot(HaveOccurred())
+			go func() {
+				defer GinkgoRecover()
+				_ = srv.Serve(listener) // ignore error, server is meant to run
+			}()
+			defer srv.Stop()
+
+			time.Sleep(100 * time.Millisecond)
+
+			_, err = controllerReconciler.Reconcile(ctx, reconcile.Request{
 				NamespacedName: typeNamespacedName,
 			})
 			Expect(err).NotTo(HaveOccurred())
@@ -130,7 +171,6 @@ var _ = Describe("FishySecret Controller", func() {
 			)
 
 			// Check created Secret
-			dummySecretValue := "dummy"
 			expectedSecret := &corev1.Secret{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test-secret",
@@ -147,8 +187,7 @@ var _ = Describe("FishySecret Controller", func() {
 					},
 				},
 				Data: map[string][]byte{
-					"DB_USER":     []byte(dummySecretValue),
-					"DB_PASSWORD": []byte(dummySecretValue),
+					"DB_USER": []byte(expectedSecretValue),
 				},
 				Type: corev1.SecretTypeOpaque,
 			}
