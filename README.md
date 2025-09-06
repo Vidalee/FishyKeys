@@ -30,6 +30,25 @@ Is it quite similar to HashiCorp's Vault but with less features as it's mainly a
 - Optimize DB requests, since we don't use an ORM let's do a few more join tables :)
 - Make FishyKeys distributed using Raft protocol
 
+## Example FishySecret CRD config
+This will create a `test-secret` Secret with the `DB_USER` and `DB_PASS` keys associated to the corresponding secret paths in the FishySecret backend.
+```yaml
+apiVersion: fishykeys.2v.pm/v1alpha1
+kind: FishySecret
+metadata:
+  name: test-fishy-secret
+  namespace: default
+spec:
+  target:
+    name: test-secret
+    namespace: default
+  data:
+    - secretPath: "/app/db/username"
+      secretKeyName: "DB_USER"
+    - secretPath: "/app/db/password"
+      secretKeyName: "DB_PASS"
+```
+
 ## Screenshots
 
 Keep in mind frontend was not the main focus of this project, so it is focused on functionality rather than "design".
@@ -61,5 +80,6 @@ Keep in mind frontend was not the main focus of this project, so it is focused o
 ![create secret](./ui/public/demo/create_secret.png)
 
 *Create a secret, you can add metadata and set the access roles.*
+
 
 
