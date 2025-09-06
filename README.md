@@ -24,6 +24,7 @@ Is it quite similar to HashiCorp's Vault but with less features as it's mainly a
 
 ## Next steps
 
+- Distribute with a Helm chart
 - Finish the Kubernetes operator tests
 - Do some trivial CRUD endpoints (mainly for roles)
 - Optimize DB requests, since we don't use an ORM let's do a few more join tables :)
@@ -60,4 +61,5 @@ Keep in mind frontend was not the main focus of this project, so it is focused o
 ![create secret](./ui/public/demo/create_secret.png)
 
 *Create a secret, you can add metadata and set the access roles.*
+
 
