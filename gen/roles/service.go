@@ -17,6 +17,14 @@ import (
 type Service interface {
 	// List all roles
 	ListRoles(context.Context) (res []*Role, err error)
+	// Create a new role
+	CreateRole(context.Context, *CreateRolePayload) (res *CreateRoleResult, err error)
+	// Delete a role byd id
+	DeleteRole(context.Context, *DeleteRolePayload) (err error)
+	// Assign a role to a user
+	AssignRoleToUser(context.Context, *AssignRoleToUserPayload) (err error)
+	// Unassign a role to a user
+	UnassignRoleToUser(context.Context, *UnassignRoleToUserPayload) (err error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -33,7 +41,42 @@ const ServiceName = "roles"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [1]string{"list roles"}
+var MethodNames = [5]string{"list roles", "create role", "delete role", "assign role to user", "unassign role to user"}
+
+// AssignRoleToUserPayload is the payload type of the roles service assign role
+// to user method.
+type AssignRoleToUserPayload struct {
+	// ID of the user to assign the role to
+	UserID int
+	// ID of the role to assign to the user
+	RoleID int
+}
+
+// CreateRolePayload is the payload type of the roles service create role
+// method.
+type CreateRolePayload struct {
+	// Name or the role
+	Name string
+	// Color of the role
+	Color string
+}
+
+// CreateRoleResult is the result type of the roles service create role method.
+type CreateRoleResult struct {
+	// The name of the created role
+	Name string
+	// The color of the created role
+	Color string
+	// Unique identifier for the role
+	ID int
+}
+
+// DeleteRolePayload is the payload type of the roles service delete role
+// method.
+type DeleteRolePayload struct {
+	// ID of the role to delete
+	ID int
+}
 
 type Role struct {
 	// Unique identifier for the role
@@ -50,6 +93,15 @@ type Role struct {
 	UpdatedAt string
 }
 
+// UnassignRoleToUserPayload is the payload type of the roles service unassign
+// role to user method.
+type UnassignRoleToUserPayload struct {
+	// ID of the user to unassign the role to
+	UserID int
+	// ID of the role to unassign to the user
+	RoleID int
+}
+
 // MakeInternalError builds a goa.ServiceError from an error.
 func MakeInternalError(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "internal_error", false, false, false)
@@ -58,4 +110,29 @@ func MakeInternalError(err error) *goa.ServiceError {
 // MakeUnauthorized builds a goa.ServiceError from an error.
 func MakeUnauthorized(err error) *goa.ServiceError {
 	return goa.NewServiceError(err, "unauthorized", false, false, false)
+}
+
+// MakeRoleTaken builds a goa.ServiceError from an error.
+func MakeRoleTaken(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "role_taken", false, false, false)
+}
+
+// MakeInvalidParameters builds a goa.ServiceError from an error.
+func MakeInvalidParameters(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "invalid_parameters", false, false, false)
+}
+
+// MakeForbidden builds a goa.ServiceError from an error.
+func MakeForbidden(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "forbidden", false, false, false)
+}
+
+// MakeRoleNotFound builds a goa.ServiceError from an error.
+func MakeRoleNotFound(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "role_not_found", false, false, false)
+}
+
+// MakeUserNotFound builds a goa.ServiceError from an error.
+func MakeUserNotFound(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "user_not_found", false, false, false)
 }

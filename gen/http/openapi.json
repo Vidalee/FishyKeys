@@ -260,6 +260,255 @@
         "schemes": [
           "http"
         ]
+      },
+      "post": {
+        "tags": [
+          "roles"
+        ],
+        "summary": "create role roles",
+        "description": "Create a new role",
+        "operationId": "roles#create role",
+        "parameters": [
+          {
+            "name": "Create RoleRequestBody",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RolesCreateRoleRequestBody",
+              "required": [
+                "name",
+                "color"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created response.",
+            "schema": {
+              "$ref": "#/definitions/RolesCreateRoleResponseBody",
+              "required": [
+                "id",
+                "name",
+                "color"
+              ]
+            }
+          },
+          "400": {
+            "description": "Bad Request response.",
+            "schema": {
+              "$ref": "#/definitions/RolesCreateRoleInvalidParametersResponseBody"
+            }
+          },
+          "401": {
+            "description": "Unauthorized response.",
+            "schema": {
+              "$ref": "#/definitions/RolesCreateRoleUnauthorizedResponseBody"
+            }
+          },
+          "403": {
+            "description": "Forbidden response.",
+            "schema": {
+              "$ref": "#/definitions/RolesCreateRoleForbiddenResponseBody"
+            }
+          },
+          "409": {
+            "description": "Conflict response.",
+            "schema": {
+              "$ref": "#/definitions/RolesCreateRoleRoleTakenResponseBody"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error response.",
+            "schema": {
+              "$ref": "#/definitions/RolesCreateRoleInternalErrorResponseBody"
+            }
+          }
+        },
+        "schemes": [
+          "http"
+        ]
+      }
+    },
+    "/roles/assign": {
+      "post": {
+        "tags": [
+          "roles"
+        ],
+        "summary": "assign role to user roles",
+        "description": "Assign a role to a user",
+        "operationId": "roles#assign role to user",
+        "parameters": [
+          {
+            "name": "Assign Role To UserRequestBody",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RolesAssignRoleToUserRequestBody",
+              "required": [
+                "user_id",
+                "role_id"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response."
+          },
+          "400": {
+            "description": "Bad Request response.",
+            "schema": {
+              "$ref": "#/definitions/RolesAssignRoleToUserInvalidParametersResponseBody"
+            }
+          },
+          "401": {
+            "description": "Unauthorized response.",
+            "schema": {
+              "$ref": "#/definitions/RolesAssignRoleToUserUnauthorizedResponseBody"
+            }
+          },
+          "403": {
+            "description": "Forbidden response.",
+            "schema": {
+              "$ref": "#/definitions/RolesAssignRoleToUserForbiddenResponseBody"
+            }
+          },
+          "404": {
+            "description": "Not Found response.",
+            "schema": {
+              "$ref": "#/definitions/RolesAssignRoleToUserRoleNotFoundResponseBody"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error response.",
+            "schema": {
+              "$ref": "#/definitions/RolesAssignRoleToUserInternalErrorResponseBody"
+            }
+          }
+        },
+        "schemes": [
+          "http"
+        ]
+      }
+    },
+    "/roles/unassign": {
+      "post": {
+        "tags": [
+          "roles"
+        ],
+        "summary": "unassign role to user roles",
+        "description": "Unassign a role to a user",
+        "operationId": "roles#unassign role to user",
+        "parameters": [
+          {
+            "name": "Unassign Role To UserRequestBody",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RolesUnassignRoleToUserRequestBody",
+              "required": [
+                "user_id",
+                "role_id"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response."
+          },
+          "400": {
+            "description": "Bad Request response.",
+            "schema": {
+              "$ref": "#/definitions/RolesUnassignRoleToUserInvalidParametersResponseBody"
+            }
+          },
+          "401": {
+            "description": "Unauthorized response.",
+            "schema": {
+              "$ref": "#/definitions/RolesUnassignRoleToUserUnauthorizedResponseBody"
+            }
+          },
+          "403": {
+            "description": "Forbidden response.",
+            "schema": {
+              "$ref": "#/definitions/RolesUnassignRoleToUserForbiddenResponseBody"
+            }
+          },
+          "404": {
+            "description": "Not Found response.",
+            "schema": {
+              "$ref": "#/definitions/RolesUnassignRoleToUserRoleNotFoundResponseBody"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error response.",
+            "schema": {
+              "$ref": "#/definitions/RolesUnassignRoleToUserInternalErrorResponseBody"
+            }
+          }
+        },
+        "schemes": [
+          "http"
+        ]
+      }
+    },
+    "/roles/{id}": {
+      "delete": {
+        "tags": [
+          "roles"
+        ],
+        "summary": "delete role roles",
+        "description": "Delete a role byd id",
+        "operationId": "roles#delete role",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the role to delete",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response."
+          },
+          "400": {
+            "description": "Bad Request response.",
+            "schema": {
+              "$ref": "#/definitions/RolesDeleteRoleInvalidParametersResponseBody"
+            }
+          },
+          "401": {
+            "description": "Unauthorized response.",
+            "schema": {
+              "$ref": "#/definitions/RolesDeleteRoleUnauthorizedResponseBody"
+            }
+          },
+          "403": {
+            "description": "Forbidden response.",
+            "schema": {
+              "$ref": "#/definitions/RolesDeleteRoleForbiddenResponseBody"
+            }
+          },
+          "404": {
+            "description": "Not Found response.",
+            "schema": {
+              "$ref": "#/definitions/RolesDeleteRoleRoleNotFoundResponseBody"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error response.",
+            "schema": {
+              "$ref": "#/definitions/RolesDeleteRoleInternalErrorResponseBody"
+            }
+          }
+        },
+        "schemes": [
+          "http"
+        ]
       }
     },
     "/secrets": {
@@ -675,7 +924,8 @@
             "in": "path",
             "description": "Username of the user to delete",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "minLength": 3
           }
         ],
         "responses": {
@@ -727,7 +977,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -747,7 +997,7 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": false
+          "example": true
         },
         "timeout": {
           "type": "boolean",
@@ -757,12 +1007,12 @@
       },
       "description": "Could not recombine the shares to unlock the key (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
-        "timeout": true
+        "temporary": false,
+        "timeout": false
       },
       "required": [
         "name",
@@ -780,7 +1030,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": true
+          "example": false
         },
         "id": {
           "type": "string",
@@ -805,17 +1055,17 @@
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "Internal server error (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": true,
-        "timeout": false
+        "timeout": true
       },
       "required": [
         "name",
@@ -833,7 +1083,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -867,8 +1117,8 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
-        "timeout": false
+        "temporary": false,
+        "timeout": true
       },
       "required": [
         "name",
@@ -959,22 +1209,22 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": false
+          "example": true
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "No master key has been set (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
-        "timeout": false
+        "temporary": false,
+        "timeout": true
       },
       "required": [
         "name",
@@ -1009,7 +1259,7 @@
         "index": {
           "type": "integer",
           "description": "The index of the share added",
-          "example": 7581756686140821679,
+          "example": 4934522018738475179,
           "format": "int64"
         },
         "unlocked": {
@@ -1019,8 +1269,8 @@
         }
       },
       "example": {
-        "index": 1942742832473054235,
-        "unlocked": true
+        "index": 1686211336919984919,
+        "unlocked": false
       },
       "required": [
         "index",
@@ -1034,7 +1284,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -1054,7 +1304,7 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
@@ -1112,12 +1362,12 @@
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "The key recombined from the shares is not the correct key (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
@@ -1140,7 +1390,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -1160,7 +1410,7 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
@@ -1170,11 +1420,11 @@
       },
       "description": "Internal server error (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
+        "temporary": false,
         "timeout": true
       },
       "required": [
@@ -1193,7 +1443,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": true
+          "example": false
         },
         "id": {
           "type": "string",
@@ -1227,7 +1477,7 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
+        "temporary": true,
         "timeout": true
       },
       "required": [
@@ -1266,17 +1516,17 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "A master key already exists (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
@@ -1345,7 +1595,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "example": "Minima fugiat."
+            "example": "Amet ipsum error ducimus."
           },
           "description": "The generated key shares",
           "example": [
@@ -1391,7 +1641,7 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": false
+          "example": true
         },
         "timeout": {
           "type": "boolean",
@@ -1401,11 +1651,11 @@
       },
       "description": "Internal server error (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
+        "temporary": true,
         "timeout": true
       },
       "required": [
@@ -1444,12 +1694,12 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": false
+          "example": true
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "The master key is already unlocked (default view)",
@@ -1458,7 +1708,7 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
+        "temporary": false,
         "timeout": true
       },
       "required": [
@@ -1497,7 +1747,7 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
@@ -1507,12 +1757,12 @@
       },
       "description": "No master key has been set (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
-        "timeout": false
+        "temporary": false,
+        "timeout": true
       },
       "required": [
         "name",
@@ -1548,7 +1798,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -1621,7 +1871,7 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": false
+          "example": true
         },
         "timeout": {
           "type": "boolean",
@@ -1635,7 +1885,7 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
+        "temporary": false,
         "timeout": false
       },
       "required": [
@@ -1688,7 +1938,7 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
+        "temporary": true,
         "timeout": true
       },
       "required": [
@@ -1707,7 +1957,7 @@
         "current_shares": {
           "type": "integer",
           "description": "Number of shares currently held",
-          "example": 5976351600798213914,
+          "example": 8059959751435884757,
           "format": "int64"
         },
         "is_locked": {
@@ -1718,21 +1968,21 @@
         "min_shares": {
           "type": "integer",
           "description": "Minimum number of shares required",
-          "example": 2885179421275788058,
+          "example": 6597967831032783709,
           "format": "int64"
         },
         "total_shares": {
           "type": "integer",
           "description": "Total number of shares",
-          "example": 5933647335511065761,
+          "example": 6553916485925491878,
           "format": "int64"
         }
       },
       "example": {
-        "current_shares": 8307246354962646932,
+        "current_shares": 623032663928956932,
         "is_locked": false,
-        "min_shares": 78622460522081617,
-        "total_shares": 8854137033747140850
+        "min_shares": 3475276066018248154,
+        "total_shares": 5326118618025669261
       },
       "required": [
         "is_locked",
@@ -1749,7 +1999,7 @@
           "type": "boolean",
           "description": "Is this role an admin role?",
           "default": false,
-          "example": false
+          "example": true
         },
         "color": {
           "type": "string",
@@ -1779,7 +2029,7 @@
         }
       },
       "example": {
-        "admin": false,
+        "admin": true,
         "color": "#FF5733",
         "created_at": "2025-06-30T12:00:00Z",
         "id": 1,
@@ -1795,7 +2045,404 @@
         "updated_at"
       ]
     },
-    "RolesListRolesInternalErrorResponseBody": {
+    "RolesAssignRoleToUserForbiddenResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Forbidden access (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesAssignRoleToUserInternalErrorResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": false
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Internal server error (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesAssignRoleToUserInvalidParametersResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": false
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "Invalid input (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesAssignRoleToUserRequestBody": {
+      "title": "RolesAssignRoleToUserRequestBody",
+      "type": "object",
+      "properties": {
+        "role_id": {
+          "type": "integer",
+          "description": "ID of the role to assign to the user",
+          "example": 1,
+          "format": "int64"
+        },
+        "user_id": {
+          "type": "integer",
+          "description": "ID of the user to assign the role to",
+          "example": 2,
+          "format": "int64"
+        }
+      },
+      "example": {
+        "role_id": 1,
+        "user_id": 2
+      },
+      "required": [
+        "user_id",
+        "role_id"
+      ]
+    },
+    "RolesAssignRoleToUserRoleNotFoundResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Role not found (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesAssignRoleToUserUnauthorizedResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": false
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "Unauthorized access (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesAssignRoleToUserUserNotFoundResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "User not found (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesCreateRoleForbiddenResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "Forbidden access (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesCreateRoleInternalErrorResponseBody": {
       "title": "Mediatype identifier: application/vnd.goa.error; view=default",
       "type": "object",
       "properties": {
@@ -1837,6 +2484,59 @@
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": false,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesCreateRoleInvalidParametersResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "Invalid input (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
         "timeout": true
       },
       "required": [
@@ -1848,7 +2548,383 @@
         "fault"
       ]
     },
-    "RolesListRolesUnauthorizedResponseBody": {
+    "RolesCreateRoleRequestBody": {
+      "title": "RolesCreateRoleRequestBody",
+      "type": "object",
+      "properties": {
+        "color": {
+          "type": "string",
+          "description": "Color of the role",
+          "example": "#33FF57",
+          "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name or the role",
+          "example": "team_sre",
+          "minLength": 1
+        }
+      },
+      "example": {
+        "color": "#33FF57",
+        "name": "team_sre"
+      },
+      "required": [
+        "name",
+        "color"
+      ]
+    },
+    "RolesCreateRoleResponseBody": {
+      "title": "RolesCreateRoleResponseBody",
+      "type": "object",
+      "properties": {
+        "color": {
+          "type": "string",
+          "description": "The color of the created role",
+          "example": "#33FF57"
+        },
+        "id": {
+          "type": "integer",
+          "description": "Unique identifier for the role",
+          "example": 2,
+          "format": "int64"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the created role",
+          "example": "team_sre"
+        }
+      },
+      "example": {
+        "color": "#33FF57",
+        "id": 2,
+        "name": "team_sre"
+      },
+      "required": [
+        "id",
+        "name",
+        "color"
+      ]
+    },
+    "RolesCreateRoleRoleTakenResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Role name already exists (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesCreateRoleUnauthorizedResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Unauthorized access (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesDeleteRoleForbiddenResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Forbidden access (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesDeleteRoleInternalErrorResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": false
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Internal server error (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesDeleteRoleInvalidParametersResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Invalid input (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesDeleteRoleRoleNotFoundResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Role not found (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesDeleteRoleUnauthorizedResponseBody": {
       "title": "Mediatype identifier: application/vnd.goa.error; view=default",
       "type": "object",
       "properties": {
@@ -1889,8 +2965,458 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
+        "temporary": false,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesListRolesInternalErrorResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": false
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "Internal server error (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesListRolesUnauthorizedResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Unauthorized access (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesUnassignRoleToUserForbiddenResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": false
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Forbidden access (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesUnassignRoleToUserInternalErrorResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": false
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Internal server error (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": true,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesUnassignRoleToUserInvalidParametersResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": false
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Invalid input (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
         "temporary": true,
         "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesUnassignRoleToUserRequestBody": {
+      "title": "RolesUnassignRoleToUserRequestBody",
+      "type": "object",
+      "properties": {
+        "role_id": {
+          "type": "integer",
+          "description": "ID of the role to unassign to the user",
+          "example": 1,
+          "format": "int64"
+        },
+        "user_id": {
+          "type": "integer",
+          "description": "ID of the user to unassign the role to",
+          "example": 2,
+          "format": "int64"
+        }
+      },
+      "example": {
+        "role_id": 1,
+        "user_id": 2
+      },
+      "required": [
+        "user_id",
+        "role_id"
+      ]
+    },
+    "RolesUnassignRoleToUserRoleNotFoundResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Role not found (default view)",
+      "example": {
+        "fault": true,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesUnassignRoleToUserUnauthorizedResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": false
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Unauthorized access (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": true
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "RolesUnassignRoleToUserUserNotFoundResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": false
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": true
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": false
+        }
+      },
+      "description": "User not found (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": true
       },
       "required": [
         "name",
@@ -1940,18 +3466,120 @@
             {
               "created_at": "2025-06-30T12:00:00Z",
               "id": 1,
+              "roles": [
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                }
+              ],
               "updated_at": "2025-06-30T15:00:00Z",
               "username": "alice"
             },
             {
               "created_at": "2025-06-30T12:00:00Z",
               "id": 1,
+              "roles": [
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                }
+              ],
               "updated_at": "2025-06-30T15:00:00Z",
               "username": "alice"
             },
             {
               "created_at": "2025-06-30T12:00:00Z",
               "id": 1,
+              "roles": [
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                }
+              ],
               "updated_at": "2025-06-30T15:00:00Z",
               "username": "alice"
             }
@@ -1994,38 +3622,86 @@
             "id": 1,
             "name": "admin",
             "updated_at": "2025-06-30T15:00:00Z"
-          },
-          {
-            "admin": false,
-            "color": "#FF5733",
-            "created_at": "2025-06-30T12:00:00Z",
-            "id": 1,
-            "name": "admin",
-            "updated_at": "2025-06-30T15:00:00Z"
           }
         ],
         "authorized_users": [
           {
             "created_at": "2025-06-30T12:00:00Z",
             "id": 1,
+            "roles": [
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              }
+            ],
             "updated_at": "2025-06-30T15:00:00Z",
             "username": "alice"
           },
           {
             "created_at": "2025-06-30T12:00:00Z",
             "id": 1,
-            "updated_at": "2025-06-30T15:00:00Z",
-            "username": "alice"
-          },
-          {
-            "created_at": "2025-06-30T12:00:00Z",
-            "id": 1,
-            "updated_at": "2025-06-30T15:00:00Z",
-            "username": "alice"
-          },
-          {
-            "created_at": "2025-06-30T12:00:00Z",
-            "id": 1,
+            "roles": [
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              }
+            ],
             "updated_at": "2025-06-30T15:00:00Z",
             "username": "alice"
           }
@@ -2034,6 +3710,40 @@
         "owner": {
           "created_at": "2025-06-30T12:00:00Z",
           "id": 1,
+          "roles": [
+            {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            },
+            {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            },
+            {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            },
+            {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            }
+          ],
           "updated_at": "2025-06-30T15:00:00Z",
           "username": "alice"
         },
@@ -2077,6 +3787,24 @@
         "owner": {
           "created_at": "2025-06-30T12:00:00Z",
           "id": 1,
+          "roles": [
+            {
+              "admin": true,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            },
+            {
+              "admin": true,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            }
+          ],
           "updated_at": "2025-06-30T15:00:00Z",
           "username": "alice"
         },
@@ -2122,16 +3850,16 @@
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "Forbidden access (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
+        "temporary": false,
         "timeout": true
       },
       "required": [
@@ -2170,7 +3898,7 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": false
+          "example": true
         },
         "timeout": {
           "type": "boolean",
@@ -2180,11 +3908,11 @@
       },
       "description": "Internal server error (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
+        "temporary": false,
         "timeout": true
       },
       "required": [
@@ -2223,21 +3951,21 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": false
+          "example": true
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "Invalid token path (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
+        "temporary": true,
         "timeout": false
       },
       "required": [
@@ -2257,7 +3985,7 @@
           "type": "array",
           "items": {
             "type": "integer",
-            "example": 7823117094384350047,
+            "example": 6544681696868333548,
             "format": "int64"
           },
           "description": "Role IDs authorized to access the secret",
@@ -2270,7 +3998,7 @@
           "type": "array",
           "items": {
             "type": "integer",
-            "example": 674298751355726141,
+            "example": 6126501000000595628,
             "format": "int64"
           },
           "description": "Users IDs authorized to access the secret",
@@ -2320,7 +4048,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -2350,12 +4078,12 @@
       },
       "description": "Unauthorized access (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
-        "timeout": true
+        "temporary": false,
+        "timeout": false
       },
       "required": [
         "name",
@@ -2393,12 +4121,12 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "Forbidden access (default view)",
@@ -2407,8 +4135,8 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
-        "timeout": true
+        "temporary": false,
+        "timeout": false
       },
       "required": [
         "name",
@@ -2446,21 +4174,21 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "Internal server error (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
+        "temporary": false,
         "timeout": true
       },
       "required": [
@@ -2479,7 +4207,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -2513,8 +4241,8 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
-        "timeout": false
+        "temporary": true,
+        "timeout": true
       },
       "required": [
         "name",
@@ -2562,12 +4290,12 @@
       },
       "description": "Secret not found (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
-        "timeout": false
+        "temporary": true,
+        "timeout": true
       },
       "required": [
         "name",
@@ -2585,7 +4313,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": true
+          "example": false
         },
         "id": {
           "type": "string",
@@ -2638,7 +4366,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -2663,63 +4391,10 @@
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "Forbidden access (default view)",
-      "example": {
-        "fault": true,
-        "id": "123abc",
-        "message": "parameter 'p' must be an integer",
-        "name": "bad_request",
-        "temporary": true,
-        "timeout": false
-      },
-      "required": [
-        "name",
-        "id",
-        "message",
-        "temporary",
-        "timeout",
-        "fault"
-      ]
-    },
-    "SecretsGetSecretValueInternalErrorResponseBody": {
-      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
-      "type": "object",
-      "properties": {
-        "fault": {
-          "type": "boolean",
-          "description": "Is the error a server-side fault?",
-          "example": false
-        },
-        "id": {
-          "type": "string",
-          "description": "ID is a unique identifier for this particular occurrence of the problem.",
-          "example": "123abc"
-        },
-        "message": {
-          "type": "string",
-          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
-          "example": "parameter 'p' must be an integer"
-        },
-        "name": {
-          "type": "string",
-          "description": "Name is the name of this class of errors.",
-          "example": "bad_request"
-        },
-        "temporary": {
-          "type": "boolean",
-          "description": "Is the error temporary?",
-          "example": true
-        },
-        "timeout": {
-          "type": "boolean",
-          "description": "Is the error a timeout?",
-          "example": true
-        }
-      },
-      "description": "Internal server error (default view)",
       "example": {
         "fault": true,
         "id": "123abc",
@@ -2737,7 +4412,7 @@
         "fault"
       ]
     },
-    "SecretsGetSecretValueInvalidParametersResponseBody": {
+    "SecretsGetSecretValueInternalErrorResponseBody": {
       "title": "Mediatype identifier: application/vnd.goa.error; view=default",
       "type": "object",
       "properties": {
@@ -2745,6 +4420,59 @@
           "type": "boolean",
           "description": "Is the error a server-side fault?",
           "example": true
+        },
+        "id": {
+          "type": "string",
+          "description": "ID is a unique identifier for this particular occurrence of the problem.",
+          "example": "123abc"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message is a human-readable explanation specific to this occurrence of the problem.",
+          "example": "parameter 'p' must be an integer"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this class of errors.",
+          "example": "bad_request"
+        },
+        "temporary": {
+          "type": "boolean",
+          "description": "Is the error temporary?",
+          "example": false
+        },
+        "timeout": {
+          "type": "boolean",
+          "description": "Is the error a timeout?",
+          "example": true
+        }
+      },
+      "description": "Internal server error (default view)",
+      "example": {
+        "fault": false,
+        "id": "123abc",
+        "message": "parameter 'p' must be an integer",
+        "name": "bad_request",
+        "temporary": false,
+        "timeout": false
+      },
+      "required": [
+        "name",
+        "id",
+        "message",
+        "temporary",
+        "timeout",
+        "fault"
+      ]
+    },
+    "SecretsGetSecretValueInvalidParametersResponseBody": {
+      "title": "Mediatype identifier: application/vnd.goa.error; view=default",
+      "type": "object",
+      "properties": {
+        "fault": {
+          "type": "boolean",
+          "description": "Is the error a server-side fault?",
+          "example": false
         },
         "id": {
           "type": "string",
@@ -2774,11 +4502,11 @@
       },
       "description": "Invalid token path (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
+        "temporary": true,
         "timeout": true
       },
       "required": [
@@ -2837,22 +4565,22 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "Secret not found (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": true,
-        "timeout": true
+        "timeout": false
       },
       "required": [
         "name",
@@ -2870,7 +4598,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -2905,7 +4633,7 @@
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": false,
-        "timeout": false
+        "timeout": true
       },
       "required": [
         "name",
@@ -2943,21 +4671,21 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": false
+          "example": true
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "Forbidden access (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
+        "temporary": false,
         "timeout": true
       },
       "required": [
@@ -2976,7 +4704,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": true
+          "example": false
         },
         "id": {
           "type": "string",
@@ -3006,12 +4734,12 @@
       },
       "description": "Internal server error (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
-        "timeout": false
+        "temporary": false,
+        "timeout": true
       },
       "required": [
         "name",
@@ -3029,7 +4757,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -3054,17 +4782,17 @@
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "Unauthorized access (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": false,
-        "timeout": true
+        "timeout": false
       },
       "required": [
         "name",
@@ -3090,6 +4818,47 @@
           "example": 1,
           "format": "int64"
         },
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Role"
+          },
+          "description": "Roles assigned to the user",
+          "example": [
+            {
+              "admin": true,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            },
+            {
+              "admin": true,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            },
+            {
+              "admin": true,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            },
+            {
+              "admin": true,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            }
+          ]
+        },
         "updated_at": {
           "type": "string",
           "description": "User last update timestamp",
@@ -3105,6 +4874,32 @@
       "example": {
         "created_at": "2025-06-30T12:00:00Z",
         "id": 1,
+        "roles": [
+          {
+            "admin": true,
+            "color": "#FF5733",
+            "created_at": "2025-06-30T12:00:00Z",
+            "id": 1,
+            "name": "admin",
+            "updated_at": "2025-06-30T15:00:00Z"
+          },
+          {
+            "admin": true,
+            "color": "#FF5733",
+            "created_at": "2025-06-30T12:00:00Z",
+            "id": 1,
+            "name": "admin",
+            "updated_at": "2025-06-30T15:00:00Z"
+          },
+          {
+            "admin": true,
+            "color": "#FF5733",
+            "created_at": "2025-06-30T12:00:00Z",
+            "id": 1,
+            "name": "admin",
+            "updated_at": "2025-06-30T15:00:00Z"
+          }
+        ],
         "updated_at": "2025-06-30T15:00:00Z",
         "username": "alice"
       },
@@ -3112,7 +4907,8 @@
         "id",
         "username",
         "created_at",
-        "updated_at"
+        "updated_at",
+        "roles"
       ]
     },
     "UsersAuthUserInternalErrorResponseBody": {
@@ -3122,7 +4918,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": true
+          "example": false
         },
         "id": {
           "type": "string",
@@ -3152,12 +4948,12 @@
       },
       "description": "Internal server error (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
-        "timeout": true
+        "temporary": false,
+        "timeout": false
       },
       "required": [
         "name",
@@ -3195,12 +4991,12 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "Invalid input (default view)",
@@ -3209,7 +5005,7 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
+        "temporary": false,
         "timeout": true
       },
       "required": [
@@ -3292,12 +5088,12 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": false
+          "example": true
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "Invalid username or password (default view)",
@@ -3306,7 +5102,7 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
+        "temporary": false,
         "timeout": false
       },
       "required": [
@@ -3350,7 +5146,7 @@
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "Internal server error (default view)",
@@ -3360,7 +5156,7 @@
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": true,
-        "timeout": false
+        "timeout": true
       },
       "required": [
         "name",
@@ -3398,7 +5194,7 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
@@ -3408,11 +5204,11 @@
       },
       "description": "Invalid input (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
+        "temporary": true,
         "timeout": true
       },
       "required": [
@@ -3506,7 +5302,7 @@
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "Username already exists (default view)",
@@ -3554,12 +5350,12 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "Forbidden access (default view)",
@@ -3568,7 +5364,7 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
+        "temporary": false,
         "timeout": true
       },
       "required": [
@@ -3587,7 +5383,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": true
+          "example": false
         },
         "id": {
           "type": "string",
@@ -3612,16 +5408,16 @@
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "Internal server error (default view)",
       "example": {
-        "fault": true,
+        "fault": false,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": true,
+        "temporary": false,
         "timeout": false
       },
       "required": [
@@ -3665,17 +5461,17 @@
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "Invalid input (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
         "temporary": false,
-        "timeout": false
+        "timeout": true
       },
       "required": [
         "name",
@@ -3693,7 +5489,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -3713,12 +5509,12 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": false
+          "example": true
         },
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "Unauthorized access (default view)",
@@ -3727,7 +5523,7 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
+        "temporary": true,
         "timeout": true
       },
       "required": [
@@ -3746,7 +5542,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -3766,7 +5562,7 @@
         "temporary": {
           "type": "boolean",
           "description": "Is the error temporary?",
-          "example": true
+          "example": false
         },
         "timeout": {
           "type": "boolean",
@@ -3776,11 +5572,11 @@
       },
       "description": "User not found (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
+        "temporary": true,
         "timeout": true
       },
       "required": [
@@ -3799,7 +5595,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": true
+          "example": false
         },
         "id": {
           "type": "string",
@@ -3824,17 +5620,17 @@
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": false
+          "example": true
         }
       },
       "description": "Internal server error (default view)",
       "example": {
-        "fault": false,
+        "fault": true,
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
-        "timeout": true
+        "temporary": true,
+        "timeout": false
       },
       "required": [
         "name",
@@ -3872,7 +5668,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -3906,7 +5702,7 @@
         "id": "123abc",
         "message": "parameter 'p' must be an integer",
         "name": "bad_request",
-        "temporary": false,
+        "temporary": true,
         "timeout": false
       },
       "required": [
@@ -3925,7 +5721,7 @@
         "fault": {
           "type": "boolean",
           "description": "Is the error a server-side fault?",
-          "example": false
+          "example": true
         },
         "id": {
           "type": "string",
@@ -3950,7 +5746,7 @@
         "timeout": {
           "type": "boolean",
           "description": "Is the error a timeout?",
-          "example": true
+          "example": false
         }
       },
       "description": "Unauthorized access (default view)",

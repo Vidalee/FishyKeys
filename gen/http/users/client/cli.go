@@ -44,9 +44,16 @@ func BuildCreateUserPayload(usersCreateUserBody string) (*users.CreateUserPayloa
 // BuildDeleteUserPayload builds the payload for the users delete user endpoint
 // from CLI flags.
 func BuildDeleteUserPayload(usersDeleteUserUsername string) (*users.DeleteUserPayload, error) {
+	var err error
 	var username string
 	{
 		username = usersDeleteUserUsername
+		if utf8.RuneCountInString(username) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("username", username, utf8.RuneCountInString(username), 3, true))
+		}
+		if err != nil {
+			return nil, err
+		}
 	}
 	v := &users.DeleteUserPayload{}
 	v.Username = username

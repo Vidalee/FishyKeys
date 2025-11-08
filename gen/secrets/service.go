@@ -146,6 +146,8 @@ type User struct {
 	CreatedAt string
 	// User last update timestamp
 	UpdatedAt string
+	// Roles assigned to the user
+	Roles []*Role
 }
 
 // MakeInvalidParameters builds a goa.ServiceError from an error.

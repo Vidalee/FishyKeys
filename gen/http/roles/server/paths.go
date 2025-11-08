@@ -7,7 +7,31 @@
 
 package server
 
+import (
+	"fmt"
+)
+
 // ListRolesRolesPath returns the URL path to the roles service list roles HTTP endpoint.
 func ListRolesRolesPath() string {
 	return "/roles"
+}
+
+// CreateRoleRolesPath returns the URL path to the roles service create role HTTP endpoint.
+func CreateRoleRolesPath() string {
+	return "/roles"
+}
+
+// DeleteRoleRolesPath returns the URL path to the roles service delete role HTTP endpoint.
+func DeleteRoleRolesPath(id int) string {
+	return fmt.Sprintf("/roles/%v", id)
+}
+
+// AssignRoleToUserRolesPath returns the URL path to the roles service assign role to user HTTP endpoint.
+func AssignRoleToUserRolesPath() string {
+	return "/roles/assign"
+}
+
+// UnassignRoleToUserRolesPath returns the URL path to the roles service unassign role to user HTTP endpoint.
+func UnassignRoleToUserRolesPath() string {
+	return "/roles/unassign"
 }

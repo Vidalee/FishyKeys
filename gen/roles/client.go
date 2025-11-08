@@ -15,13 +15,21 @@ import (
 
 // Client is the "roles" service client.
 type Client struct {
-	ListRolesEndpoint goa.Endpoint
+	ListRolesEndpoint          goa.Endpoint
+	CreateRoleEndpoint         goa.Endpoint
+	DeleteRoleEndpoint         goa.Endpoint
+	AssignRoleToUserEndpoint   goa.Endpoint
+	UnassignRoleToUserEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "roles" service client given the endpoints.
-func NewClient(listRoles goa.Endpoint) *Client {
+func NewClient(listRoles, createRole, deleteRole, assignRoleToUser, unassignRoleToUser goa.Endpoint) *Client {
 	return &Client{
-		ListRolesEndpoint: listRoles,
+		ListRolesEndpoint:          listRoles,
+		CreateRoleEndpoint:         createRole,
+		DeleteRoleEndpoint:         deleteRole,
+		AssignRoleToUserEndpoint:   assignRoleToUser,
+		UnassignRoleToUserEndpoint: unassignRoleToUser,
 	}
 }
 
@@ -37,4 +45,64 @@ func (c *Client) ListRoles(ctx context.Context) (res []*Role, err error) {
 		return
 	}
 	return ires.([]*Role), nil
+}
+
+// CreateRole calls the "create role" endpoint of the "roles" service.
+// CreateRole may return the following errors:
+//   - "role_taken" (type *goa.ServiceError): Role name already exists
+//   - "invalid_parameters" (type *goa.ServiceError): Invalid input
+//   - "internal_error" (type *goa.ServiceError): Internal server error
+//   - "forbidden" (type *goa.ServiceError): Forbidden access
+//   - "unauthorized" (type *goa.ServiceError): Unauthorized access
+//   - error: internal error
+func (c *Client) CreateRole(ctx context.Context, p *CreateRolePayload) (res *CreateRoleResult, err error) {
+	var ires any
+	ires, err = c.CreateRoleEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*CreateRoleResult), nil
+}
+
+// DeleteRole calls the "delete role" endpoint of the "roles" service.
+// DeleteRole may return the following errors:
+//   - "role_not_found" (type *goa.ServiceError): Role not found
+//   - "invalid_parameters" (type *goa.ServiceError): Invalid input
+//   - "internal_error" (type *goa.ServiceError): Internal server error
+//   - "forbidden" (type *goa.ServiceError): Forbidden access
+//   - "unauthorized" (type *goa.ServiceError): Unauthorized access
+//   - error: internal error
+func (c *Client) DeleteRole(ctx context.Context, p *DeleteRolePayload) (err error) {
+	_, err = c.DeleteRoleEndpoint(ctx, p)
+	return
+}
+
+// AssignRoleToUser calls the "assign role to user" endpoint of the "roles"
+// service.
+// AssignRoleToUser may return the following errors:
+//   - "user_not_found" (type *goa.ServiceError): User not found
+//   - "role_not_found" (type *goa.ServiceError): Role not found
+//   - "invalid_parameters" (type *goa.ServiceError): Invalid input
+//   - "internal_error" (type *goa.ServiceError): Internal server error
+//   - "forbidden" (type *goa.ServiceError): Forbidden access
+//   - "unauthorized" (type *goa.ServiceError): Unauthorized access
+//   - error: internal error
+func (c *Client) AssignRoleToUser(ctx context.Context, p *AssignRoleToUserPayload) (err error) {
+	_, err = c.AssignRoleToUserEndpoint(ctx, p)
+	return
+}
+
+// UnassignRoleToUser calls the "unassign role to user" endpoint of the "roles"
+// service.
+// UnassignRoleToUser may return the following errors:
+//   - "user_not_found" (type *goa.ServiceError): User not found
+//   - "role_not_found" (type *goa.ServiceError): Role not found
+//   - "invalid_parameters" (type *goa.ServiceError): Invalid input
+//   - "internal_error" (type *goa.ServiceError): Internal server error
+//   - "forbidden" (type *goa.ServiceError): Forbidden access
+//   - "unauthorized" (type *goa.ServiceError): Unauthorized access
+//   - error: internal error
+func (c *Client) UnassignRoleToUser(ctx context.Context, p *UnassignRoleToUserPayload) (err error) {
+	_, err = c.UnassignRoleToUserEndpoint(ctx, p)
+	return
 }

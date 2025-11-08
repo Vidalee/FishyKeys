@@ -66,12 +66,45 @@ func (i *ServerSecretsInterceptors) Authentified(ctx context.Context, info *secr
 	return next(ctx, info.RawPayload())
 }
 
-type ServerRolesInterceptors struct{}
+type ServerRolesInterceptors struct {
+	rolesRepository     repository.RolesRepository
+	userRolesRepository repository.UserRolesRepository
+}
 
 func (i *ServerRolesInterceptors) Authentified(ctx context.Context, info *roles.AuthentifiedInfo, next goa.Endpoint) (any, error) {
 	token := ctx.Value("token")
 	if token == nil {
-		return nil, secrets.MakeUnauthorized(fmt.Errorf("you need to be authenticated to access this endpoint"))
+		return nil, roles.MakeUnauthorized(fmt.Errorf("you need to be authenticated to access this endpoint"))
 	}
 	return next(ctx, info.RawPayload())
+}
+
+func (i *ServerRolesInterceptors) IsAdmin(ctx context.Context, info *roles.IsAdminInfo, next goa.Endpoint) (any, error) {
+	token := ctx.Value("token")
+	if token == nil {
+		return nil, roles.MakeUnauthorized(fmt.Errorf("you need to be authenticated to access this endpoint"))
+	}
+	jwtClaims := token.(*service.JwtClaims)
+
+	roleIds, err := i.userRolesRepository.GetUserRoleIDs(ctx, jwtClaims.UserID)
+	if err != nil {
+		return nil, roles.MakeInternalError(fmt.Errorf("could not retrieve user roles: %w", err))
+	}
+
+	if len(roleIds) == 0 {
+
+	}
+
+	rolesList, err := i.rolesRepository.GetRolesByIDs(ctx, roleIds)
+
+	if err != nil {
+		return nil, roles.MakeInternalError(fmt.Errorf("could not retrieve roles: %w", err))
+	}
+	for _, role := range rolesList {
+		if role.Admin {
+			return next(ctx, info.RawPayload())
+		}
+	}
+
+	return nil, roles.MakeForbidden(fmt.Errorf("you need to be an admin to access this endpoint"))
 }

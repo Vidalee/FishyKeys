@@ -18,7 +18,10 @@ var UserType = Type("User", func() {
 	Attribute("updated_at", String, "User last update timestamp", func() {
 		Example("2025-06-30T15:00:00Z")
 	})
-	Required("id", "username", "created_at", "updated_at")
+
+	Attribute("roles", ArrayOf(RoleType), "Roles assigned to the user")
+
+	Required("id", "username", "created_at", "updated_at", "roles")
 })
 
 var _ = Service("users", func() {
@@ -80,6 +83,7 @@ var _ = Service("users", func() {
 		Payload(func() {
 			Attribute("username", String, "Username of the user to delete", func() {
 				Example("alice")
+				MinLength(3)
 			})
 			Required("username")
 		})

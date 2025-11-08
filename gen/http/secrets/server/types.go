@@ -389,6 +389,24 @@ type UserResponse struct {
 	CreatedAt string `form:"created_at" json:"created_at" xml:"created_at"`
 	// User last update timestamp
 	UpdatedAt string `form:"updated_at" json:"updated_at" xml:"updated_at"`
+	// Roles assigned to the user
+	Roles []*RoleResponse `form:"roles" json:"roles" xml:"roles"`
+}
+
+// RoleResponse is used to define fields on response body types.
+type RoleResponse struct {
+	// Unique identifier for the role
+	ID int `form:"id" json:"id" xml:"id"`
+	// Name of the role
+	Name string `form:"name" json:"name" xml:"name"`
+	// Color associated with the role
+	Color string `form:"color" json:"color" xml:"color"`
+	// Is this role an admin role?
+	Admin bool `form:"admin" json:"admin" xml:"admin"`
+	// Role creation timestamp
+	CreatedAt string `form:"created_at" json:"created_at" xml:"created_at"`
+	// Role last update timestamp
+	UpdatedAt string `form:"updated_at" json:"updated_at" xml:"updated_at"`
 }
 
 // UserResponseBody is used to define fields on response body types.
@@ -401,6 +419,8 @@ type UserResponseBody struct {
 	CreatedAt string `form:"created_at" json:"created_at" xml:"created_at"`
 	// User last update timestamp
 	UpdatedAt string `form:"updated_at" json:"updated_at" xml:"updated_at"`
+	// Roles assigned to the user
+	Roles []*RoleResponseBody `form:"roles" json:"roles" xml:"roles"`
 }
 
 // RoleResponseBody is used to define fields on response body types.

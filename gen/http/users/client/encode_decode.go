@@ -550,6 +550,25 @@ func unmarshalUserResponseToUsersUser(v *UserResponse) *users.User {
 		CreatedAt: *v.CreatedAt,
 		UpdatedAt: *v.UpdatedAt,
 	}
+	res.Roles = make([]*users.Role, len(v.Roles))
+	for i, val := range v.Roles {
+		res.Roles[i] = unmarshalRoleResponseToUsersRole(val)
+	}
+
+	return res
+}
+
+// unmarshalRoleResponseToUsersRole builds a value of type *users.Role from a
+// value of type *RoleResponse.
+func unmarshalRoleResponseToUsersRole(v *RoleResponse) *users.Role {
+	res := &users.Role{
+		ID:        *v.ID,
+		Name:      *v.Name,
+		Color:     *v.Color,
+		Admin:     *v.Admin,
+		CreatedAt: *v.CreatedAt,
+		UpdatedAt: *v.UpdatedAt,
+	}
 
 	return res
 }

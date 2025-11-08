@@ -26,3 +26,57 @@ func wrapListRolesAuthentified(endpoint goa.Endpoint, i ServerInterceptors) goa.
 		return i.Authentified(ctx, info, endpoint)
 	}
 }
+
+// wrapIsAdminCreateRole applies the IsAdmin server interceptor to endpoints.
+func wrapCreateRoleIsAdmin(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		info := &IsAdminInfo{
+			service:    "roles",
+			method:     "CreateRole",
+			callType:   goa.InterceptorUnary,
+			rawPayload: req,
+		}
+		return i.IsAdmin(ctx, info, endpoint)
+	}
+}
+
+// wrapIsAdminDeleteRole applies the IsAdmin server interceptor to endpoints.
+func wrapDeleteRoleIsAdmin(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		info := &IsAdminInfo{
+			service:    "roles",
+			method:     "DeleteRole",
+			callType:   goa.InterceptorUnary,
+			rawPayload: req,
+		}
+		return i.IsAdmin(ctx, info, endpoint)
+	}
+}
+
+// wrapIsAdminAssignRoleToUser applies the IsAdmin server interceptor to
+// endpoints.
+func wrapAssignRoleToUserIsAdmin(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		info := &IsAdminInfo{
+			service:    "roles",
+			method:     "AssignRoleToUser",
+			callType:   goa.InterceptorUnary,
+			rawPayload: req,
+		}
+		return i.IsAdmin(ctx, info, endpoint)
+	}
+}
+
+// wrapIsAdminUnassignRoleToUser applies the IsAdmin server interceptor to
+// endpoints.
+func wrapUnassignRoleToUserIsAdmin(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		info := &IsAdminInfo{
+			service:    "roles",
+			method:     "UnassignRoleToUser",
+			callType:   goa.InterceptorUnary,
+			rawPayload: req,
+		}
+		return i.IsAdmin(ctx, info, endpoint)
+	}
+}

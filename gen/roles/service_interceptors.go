@@ -20,6 +20,8 @@ import (
 type ServerInterceptors interface {
 	// Server-side interceptor that validates JWT token for HTTP services
 	Authentified(ctx context.Context, info *AuthentifiedInfo, next goa.Endpoint) (any, error)
+	// Server-side interceptor that checks if the user has admin privileges
+	IsAdmin(ctx context.Context, info *IsAdminInfo, next goa.Endpoint) (any, error)
 }
 
 // Access interfaces for interceptor payloads and results
@@ -32,12 +34,48 @@ type (
 		callType   goa.InterceptorCallType
 		rawPayload any
 	}
+	// IsAdminInfo provides metadata about the current interception.
+	// It includes service name, method name, and access to the endpoint.
+	IsAdminInfo struct {
+		service    string
+		method     string
+		callType   goa.InterceptorCallType
+		rawPayload any
+	}
 )
 
 // WrapListRolesEndpoint wraps the list roles endpoint with the server-side
 // interceptors defined in the design.
 func WrapListRolesEndpoint(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
 	endpoint = wrapListRolesAuthentified(endpoint, i)
+	return endpoint
+}
+
+// WrapCreateRoleEndpoint wraps the create role endpoint with the server-side
+// interceptors defined in the design.
+func WrapCreateRoleEndpoint(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	endpoint = wrapCreateRoleIsAdmin(endpoint, i)
+	return endpoint
+}
+
+// WrapDeleteRoleEndpoint wraps the delete role endpoint with the server-side
+// interceptors defined in the design.
+func WrapDeleteRoleEndpoint(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	endpoint = wrapDeleteRoleIsAdmin(endpoint, i)
+	return endpoint
+}
+
+// WrapAssignRoleToUserEndpoint wraps the assign role to user endpoint with the
+// server-side interceptors defined in the design.
+func WrapAssignRoleToUserEndpoint(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	endpoint = wrapAssignRoleToUserIsAdmin(endpoint, i)
+	return endpoint
+}
+
+// WrapUnassignRoleToUserEndpoint wraps the unassign role to user endpoint with
+// the server-side interceptors defined in the design.
+func WrapUnassignRoleToUserEndpoint(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	endpoint = wrapUnassignRoleToUserIsAdmin(endpoint, i)
 	return endpoint
 }
 
@@ -60,5 +98,25 @@ func (info *AuthentifiedInfo) CallType() goa.InterceptorCallType {
 
 // RawPayload returns the raw payload of the request.
 func (info *AuthentifiedInfo) RawPayload() any {
+	return info.rawPayload
+}
+
+// Service returns the name of the service handling the request.
+func (info *IsAdminInfo) Service() string {
+	return info.service
+}
+
+// Method returns the name of the method handling the request.
+func (info *IsAdminInfo) Method() string {
+	return info.method
+}
+
+// CallType returns the type of call the interceptor is handling.
+func (info *IsAdminInfo) CallType() goa.InterceptorCallType {
+	return info.callType
+}
+
+// RawPayload returns the raw payload of the request.
+func (info *IsAdminInfo) RawPayload() any {
 	return info.rawPayload
 }

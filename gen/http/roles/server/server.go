@@ -19,9 +19,13 @@ import (
 
 // Server lists the roles service endpoint HTTP handlers.
 type Server struct {
-	Mounts    []*MountPoint
-	ListRoles http.Handler
-	CORS      http.Handler
+	Mounts             []*MountPoint
+	ListRoles          http.Handler
+	CreateRole         http.Handler
+	DeleteRole         http.Handler
+	AssignRoleToUser   http.Handler
+	UnassignRoleToUser http.Handler
+	CORS               http.Handler
 }
 
 // MountPoint holds information about the mounted endpoints.
@@ -52,10 +56,21 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"ListRoles", "GET", "/roles"},
+			{"CreateRole", "POST", "/roles"},
+			{"DeleteRole", "DELETE", "/roles/{id}"},
+			{"AssignRoleToUser", "POST", "/roles/assign"},
+			{"UnassignRoleToUser", "POST", "/roles/unassign"},
 			{"CORS", "OPTIONS", "/roles"},
+			{"CORS", "OPTIONS", "/roles/{id}"},
+			{"CORS", "OPTIONS", "/roles/assign"},
+			{"CORS", "OPTIONS", "/roles/unassign"},
 		},
-		ListRoles: NewListRolesHandler(e.ListRoles, mux, decoder, encoder, errhandler, formatter),
-		CORS:      NewCORSHandler(),
+		ListRoles:          NewListRolesHandler(e.ListRoles, mux, decoder, encoder, errhandler, formatter),
+		CreateRole:         NewCreateRoleHandler(e.CreateRole, mux, decoder, encoder, errhandler, formatter),
+		DeleteRole:         NewDeleteRoleHandler(e.DeleteRole, mux, decoder, encoder, errhandler, formatter),
+		AssignRoleToUser:   NewAssignRoleToUserHandler(e.AssignRoleToUser, mux, decoder, encoder, errhandler, formatter),
+		UnassignRoleToUser: NewUnassignRoleToUserHandler(e.UnassignRoleToUser, mux, decoder, encoder, errhandler, formatter),
+		CORS:               NewCORSHandler(),
 	}
 }
 
@@ -65,6 +80,10 @@ func (s *Server) Service() string { return "roles" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.ListRoles = m(s.ListRoles)
+	s.CreateRole = m(s.CreateRole)
+	s.DeleteRole = m(s.DeleteRole)
+	s.AssignRoleToUser = m(s.AssignRoleToUser)
+	s.UnassignRoleToUser = m(s.UnassignRoleToUser)
 	s.CORS = m(s.CORS)
 }
 
@@ -74,6 +93,10 @@ func (s *Server) MethodNames() []string { return roles.MethodNames[:] }
 // Mount configures the mux to serve the roles endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountListRolesHandler(mux, h.ListRoles)
+	MountCreateRoleHandler(mux, h.CreateRole)
+	MountDeleteRoleHandler(mux, h.DeleteRole)
+	MountAssignRoleToUserHandler(mux, h.AssignRoleToUser)
+	MountUnassignRoleToUserHandler(mux, h.UnassignRoleToUser)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -126,11 +149,218 @@ func NewListRolesHandler(
 	})
 }
 
+// MountCreateRoleHandler configures the mux to serve the "roles" service
+// "create role" endpoint.
+func MountCreateRoleHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := HandleRolesOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/roles", f)
+}
+
+// NewCreateRoleHandler creates a HTTP handler which loads the HTTP request and
+// calls the "roles" service "create role" endpoint.
+func NewCreateRoleHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeCreateRoleRequest(mux, decoder)
+		encodeResponse = EncodeCreateRoleResponse(encoder)
+		encodeError    = EncodeCreateRoleError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "create role")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "roles")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountDeleteRoleHandler configures the mux to serve the "roles" service
+// "delete role" endpoint.
+func MountDeleteRoleHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := HandleRolesOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("DELETE", "/roles/{id}", f)
+}
+
+// NewDeleteRoleHandler creates a HTTP handler which loads the HTTP request and
+// calls the "roles" service "delete role" endpoint.
+func NewDeleteRoleHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeDeleteRoleRequest(mux, decoder)
+		encodeResponse = EncodeDeleteRoleResponse(encoder)
+		encodeError    = EncodeDeleteRoleError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "delete role")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "roles")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountAssignRoleToUserHandler configures the mux to serve the "roles" service
+// "assign role to user" endpoint.
+func MountAssignRoleToUserHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := HandleRolesOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/roles/assign", f)
+}
+
+// NewAssignRoleToUserHandler creates a HTTP handler which loads the HTTP
+// request and calls the "roles" service "assign role to user" endpoint.
+func NewAssignRoleToUserHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeAssignRoleToUserRequest(mux, decoder)
+		encodeResponse = EncodeAssignRoleToUserResponse(encoder)
+		encodeError    = EncodeAssignRoleToUserError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "assign role to user")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "roles")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountUnassignRoleToUserHandler configures the mux to serve the "roles"
+// service "unassign role to user" endpoint.
+func MountUnassignRoleToUserHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := HandleRolesOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/roles/unassign", f)
+}
+
+// NewUnassignRoleToUserHandler creates a HTTP handler which loads the HTTP
+// request and calls the "roles" service "unassign role to user" endpoint.
+func NewUnassignRoleToUserHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeUnassignRoleToUserRequest(mux, decoder)
+		encodeResponse = EncodeUnassignRoleToUserResponse(encoder)
+		encodeError    = EncodeUnassignRoleToUserError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "unassign role to user")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "roles")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service roles.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	h = HandleRolesOrigin(h)
 	mux.Handle("OPTIONS", "/roles", h.ServeHTTP)
+	mux.Handle("OPTIONS", "/roles/{id}", h.ServeHTTP)
+	mux.Handle("OPTIONS", "/roles/assign", h.ServeHTTP)
+	mux.Handle("OPTIONS", "/roles/unassign", h.ServeHTTP)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 204 response.

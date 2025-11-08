@@ -12,6 +12,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"unicode/utf8"
 
 	users "github.com/Vidalee/FishyKeys/gen/users"
 	goahttp "goa.design/goa/v3/http"
@@ -183,10 +184,17 @@ func DecodeDeleteUserRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 	return func(r *http.Request) (any, error) {
 		var (
 			username string
+			err      error
 
 			params = mux.Vars(r)
 		)
 		username = params["username"]
+		if utf8.RuneCountInString(username) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("username", username, utf8.RuneCountInString(username), 3, true))
+		}
+		if err != nil {
+			return nil, err
+		}
 		payload := NewDeleteUserPayload(username)
 
 		return payload, nil
@@ -417,6 +425,29 @@ func marshalUsersUserToUserResponse(v *users.User) *UserResponse {
 	res := &UserResponse{
 		ID:        v.ID,
 		Username:  v.Username,
+		CreatedAt: v.CreatedAt,
+		UpdatedAt: v.UpdatedAt,
+	}
+	if v.Roles != nil {
+		res.Roles = make([]*RoleResponse, len(v.Roles))
+		for i, val := range v.Roles {
+			res.Roles[i] = marshalUsersRoleToRoleResponse(val)
+		}
+	} else {
+		res.Roles = []*RoleResponse{}
+	}
+
+	return res
+}
+
+// marshalUsersRoleToRoleResponse builds a value of type *RoleResponse from a
+// value of type *users.Role.
+func marshalUsersRoleToRoleResponse(v *users.Role) *RoleResponse {
+	res := &RoleResponse{
+		ID:        v.ID,
+		Name:      v.Name,
+		Color:     v.Color,
+		Admin:     v.Admin,
 		CreatedAt: v.CreatedAt,
 		UpdatedAt: v.UpdatedAt,
 	}

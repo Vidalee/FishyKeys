@@ -27,6 +27,7 @@ type RolesRepository interface {
 	GetRoleByName(ctx context.Context, name string) (*Role, error)
 	ListRoles(ctx context.Context) ([]Role, error)
 	GetRolesByIDs(ctx context.Context, ids []int) ([]Role, error)
+	DeleteRole(ctx context.Context, id int) error
 }
 
 type rolesRepository struct {
@@ -113,4 +114,16 @@ func (r *rolesRepository) GetRolesByIDs(ctx context.Context, ids []int) ([]Role,
 		roles = append(roles, role)
 	}
 	return roles, nil
+}
+
+func (r *rolesRepository) DeleteRole(ctx context.Context, id int) error {
+	query := `DELETE FROM roles WHERE id = $1`
+	cmdTag, err := r.pool.Exec(ctx, query, id)
+	if err != nil {
+		return err
+	}
+	if cmdTag.RowsAffected() == 0 {
+		return ErrRoleNotFound
+	}
+	return nil
 }

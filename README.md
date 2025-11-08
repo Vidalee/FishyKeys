@@ -81,5 +81,11 @@ Keep in mind frontend was not the main focus of this project, so it is focused o
 
 *Create a secret, you can add metadata and set the access roles.*
 
+---
+
+![manage roles](./ui/public/demo/manage_roles.png)
+
+*Manage roles.*
+
 
 

@@ -183,7 +183,7 @@
                   "$ref": "#/components/schemas/AddShareResponseBody"
                 },
                 "example": {
-                  "index": 4689996537036155328,
+                  "index": 292269787529135470,
                   "unlocked": true
                 }
               }
@@ -249,10 +249,10 @@
                   "$ref": "#/components/schemas/GetKeyStatusResponseBody"
                 },
                 "example": {
-                  "current_shares": 382474295782307311,
-                  "is_locked": true,
-                  "min_shares": 5117056083765439164,
-                  "total_shares": 908568140735950639
+                  "current_shares": 5117056083765439164,
+                  "is_locked": false,
+                  "min_shares": 908568140735950639,
+                  "total_shares": 3571465081279942681
                 }
               }
             }
@@ -341,14 +341,6 @@
                     "id": 1,
                     "name": "admin",
                     "updated_at": "2025-06-30T15:00:00Z"
-                  },
-                  {
-                    "admin": true,
-                    "color": "#FF5733",
-                    "created_at": "2025-06-30T12:00:00Z",
-                    "id": 1,
-                    "name": "admin",
-                    "updated_at": "2025-06-30T15:00:00Z"
                   }
                 ]
               }
@@ -356,6 +348,333 @@
           },
           "401": {
             "description": "unauthorized: Unauthorized access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error: Internal server error",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "roles"
+        ],
+        "summary": "create role roles",
+        "description": "Create a new role",
+        "operationId": "roles#create role",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoleRequestBody"
+              },
+              "example": {
+                "color": "#33FF57",
+                "name": "team_sre"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateRoleResponseBody"
+                },
+                "example": {
+                  "color": "#33FF57",
+                  "id": 2,
+                  "name": "team_sre"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid_parameters: Invalid input",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized: Unauthorized access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "forbidden: Forbidden access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "role_taken: Role name already exists",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error: Internal server error",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/roles/assign": {
+      "post": {
+        "tags": [
+          "roles"
+        ],
+        "summary": "assign role to user roles",
+        "description": "Assign a role to a user",
+        "operationId": "roles#assign role to user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignRoleToUserRequestBody"
+              },
+              "example": {
+                "role_id": 1,
+                "user_id": 2
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK response."
+          },
+          "400": {
+            "description": "invalid_parameters: Invalid input",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized: Unauthorized access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "forbidden: Forbidden access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "role_not_found: Role not found",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error: Internal server error",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/roles/unassign": {
+      "post": {
+        "tags": [
+          "roles"
+        ],
+        "summary": "unassign role to user roles",
+        "description": "Unassign a role to a user",
+        "operationId": "roles#unassign role to user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignRoleToUserRequestBody"
+              },
+              "example": {
+                "role_id": 1,
+                "user_id": 2
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK response."
+          },
+          "400": {
+            "description": "invalid_parameters: Invalid input",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized: Unauthorized access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "forbidden: Forbidden access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "role_not_found: Role not found",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error: Internal server error",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/roles/{id}": {
+      "delete": {
+        "tags": [
+          "roles"
+        ],
+        "summary": "delete role roles",
+        "description": "Delete a role byd id",
+        "operationId": "roles#delete role",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the role to delete",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "description": "ID of the role to delete",
+              "example": 2,
+              "format": "int64"
+            },
+            "example": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK response."
+          },
+          "400": {
+            "description": "invalid_parameters: Invalid input",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized: Unauthorized access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "forbidden: Forbidden access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "role_not_found: Role not found",
             "content": {
               "application/vnd.goa.error": {
                 "schema": {
@@ -402,6 +721,24 @@
                       "owner": {
                         "created_at": "2025-06-30T12:00:00Z",
                         "id": 1,
+                        "roles": [
+                          {
+                            "admin": true,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": true,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          }
+                        ],
                         "updated_at": "2025-06-30T15:00:00Z",
                         "username": "alice"
                       },
@@ -413,6 +750,82 @@
                       "owner": {
                         "created_at": "2025-06-30T12:00:00Z",
                         "id": 1,
+                        "roles": [
+                          {
+                            "admin": true,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": true,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          }
+                        ],
+                        "updated_at": "2025-06-30T15:00:00Z",
+                        "username": "alice"
+                      },
+                      "path": "customers/google/api_key",
+                      "updated_at": "2025-06-30T15:00:00Z"
+                    },
+                    {
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "owner": {
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "roles": [
+                          {
+                            "admin": true,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": true,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          }
+                        ],
+                        "updated_at": "2025-06-30T15:00:00Z",
+                        "username": "alice"
+                      },
+                      "path": "customers/google/api_key",
+                      "updated_at": "2025-06-30T15:00:00Z"
+                    },
+                    {
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "owner": {
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "roles": [
+                          {
+                            "admin": true,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": true,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          }
+                        ],
                         "updated_at": "2025-06-30T15:00:00Z",
                         "username": "alice"
                       },
@@ -427,6 +840,24 @@
                     "owner": {
                       "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
+                      "roles": [
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        }
+                      ],
                       "updated_at": "2025-06-30T15:00:00Z",
                       "username": "alice"
                     },
@@ -438,6 +869,53 @@
                     "owner": {
                       "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
+                      "roles": [
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        }
+                      ],
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "username": "alice"
+                    },
+                    "path": "customers/google/api_key",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "owner": {
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "id": 1,
+                      "roles": [
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        }
+                      ],
                       "updated_at": "2025-06-30T15:00:00Z",
                       "username": "alice"
                     },
@@ -605,26 +1083,126 @@
                       "id": 1,
                       "name": "admin",
                       "updated_at": "2025-06-30T15:00:00Z"
-                    },
-                    {
-                      "admin": false,
-                      "color": "#FF5733",
-                      "created_at": "2025-06-30T12:00:00Z",
-                      "id": 1,
-                      "name": "admin",
-                      "updated_at": "2025-06-30T15:00:00Z"
                     }
                   ],
                   "authorized_users": [
                     {
                       "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
+                      "roles": [
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        }
+                      ],
                       "updated_at": "2025-06-30T15:00:00Z",
                       "username": "alice"
                     },
                     {
                       "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
+                      "roles": [
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        }
+                      ],
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "username": "alice"
+                    },
+                    {
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "id": 1,
+                      "roles": [
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        }
+                      ],
                       "updated_at": "2025-06-30T15:00:00Z",
                       "username": "alice"
                     }
@@ -633,6 +1211,40 @@
                   "owner": {
                     "created_at": "2025-06-30T12:00:00Z",
                     "id": 1,
+                    "roles": [
+                      {
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      }
+                    ],
                     "updated_at": "2025-06-30T15:00:00Z",
                     "username": "alice"
                   },
@@ -808,18 +1420,72 @@
                     {
                       "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
+                      "roles": [
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        }
+                      ],
                       "updated_at": "2025-06-30T15:00:00Z",
                       "username": "alice"
                     },
                     {
                       "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
+                      "roles": [
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        }
+                      ],
                       "updated_at": "2025-06-30T15:00:00Z",
                       "username": "alice"
                     },
                     {
                       "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
+                      "roles": [
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        }
+                      ],
                       "updated_at": "2025-06-30T15:00:00Z",
                       "username": "alice"
                     }
@@ -829,18 +1495,96 @@
                   {
                     "created_at": "2025-06-30T12:00:00Z",
                     "id": 1,
+                    "roles": [
+                      {
+                        "admin": true,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": true,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      }
+                    ],
                     "updated_at": "2025-06-30T15:00:00Z",
                     "username": "alice"
                   },
                   {
                     "created_at": "2025-06-30T12:00:00Z",
                     "id": 1,
+                    "roles": [
+                      {
+                        "admin": true,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": true,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      }
+                    ],
                     "updated_at": "2025-06-30T15:00:00Z",
                     "username": "alice"
                   },
                   {
                     "created_at": "2025-06-30T12:00:00Z",
                     "id": 1,
+                    "roles": [
+                      {
+                        "admin": true,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": true,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      }
+                    ],
+                    "updated_at": "2025-06-30T15:00:00Z",
+                    "username": "alice"
+                  },
+                  {
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "roles": [
+                      {
+                        "admin": true,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": true,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      }
+                    ],
                     "updated_at": "2025-06-30T15:00:00Z",
                     "username": "alice"
                   }
@@ -1062,7 +1806,8 @@
             "schema": {
               "type": "string",
               "description": "Username of the user to delete",
-              "example": "alice"
+              "example": "alice",
+              "minLength": 3
             },
             "example": "alice"
           }
@@ -1149,7 +1894,7 @@
           "index": {
             "type": "integer",
             "description": "The index of the share added",
-            "example": 4746837444423522907,
+            "example": 908796951079181226,
             "format": "int64"
           },
           "unlocked": {
@@ -1159,12 +1904,37 @@
           }
         },
         "example": {
-          "index": 1534199350079676293,
-          "unlocked": false
+          "index": 2634242440342999069,
+          "unlocked": true
         },
         "required": [
           "index",
           "unlocked"
+        ]
+      },
+      "AssignRoleToUserRequestBody": {
+        "type": "object",
+        "properties": {
+          "role_id": {
+            "type": "integer",
+            "description": "ID of the role to assign to the user",
+            "example": 1,
+            "format": "int64"
+          },
+          "user_id": {
+            "type": "integer",
+            "description": "ID of the user to assign the role to",
+            "example": 2,
+            "format": "int64"
+          }
+        },
+        "example": {
+          "role_id": 1,
+          "user_id": 2
+        },
+        "required": [
+          "user_id",
+          "role_id"
         ]
       },
       "AuthUserRequestBody": {
@@ -1260,7 +2030,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "example": "Voluptatum non ducimus natus."
+              "example": "Eos est sit dignissimos ex."
             },
             "description": "The generated key shares",
             "example": [
@@ -1279,6 +2049,62 @@
           ]
         }
       },
+      "CreateRoleRequestBody": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "string",
+            "description": "Color of the role",
+            "example": "#33FF57",
+            "pattern": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name or the role",
+            "example": "team_sre",
+            "minLength": 1
+          }
+        },
+        "example": {
+          "color": "#33FF57",
+          "name": "team_sre"
+        },
+        "required": [
+          "name",
+          "color"
+        ]
+      },
+      "CreateRoleResponseBody": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "string",
+            "description": "The color of the created role",
+            "example": "#33FF57"
+          },
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier for the role",
+            "example": 2,
+            "format": "int64"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the created role",
+            "example": "team_sre"
+          }
+        },
+        "example": {
+          "color": "#33FF57",
+          "id": 2,
+          "name": "team_sre"
+        },
+        "required": [
+          "id",
+          "name",
+          "color"
+        ]
+      },
       "CreateSecretRequestBody": {
         "type": "object",
         "properties": {
@@ -1286,7 +2112,7 @@
             "type": "array",
             "items": {
               "type": "integer",
-              "example": 5993626676017206569,
+              "example": 516397163871956071,
               "format": "int64"
             },
             "description": "Role IDs authorized to access the secret",
@@ -1299,7 +2125,7 @@
             "type": "array",
             "items": {
               "type": "integer",
-              "example": 3661786480120339291,
+              "example": 341127503104855258,
               "format": "int64"
             },
             "description": "Users IDs authorized to access the secret",
@@ -1413,7 +2239,7 @@
           "fault": {
             "type": "boolean",
             "description": "Is the error a server-side fault?",
-            "example": true
+            "example": false
           },
           "id": {
             "type": "string",
@@ -1438,17 +2264,17 @@
           "timeout": {
             "type": "boolean",
             "description": "Is the error a timeout?",
-            "example": false
+            "example": true
           }
         },
         "description": "Invalid parameters provided",
         "example": {
-          "fault": false,
+          "fault": true,
           "id": "123abc",
           "message": "parameter 'p' must be an integer",
           "name": "bad_request",
           "temporary": false,
-          "timeout": true
+          "timeout": false
         },
         "required": [
           "name",
@@ -1465,32 +2291,32 @@
           "current_shares": {
             "type": "integer",
             "description": "Number of shares currently held",
-            "example": 2787524579937080077,
+            "example": 2900553972583198744,
             "format": "int64"
           },
           "is_locked": {
             "type": "boolean",
             "description": "Whether the key is currently locked",
-            "example": false
+            "example": true
           },
           "min_shares": {
             "type": "integer",
             "description": "Minimum number of shares required",
-            "example": 1741392137154913574,
+            "example": 2431615301122470772,
             "format": "int64"
           },
           "total_shares": {
             "type": "integer",
             "description": "Total number of shares",
-            "example": 1081155919994856112,
+            "example": 4042449222842363142,
             "format": "int64"
           }
         },
         "example": {
-          "current_shares": 2804251276007726417,
+          "current_shares": 7259916586993169848,
           "is_locked": false,
-          "min_shares": 6899294025665174510,
-          "total_shares": 8405355850990433405
+          "min_shares": 7162640890096176202,
+          "total_shares": 6020274338472822433
         },
         "required": [
           "is_locked",
@@ -1525,7 +2351,7 @@
             "type": "boolean",
             "description": "Is this role an admin role?",
             "default": false,
-            "example": true
+            "example": false
           },
           "color": {
             "type": "string",
@@ -1609,12 +2435,160 @@
               {
                 "created_at": "2025-06-30T12:00:00Z",
                 "id": 1,
+                "roles": [
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  }
+                ],
                 "updated_at": "2025-06-30T15:00:00Z",
                 "username": "alice"
               },
               {
                 "created_at": "2025-06-30T12:00:00Z",
                 "id": 1,
+                "roles": [
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  }
+                ],
+                "updated_at": "2025-06-30T15:00:00Z",
+                "username": "alice"
+              },
+              {
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "roles": [
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  }
+                ],
+                "updated_at": "2025-06-30T15:00:00Z",
+                "username": "alice"
+              },
+              {
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "roles": [
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  }
+                ],
                 "updated_at": "2025-06-30T15:00:00Z",
                 "username": "alice"
               }
@@ -1664,32 +2638,126 @@
               "id": 1,
               "name": "admin",
               "updated_at": "2025-06-30T15:00:00Z"
-            },
-            {
-              "admin": false,
-              "color": "#FF5733",
-              "created_at": "2025-06-30T12:00:00Z",
-              "id": 1,
-              "name": "admin",
-              "updated_at": "2025-06-30T15:00:00Z"
             }
           ],
           "authorized_users": [
             {
               "created_at": "2025-06-30T12:00:00Z",
               "id": 1,
+              "roles": [
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                }
+              ],
               "updated_at": "2025-06-30T15:00:00Z",
               "username": "alice"
             },
             {
               "created_at": "2025-06-30T12:00:00Z",
               "id": 1,
+              "roles": [
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                }
+              ],
               "updated_at": "2025-06-30T15:00:00Z",
               "username": "alice"
             },
             {
               "created_at": "2025-06-30T12:00:00Z",
               "id": 1,
+              "roles": [
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                }
+              ],
               "updated_at": "2025-06-30T15:00:00Z",
               "username": "alice"
             }
@@ -1698,6 +2766,40 @@
           "owner": {
             "created_at": "2025-06-30T12:00:00Z",
             "id": 1,
+            "roles": [
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              }
+            ],
             "updated_at": "2025-06-30T15:00:00Z",
             "username": "alice"
           },
@@ -1740,6 +2842,40 @@
           "owner": {
             "created_at": "2025-06-30T12:00:00Z",
             "id": 1,
+            "roles": [
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              }
+            ],
             "updated_at": "2025-06-30T15:00:00Z",
             "username": "alice"
           },
@@ -1767,6 +2903,39 @@
             "example": 1,
             "format": "int64"
           },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            },
+            "description": "Roles assigned to the user",
+            "example": [
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              }
+            ]
+          },
           "updated_at": {
             "type": "string",
             "description": "User last update timestamp",
@@ -1782,6 +2951,24 @@
         "example": {
           "created_at": "2025-06-30T12:00:00Z",
           "id": 1,
+          "roles": [
+            {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            },
+            {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            }
+          ],
           "updated_at": "2025-06-30T15:00:00Z",
           "username": "alice"
         },
@@ -1789,7 +2976,8 @@
           "id",
           "username",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "roles"
         ]
       }
     }

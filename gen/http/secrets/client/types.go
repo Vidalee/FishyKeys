@@ -389,6 +389,24 @@ type UserResponse struct {
 	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// User last update timestamp
 	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+	// Roles assigned to the user
+	Roles []*RoleResponse `form:"roles,omitempty" json:"roles,omitempty" xml:"roles,omitempty"`
+}
+
+// RoleResponse is used to define fields on response body types.
+type RoleResponse struct {
+	// Unique identifier for the role
+	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Name of the role
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// Color associated with the role
+	Color *string `form:"color,omitempty" json:"color,omitempty" xml:"color,omitempty"`
+	// Is this role an admin role?
+	Admin *bool `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	// Role creation timestamp
+	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
+	// Role last update timestamp
+	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
 }
 
 // UserResponseBody is used to define fields on response body types.
@@ -401,6 +419,8 @@ type UserResponseBody struct {
 	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// User last update timestamp
 	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+	// Roles assigned to the user
+	Roles []*RoleResponseBody `form:"roles,omitempty" json:"roles,omitempty" xml:"roles,omitempty"`
 }
 
 // RoleResponseBody is used to define fields on response body types.
@@ -1231,10 +1251,43 @@ func ValidateUserResponse(body *UserResponse) (err error) {
 	if body.UpdatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("updated_at", "body"))
 	}
+	if body.Roles == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("roles", "body"))
+	}
 	if body.Username != nil {
 		if utf8.RuneCountInString(*body.Username) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.username", *body.Username, utf8.RuneCountInString(*body.Username), 3, true))
 		}
+	}
+	for _, e := range body.Roles {
+		if e != nil {
+			if err2 := ValidateRoleResponse(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateRoleResponse runs the validations defined on RoleResponse
+func ValidateRoleResponse(body *RoleResponse) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Color == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("color", "body"))
+	}
+	if body.Admin == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("admin", "body"))
+	}
+	if body.CreatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("created_at", "body"))
+	}
+	if body.UpdatedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("updated_at", "body"))
 	}
 	return
 }
@@ -1253,9 +1306,19 @@ func ValidateUserResponseBody(body *UserResponseBody) (err error) {
 	if body.UpdatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("updated_at", "body"))
 	}
+	if body.Roles == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("roles", "body"))
+	}
 	if body.Username != nil {
 		if utf8.RuneCountInString(*body.Username) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.username", *body.Username, utf8.RuneCountInString(*body.Username), 3, true))
+		}
+	}
+	for _, e := range body.Roles {
+		if e != nil {
+			if err2 := ValidateRoleResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
 	return

@@ -8,13 +8,53 @@
 package server
 
 import (
+	"unicode/utf8"
+
 	roles "github.com/Vidalee/FishyKeys/gen/roles"
 	goa "goa.design/goa/v3/pkg"
 )
 
+// CreateRoleRequestBody is the type of the "roles" service "create role"
+// endpoint HTTP request body.
+type CreateRoleRequestBody struct {
+	// Name or the role
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// Color of the role
+	Color *string `form:"color,omitempty" json:"color,omitempty" xml:"color,omitempty"`
+}
+
+// AssignRoleToUserRequestBody is the type of the "roles" service "assign role
+// to user" endpoint HTTP request body.
+type AssignRoleToUserRequestBody struct {
+	// ID of the user to assign the role to
+	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+	// ID of the role to assign to the user
+	RoleID *int `form:"role_id,omitempty" json:"role_id,omitempty" xml:"role_id,omitempty"`
+}
+
+// UnassignRoleToUserRequestBody is the type of the "roles" service "unassign
+// role to user" endpoint HTTP request body.
+type UnassignRoleToUserRequestBody struct {
+	// ID of the user to unassign the role to
+	UserID *int `form:"user_id,omitempty" json:"user_id,omitempty" xml:"user_id,omitempty"`
+	// ID of the role to unassign to the user
+	RoleID *int `form:"role_id,omitempty" json:"role_id,omitempty" xml:"role_id,omitempty"`
+}
+
 // ListRolesResponseBody is the type of the "roles" service "list roles"
 // endpoint HTTP response body.
 type ListRolesResponseBody []*RoleResponse
+
+// CreateRoleResponseBody is the type of the "roles" service "create role"
+// endpoint HTTP response body.
+type CreateRoleResponseBody struct {
+	// The name of the created role
+	Name string `form:"name" json:"name" xml:"name"`
+	// The color of the created role
+	Color string `form:"color" json:"color" xml:"color"`
+	// Unique identifier for the role
+	ID int `form:"id" json:"id" xml:"id"`
+}
 
 // ListRolesInternalErrorResponseBody is the type of the "roles" service "list
 // roles" endpoint HTTP response body for the "internal_error" error.
@@ -37,6 +77,413 @@ type ListRolesInternalErrorResponseBody struct {
 // ListRolesUnauthorizedResponseBody is the type of the "roles" service "list
 // roles" endpoint HTTP response body for the "unauthorized" error.
 type ListRolesUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CreateRoleRoleTakenResponseBody is the type of the "roles" service "create
+// role" endpoint HTTP response body for the "role_taken" error.
+type CreateRoleRoleTakenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CreateRoleInvalidParametersResponseBody is the type of the "roles" service
+// "create role" endpoint HTTP response body for the "invalid_parameters" error.
+type CreateRoleInvalidParametersResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CreateRoleInternalErrorResponseBody is the type of the "roles" service
+// "create role" endpoint HTTP response body for the "internal_error" error.
+type CreateRoleInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CreateRoleForbiddenResponseBody is the type of the "roles" service "create
+// role" endpoint HTTP response body for the "forbidden" error.
+type CreateRoleForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CreateRoleUnauthorizedResponseBody is the type of the "roles" service
+// "create role" endpoint HTTP response body for the "unauthorized" error.
+type CreateRoleUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteRoleRoleNotFoundResponseBody is the type of the "roles" service
+// "delete role" endpoint HTTP response body for the "role_not_found" error.
+type DeleteRoleRoleNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteRoleInternalErrorResponseBody is the type of the "roles" service
+// "delete role" endpoint HTTP response body for the "internal_error" error.
+type DeleteRoleInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteRoleInvalidParametersResponseBody is the type of the "roles" service
+// "delete role" endpoint HTTP response body for the "invalid_parameters" error.
+type DeleteRoleInvalidParametersResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteRoleForbiddenResponseBody is the type of the "roles" service "delete
+// role" endpoint HTTP response body for the "forbidden" error.
+type DeleteRoleForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteRoleUnauthorizedResponseBody is the type of the "roles" service
+// "delete role" endpoint HTTP response body for the "unauthorized" error.
+type DeleteRoleUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AssignRoleToUserUserNotFoundResponseBody is the type of the "roles" service
+// "assign role to user" endpoint HTTP response body for the "user_not_found"
+// error.
+type AssignRoleToUserUserNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AssignRoleToUserRoleNotFoundResponseBody is the type of the "roles" service
+// "assign role to user" endpoint HTTP response body for the "role_not_found"
+// error.
+type AssignRoleToUserRoleNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AssignRoleToUserInternalErrorResponseBody is the type of the "roles" service
+// "assign role to user" endpoint HTTP response body for the "internal_error"
+// error.
+type AssignRoleToUserInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AssignRoleToUserInvalidParametersResponseBody is the type of the "roles"
+// service "assign role to user" endpoint HTTP response body for the
+// "invalid_parameters" error.
+type AssignRoleToUserInvalidParametersResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AssignRoleToUserForbiddenResponseBody is the type of the "roles" service
+// "assign role to user" endpoint HTTP response body for the "forbidden" error.
+type AssignRoleToUserForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// AssignRoleToUserUnauthorizedResponseBody is the type of the "roles" service
+// "assign role to user" endpoint HTTP response body for the "unauthorized"
+// error.
+type AssignRoleToUserUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UnassignRoleToUserUserNotFoundResponseBody is the type of the "roles"
+// service "unassign role to user" endpoint HTTP response body for the
+// "user_not_found" error.
+type UnassignRoleToUserUserNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UnassignRoleToUserRoleNotFoundResponseBody is the type of the "roles"
+// service "unassign role to user" endpoint HTTP response body for the
+// "role_not_found" error.
+type UnassignRoleToUserRoleNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UnassignRoleToUserInternalErrorResponseBody is the type of the "roles"
+// service "unassign role to user" endpoint HTTP response body for the
+// "internal_error" error.
+type UnassignRoleToUserInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UnassignRoleToUserInvalidParametersResponseBody is the type of the "roles"
+// service "unassign role to user" endpoint HTTP response body for the
+// "invalid_parameters" error.
+type UnassignRoleToUserInvalidParametersResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UnassignRoleToUserForbiddenResponseBody is the type of the "roles" service
+// "unassign role to user" endpoint HTTP response body for the "forbidden"
+// error.
+type UnassignRoleToUserForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UnassignRoleToUserUnauthorizedResponseBody is the type of the "roles"
+// service "unassign role to user" endpoint HTTP response body for the
+// "unauthorized" error.
+type UnassignRoleToUserUnauthorizedResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -78,6 +525,17 @@ func NewListRolesResponseBody(res []*roles.Role) ListRolesResponseBody {
 	return body
 }
 
+// NewCreateRoleResponseBody builds the HTTP response body from the result of
+// the "create role" endpoint of the "roles" service.
+func NewCreateRoleResponseBody(res *roles.CreateRoleResult) *CreateRoleResponseBody {
+	body := &CreateRoleResponseBody{
+		Name:  res.Name,
+		Color: res.Color,
+		ID:    res.ID,
+	}
+	return body
+}
+
 // NewListRolesInternalErrorResponseBody builds the HTTP response body from the
 // result of the "list roles" endpoint of the "roles" service.
 func NewListRolesInternalErrorResponseBody(res *goa.ServiceError) *ListRolesInternalErrorResponseBody {
@@ -104,4 +562,403 @@ func NewListRolesUnauthorizedResponseBody(res *goa.ServiceError) *ListRolesUnaut
 		Fault:     res.Fault,
 	}
 	return body
+}
+
+// NewCreateRoleRoleTakenResponseBody builds the HTTP response body from the
+// result of the "create role" endpoint of the "roles" service.
+func NewCreateRoleRoleTakenResponseBody(res *goa.ServiceError) *CreateRoleRoleTakenResponseBody {
+	body := &CreateRoleRoleTakenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCreateRoleInvalidParametersResponseBody builds the HTTP response body
+// from the result of the "create role" endpoint of the "roles" service.
+func NewCreateRoleInvalidParametersResponseBody(res *goa.ServiceError) *CreateRoleInvalidParametersResponseBody {
+	body := &CreateRoleInvalidParametersResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCreateRoleInternalErrorResponseBody builds the HTTP response body from
+// the result of the "create role" endpoint of the "roles" service.
+func NewCreateRoleInternalErrorResponseBody(res *goa.ServiceError) *CreateRoleInternalErrorResponseBody {
+	body := &CreateRoleInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCreateRoleForbiddenResponseBody builds the HTTP response body from the
+// result of the "create role" endpoint of the "roles" service.
+func NewCreateRoleForbiddenResponseBody(res *goa.ServiceError) *CreateRoleForbiddenResponseBody {
+	body := &CreateRoleForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCreateRoleUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "create role" endpoint of the "roles" service.
+func NewCreateRoleUnauthorizedResponseBody(res *goa.ServiceError) *CreateRoleUnauthorizedResponseBody {
+	body := &CreateRoleUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteRoleRoleNotFoundResponseBody builds the HTTP response body from the
+// result of the "delete role" endpoint of the "roles" service.
+func NewDeleteRoleRoleNotFoundResponseBody(res *goa.ServiceError) *DeleteRoleRoleNotFoundResponseBody {
+	body := &DeleteRoleRoleNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteRoleInternalErrorResponseBody builds the HTTP response body from
+// the result of the "delete role" endpoint of the "roles" service.
+func NewDeleteRoleInternalErrorResponseBody(res *goa.ServiceError) *DeleteRoleInternalErrorResponseBody {
+	body := &DeleteRoleInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteRoleInvalidParametersResponseBody builds the HTTP response body
+// from the result of the "delete role" endpoint of the "roles" service.
+func NewDeleteRoleInvalidParametersResponseBody(res *goa.ServiceError) *DeleteRoleInvalidParametersResponseBody {
+	body := &DeleteRoleInvalidParametersResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteRoleForbiddenResponseBody builds the HTTP response body from the
+// result of the "delete role" endpoint of the "roles" service.
+func NewDeleteRoleForbiddenResponseBody(res *goa.ServiceError) *DeleteRoleForbiddenResponseBody {
+	body := &DeleteRoleForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteRoleUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "delete role" endpoint of the "roles" service.
+func NewDeleteRoleUnauthorizedResponseBody(res *goa.ServiceError) *DeleteRoleUnauthorizedResponseBody {
+	body := &DeleteRoleUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAssignRoleToUserUserNotFoundResponseBody builds the HTTP response body
+// from the result of the "assign role to user" endpoint of the "roles" service.
+func NewAssignRoleToUserUserNotFoundResponseBody(res *goa.ServiceError) *AssignRoleToUserUserNotFoundResponseBody {
+	body := &AssignRoleToUserUserNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAssignRoleToUserRoleNotFoundResponseBody builds the HTTP response body
+// from the result of the "assign role to user" endpoint of the "roles" service.
+func NewAssignRoleToUserRoleNotFoundResponseBody(res *goa.ServiceError) *AssignRoleToUserRoleNotFoundResponseBody {
+	body := &AssignRoleToUserRoleNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAssignRoleToUserInternalErrorResponseBody builds the HTTP response body
+// from the result of the "assign role to user" endpoint of the "roles" service.
+func NewAssignRoleToUserInternalErrorResponseBody(res *goa.ServiceError) *AssignRoleToUserInternalErrorResponseBody {
+	body := &AssignRoleToUserInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAssignRoleToUserInvalidParametersResponseBody builds the HTTP response
+// body from the result of the "assign role to user" endpoint of the "roles"
+// service.
+func NewAssignRoleToUserInvalidParametersResponseBody(res *goa.ServiceError) *AssignRoleToUserInvalidParametersResponseBody {
+	body := &AssignRoleToUserInvalidParametersResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAssignRoleToUserForbiddenResponseBody builds the HTTP response body from
+// the result of the "assign role to user" endpoint of the "roles" service.
+func NewAssignRoleToUserForbiddenResponseBody(res *goa.ServiceError) *AssignRoleToUserForbiddenResponseBody {
+	body := &AssignRoleToUserForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewAssignRoleToUserUnauthorizedResponseBody builds the HTTP response body
+// from the result of the "assign role to user" endpoint of the "roles" service.
+func NewAssignRoleToUserUnauthorizedResponseBody(res *goa.ServiceError) *AssignRoleToUserUnauthorizedResponseBody {
+	body := &AssignRoleToUserUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUnassignRoleToUserUserNotFoundResponseBody builds the HTTP response body
+// from the result of the "unassign role to user" endpoint of the "roles"
+// service.
+func NewUnassignRoleToUserUserNotFoundResponseBody(res *goa.ServiceError) *UnassignRoleToUserUserNotFoundResponseBody {
+	body := &UnassignRoleToUserUserNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUnassignRoleToUserRoleNotFoundResponseBody builds the HTTP response body
+// from the result of the "unassign role to user" endpoint of the "roles"
+// service.
+func NewUnassignRoleToUserRoleNotFoundResponseBody(res *goa.ServiceError) *UnassignRoleToUserRoleNotFoundResponseBody {
+	body := &UnassignRoleToUserRoleNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUnassignRoleToUserInternalErrorResponseBody builds the HTTP response body
+// from the result of the "unassign role to user" endpoint of the "roles"
+// service.
+func NewUnassignRoleToUserInternalErrorResponseBody(res *goa.ServiceError) *UnassignRoleToUserInternalErrorResponseBody {
+	body := &UnassignRoleToUserInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUnassignRoleToUserInvalidParametersResponseBody builds the HTTP response
+// body from the result of the "unassign role to user" endpoint of the "roles"
+// service.
+func NewUnassignRoleToUserInvalidParametersResponseBody(res *goa.ServiceError) *UnassignRoleToUserInvalidParametersResponseBody {
+	body := &UnassignRoleToUserInvalidParametersResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUnassignRoleToUserForbiddenResponseBody builds the HTTP response body
+// from the result of the "unassign role to user" endpoint of the "roles"
+// service.
+func NewUnassignRoleToUserForbiddenResponseBody(res *goa.ServiceError) *UnassignRoleToUserForbiddenResponseBody {
+	body := &UnassignRoleToUserForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUnassignRoleToUserUnauthorizedResponseBody builds the HTTP response body
+// from the result of the "unassign role to user" endpoint of the "roles"
+// service.
+func NewUnassignRoleToUserUnauthorizedResponseBody(res *goa.ServiceError) *UnassignRoleToUserUnauthorizedResponseBody {
+	body := &UnassignRoleToUserUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCreateRolePayload builds a roles service create role endpoint payload.
+func NewCreateRolePayload(body *CreateRoleRequestBody) *roles.CreateRolePayload {
+	v := &roles.CreateRolePayload{
+		Name:  *body.Name,
+		Color: *body.Color,
+	}
+
+	return v
+}
+
+// NewDeleteRolePayload builds a roles service delete role endpoint payload.
+func NewDeleteRolePayload(id int) *roles.DeleteRolePayload {
+	v := &roles.DeleteRolePayload{}
+	v.ID = id
+
+	return v
+}
+
+// NewAssignRoleToUserPayload builds a roles service assign role to user
+// endpoint payload.
+func NewAssignRoleToUserPayload(body *AssignRoleToUserRequestBody) *roles.AssignRoleToUserPayload {
+	v := &roles.AssignRoleToUserPayload{
+		UserID: *body.UserID,
+		RoleID: *body.RoleID,
+	}
+
+	return v
+}
+
+// NewUnassignRoleToUserPayload builds a roles service unassign role to user
+// endpoint payload.
+func NewUnassignRoleToUserPayload(body *UnassignRoleToUserRequestBody) *roles.UnassignRoleToUserPayload {
+	v := &roles.UnassignRoleToUserPayload{
+		UserID: *body.UserID,
+		RoleID: *body.RoleID,
+	}
+
+	return v
+}
+
+// ValidateCreateRoleRequestBody runs the validations defined on Create
+// RoleRequestBody
+func ValidateCreateRoleRequestBody(body *CreateRoleRequestBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Color == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("color", "body"))
+	}
+	if body.Name != nil {
+		if utf8.RuneCountInString(*body.Name) < 1 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", *body.Name, utf8.RuneCountInString(*body.Name), 1, true))
+		}
+	}
+	if body.Color != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.color", *body.Color, "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"))
+	}
+	return
+}
+
+// ValidateAssignRoleToUserRequestBody runs the validations defined on Assign
+// Role To UserRequestBody
+func ValidateAssignRoleToUserRequestBody(body *AssignRoleToUserRequestBody) (err error) {
+	if body.UserID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("user_id", "body"))
+	}
+	if body.RoleID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("role_id", "body"))
+	}
+	return
+}
+
+// ValidateUnassignRoleToUserRequestBody runs the validations defined on
+// Unassign Role To UserRequestBody
+func ValidateUnassignRoleToUserRequestBody(body *UnassignRoleToUserRequestBody) (err error) {
+	if body.UserID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("user_id", "body"))
+	}
+	if body.RoleID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("role_id", "body"))
+	}
+	return
 }
