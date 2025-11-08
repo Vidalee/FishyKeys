@@ -550,6 +550,25 @@ func unmarshalUserResponseToSecretsUser(v *UserResponse) *secrets.User {
 		CreatedAt: *v.CreatedAt,
 		UpdatedAt: *v.UpdatedAt,
 	}
+	res.Roles = make([]*secrets.Role, len(v.Roles))
+	for i, val := range v.Roles {
+		res.Roles[i] = unmarshalRoleResponseToSecretsRole(val)
+	}
+
+	return res
+}
+
+// unmarshalRoleResponseToSecretsRole builds a value of type *secrets.Role from
+// a value of type *RoleResponse.
+func unmarshalRoleResponseToSecretsRole(v *RoleResponse) *secrets.Role {
+	res := &secrets.Role{
+		ID:        *v.ID,
+		Name:      *v.Name,
+		Color:     *v.Color,
+		Admin:     *v.Admin,
+		CreatedAt: *v.CreatedAt,
+		UpdatedAt: *v.UpdatedAt,
+	}
 
 	return res
 }
@@ -562,6 +581,10 @@ func unmarshalUserResponseBodyToSecretsUser(v *UserResponseBody) *secrets.User {
 		Username:  *v.Username,
 		CreatedAt: *v.CreatedAt,
 		UpdatedAt: *v.UpdatedAt,
+	}
+	res.Roles = make([]*secrets.Role, len(v.Roles))
+	for i, val := range v.Roles {
+		res.Roles[i] = unmarshalRoleResponseBodyToSecretsRole(val)
 	}
 
 	return res

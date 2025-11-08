@@ -24,6 +24,8 @@ type UsersService struct {
 	usersRepository          repository.UsersRepository
 	globalSettingsRepository repository.GlobalSettingsRepository
 	secretsRepository        repository.SecretsRepository
+	rolesRepository          repository.RolesRepository
+	userRolesRepository      repository.UserRolesRepository
 }
 
 func NewUsersService(
@@ -31,12 +33,16 @@ func NewUsersService(
 	usersRepository repository.UsersRepository,
 	globalSettingsRepository repository.GlobalSettingsRepository,
 	secretsRepository repository.SecretsRepository,
+	rolesRepository repository.RolesRepository,
+	userRolesRepository repository.UserRolesRepository,
 ) *UsersService {
 	return &UsersService{
 		keyManager:               keyManager,
 		usersRepository:          usersRepository,
 		globalSettingsRepository: globalSettingsRepository,
 		secretsRepository:        secretsRepository,
+		rolesRepository:          rolesRepository,
+		userRolesRepository:      userRolesRepository,
 	}
 }
 
@@ -159,13 +165,38 @@ func (s *UsersService) ListUsers(ctx context.Context) ([]*genusers.User, error) 
 		return nil, genusers.MakeInternalError(fmt.Errorf("could not list users: %w", err))
 	}
 
+	roles, err := s.rolesRepository.ListRoles(ctx)
+	if err != nil {
+		return nil, genusers.MakeInternalError(fmt.Errorf("could not list roles: %w", err))
+	}
+
 	result := make([]*genusers.User, 0, len(users))
 	for _, u := range users {
+		ids, err := s.userRolesRepository.GetUserRoleIDs(ctx, u.ID)
+		if err != nil {
+			return nil, genusers.MakeInternalError(fmt.Errorf("could not list roles for user id %d: %w", u.ID, err))
+		}
+		userRoles := make([]*genusers.Role, 0, len(ids))
+		for _, r := range roles {
+			for _, id := range ids {
+				if r.ID == id {
+					userRoles = append(userRoles, &genusers.Role{
+						ID:        r.ID,
+						Name:      r.Name,
+						Color:     r.Color,
+						Admin:     r.Admin,
+						CreatedAt: r.CreatedAt.Format("2006-01-02T15:04:05Z"),
+						UpdatedAt: r.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+					})
+				}
+			}
+		}
 		result = append(result, &genusers.User{
 			ID:        u.ID,
 			Username:  u.Username,
 			CreatedAt: u.CreatedAt.Format("2006-01-02T15:04:05Z"),
 			UpdatedAt: u.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+			Roles:     userRoles,
 		})
 	}
 	return result, nil
@@ -174,6 +205,16 @@ func (s *UsersService) ListUsers(ctx context.Context) ([]*genusers.User, error) 
 func (s *UsersService) DeleteUser(ctx context.Context, payload *genusers.DeleteUserPayload) error {
 	if payload.Username == "" {
 		return genusers.MakeInvalidParameters(fmt.Errorf("username must be provided"))
+	}
+
+	// Guaranteed by the IsAdmin interceptor
+	if ctx.Value("token").(*JwtClaims).Username == payload.Username {
+		return genusers.MakeInvalidParameters(fmt.Errorf("you cannot delete your own user"))
+	}
+
+	// Cannot delete system user
+	if payload.Username == "system" {
+		return genusers.MakeForbidden(fmt.Errorf("cannot delete system user"))
 	}
 
 	err := s.usersRepository.DeleteUser(ctx, payload.Username)

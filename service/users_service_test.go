@@ -26,7 +26,9 @@ func setupUsersTestService(t *testing.T) *UsersService {
 	usersRepo := repository.NewUsersRepository(testDB)
 	globalSettingsRepo := repository.NewGlobalSettingsRepository(testDB)
 	secretsRepo := repository.NewSecretsRepository(testDB)
-	return NewUsersService(keyManager, usersRepo, globalSettingsRepo, secretsRepo)
+	userRolesRepo := repository.NewUserRolesRepository(testDB)
+	rolesRepo := repository.NewRolesRepository(testDB)
+	return NewUsersService(keyManager, usersRepo, globalSettingsRepo, secretsRepo, rolesRepo, userRolesRepo)
 }
 
 func clearUsersServiceTables(t *testing.T, ctx context.Context) {
@@ -336,6 +338,8 @@ func TestUsersService_DeleteUser(t *testing.T) {
 	service := setupUsersTestService(t)
 	ctx := context.Background()
 
+	callerUsername := "caller_user"
+
 	tests := []struct {
 		name              string
 		username          string
@@ -363,6 +367,20 @@ func TestUsersService_DeleteUser(t *testing.T) {
 			createUser:    true,
 			expectedError: false,
 		},
+		{
+			name:              "delete self",
+			username:          callerUsername,
+			createUser:        false,
+			expectedError:     true,
+			expectedErrorText: "you cannot delete your own user",
+		},
+		{
+			name:              "delete system user",
+			username:          "system",
+			createUser:        false,
+			expectedError:     true,
+			expectedErrorText: "cannot delete system user",
+		},
 	}
 
 	for _, tt := range tests {
@@ -382,6 +400,12 @@ func TestUsersService_DeleteUser(t *testing.T) {
 				Username: tt.username,
 			}
 
+			token := jwt.NewWithClaims(jwt.SigningMethodHS256, &JwtClaims{
+				Username: callerUsername,
+				UserID:   3,
+			})
+
+			ctx = context.WithValue(ctx, "token", token.Claims.(*JwtClaims))
 			err := service.DeleteUser(ctx, payload)
 
 			if tt.expectedError {

@@ -4,6 +4,8 @@ import React, {useEffect, useState} from 'react';
 import {getSecret, listSecrets} from '../api/secrets';
 import {FolderNode, SecretInfoSummary} from '../types';
 import CreateSecretModal from './CreateSecretModal';
+import ManageRolesModal from './ManageRolesModal';
+import ManageUsersModal from './ManageUsersModal';
 
 function buildFolderTree(secrets: SecretInfoSummary[]): FolderNode {
     const root: FolderNode = {name: '', path: '', children: [], secrets: [], isFolder: true};
@@ -77,6 +79,8 @@ export default function Dashboard() {
     const [error, setError] = useState<string | null>(null);
     const [selectedSecret, setSelectedSecret] = useState<SecretInfoSummary | null>(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showManageRolesModal, setShowManageRolesModal] = useState(false);
+    const [showManageUsersModal, setShowManageUsersModal] = useState(false);
     const [secretInfo, setSecretInfo] = useState<any>(null);
     const [secretInfoLoading, setSecretInfoLoading] = useState(false);
     const [secretInfoError, setSecretInfoError] = useState<string | null>(null);
@@ -180,9 +184,29 @@ export default function Dashboard() {
         <div style={{padding: 24}}>
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16}}>
                 <h2>Secrets Dashboard</h2>
-                <button style={{padding: '8px 16px', fontSize: 16}} onClick={() => setShowCreateModal(true)}>+ New
-                    Secret
-                </button>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-end',
+                    marginBottom: 16,
+                    gap: 12
+                }}>
+                    <button type="button" style={{padding: '8px 16px', fontSize: 16}}
+                            onClick={() => setShowCreateModal(true)}>
+                        + New Secret
+                    </button>
+                    <button type="button" style={{padding: '8px 16px', fontSize: 16}}
+                            onClick={() => setShowManageRolesModal(true)}>
+                        Manage roles
+                    </button>
+                    <button
+                        type="button"
+                        style={{padding: '8px 16px', fontSize: 16}}
+                        onClick={() => setShowManageUsersModal(true)}
+                    >
+                        Manage users
+                    </button>
+                </div>
             </div>
             {loading ? (
                 <div>Loading secrets...</div>
@@ -231,48 +255,48 @@ export default function Dashboard() {
                                 </button>
                                 {showValue && (
                                     <span style={{marginLeft: 8, display: 'flex', alignItems: 'center', gap: 8}}>
-                    {secretValueError ? (
-                        <span style={{color: 'red'}}>{secretValueError}</span>
-                    ) : secretValue !== null ? (
-                        <>
-                        <textarea
-                            value={secretValue}
-                            readOnly
-                            style={{
-                                fontFamily: 'monospace',
-                                background: '#f5f5f5',
-                                padding: '8px',
-                                borderRadius: 4,
-                                minWidth: 260,
-                                minHeight: 60,
-                                resize: 'vertical',
-                                border: '1px solid #ccc',
-                                marginTop: 4,
-                                display: 'block',
-                            }}
-                        />
-                            <button
-                                type="button"
-                                onClick={handleCopySecretValue}
-                                style={{
-                                    marginLeft: 6,
-                                    padding: '6px 12px',
-                                    borderRadius: 4,
-                                    border: '1px solid #bbb',
-                                    background: secretValueCopied ? '#d1fae5' : '#f5f5f5',
-                                    color: '#222',
-                                    fontWeight: 500,
-                                    cursor: 'pointer',
-                                    transition: 'background 0.18s',
-                                }}
-                                disabled={secretValueCopied}
-                                title="Copy to clipboard"
-                            >
-                                {secretValueCopied ? 'Copied!' : 'Copy'}
-                            </button>
-                        </>
-                    ) : null}
-                  </span>
+                                        {secretValueError ? (
+                                            <span style={{color: 'red'}}>{secretValueError}</span>
+                                        ) : secretValue !== null ? (
+                                            <>
+                                                <textarea
+                                                    value={secretValue}
+                                                    readOnly
+                                                    style={{
+                                                        fontFamily: 'monospace',
+                                                        background: '#f5f5f5',
+                                                        padding: '8px',
+                                                        borderRadius: 4,
+                                                        minWidth: 260,
+                                                        minHeight: 60,
+                                                        resize: 'vertical',
+                                                        border: '1px solid #ccc',
+                                                        marginTop: 4,
+                                                        display: 'block',
+                                                    }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={handleCopySecretValue}
+                                                    style={{
+                                                        marginLeft: 6,
+                                                        padding: '6px 12px',
+                                                        borderRadius: 4,
+                                                        border: '1px solid #bbb',
+                                                        background: secretValueCopied ? '#d1fae5' : '#f5f5f5',
+                                                        color: '#222',
+                                                        fontWeight: 500,
+                                                        cursor: 'pointer',
+                                                        transition: 'background 0.18s',
+                                                    }}
+                                                    disabled={secretValueCopied}
+                                                    title="Copy to clipboard"
+                                                >
+                                                    {secretValueCopied ? 'Copied!' : 'Copy'}
+                                                </button>
+                                            </>
+                                        ) : null}
+                                    </span>
                                 )}
                             </div>
                         </>
@@ -282,6 +306,8 @@ export default function Dashboard() {
             )}
             <CreateSecretModal open={showCreateModal} onClose={() => setShowCreateModal(false)}
                                onCreated={fetchSecrets}/>
+            <ManageRolesModal open={showManageRolesModal} onClose={() => setShowManageRolesModal(false)}/>
+            <ManageUsersModal open={showManageUsersModal} onClose={() => setShowManageUsersModal(false)}/>
         </div>
     );
 } 

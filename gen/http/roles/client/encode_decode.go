@@ -112,6 +112,598 @@ func DecodeListRolesResponse(decoder func(*http.Response) goahttp.Decoder, resto
 	}
 }
 
+// BuildCreateRoleRequest instantiates a HTTP request object with method and
+// path set to call the "roles" service "create role" endpoint
+func (c *Client) BuildCreateRoleRequest(ctx context.Context, v any) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: CreateRoleRolesPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("roles", "create role", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeCreateRoleRequest returns an encoder for requests sent to the roles
+// create role server.
+func EncodeCreateRoleRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*roles.CreateRolePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("roles", "create role", "*roles.CreateRolePayload", v)
+		}
+		body := NewCreateRoleRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("roles", "create role", err)
+		}
+		return nil
+	}
+}
+
+// DecodeCreateRoleResponse returns a decoder for responses returned by the
+// roles create role endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeCreateRoleResponse may return the following errors:
+//   - "role_taken" (type *goa.ServiceError): http.StatusConflict
+//   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - error: internal error
+func DecodeCreateRoleResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusCreated:
+			var (
+				body CreateRoleResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "create role", err)
+			}
+			err = ValidateCreateRoleResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "create role", err)
+			}
+			res := NewCreateRoleResultCreated(&body)
+			return res, nil
+		case http.StatusConflict:
+			var (
+				body CreateRoleRoleTakenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "create role", err)
+			}
+			err = ValidateCreateRoleRoleTakenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "create role", err)
+			}
+			return nil, NewCreateRoleRoleTaken(&body)
+		case http.StatusBadRequest:
+			var (
+				body CreateRoleInvalidParametersResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "create role", err)
+			}
+			err = ValidateCreateRoleInvalidParametersResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "create role", err)
+			}
+			return nil, NewCreateRoleInvalidParameters(&body)
+		case http.StatusInternalServerError:
+			var (
+				body CreateRoleInternalErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "create role", err)
+			}
+			err = ValidateCreateRoleInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "create role", err)
+			}
+			return nil, NewCreateRoleInternalError(&body)
+		case http.StatusForbidden:
+			var (
+				body CreateRoleForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "create role", err)
+			}
+			err = ValidateCreateRoleForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "create role", err)
+			}
+			return nil, NewCreateRoleForbidden(&body)
+		case http.StatusUnauthorized:
+			var (
+				body CreateRoleUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "create role", err)
+			}
+			err = ValidateCreateRoleUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "create role", err)
+			}
+			return nil, NewCreateRoleUnauthorized(&body)
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("roles", "create role", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildDeleteRoleRequest instantiates a HTTP request object with method and
+// path set to call the "roles" service "delete role" endpoint
+func (c *Client) BuildDeleteRoleRequest(ctx context.Context, v any) (*http.Request, error) {
+	var (
+		id int
+	)
+	{
+		p, ok := v.(*roles.DeleteRolePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("roles", "delete role", "*roles.DeleteRolePayload", v)
+		}
+		id = p.ID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteRoleRolesPath(id)}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("roles", "delete role", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// DecodeDeleteRoleResponse returns a decoder for responses returned by the
+// roles delete role endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeDeleteRoleResponse may return the following errors:
+//   - "role_not_found" (type *goa.ServiceError): http.StatusNotFound
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
+//   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - error: internal error
+func DecodeDeleteRoleResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusNotFound:
+			var (
+				body DeleteRoleRoleNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "delete role", err)
+			}
+			err = ValidateDeleteRoleRoleNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "delete role", err)
+			}
+			return nil, NewDeleteRoleRoleNotFound(&body)
+		case http.StatusInternalServerError:
+			var (
+				body DeleteRoleInternalErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "delete role", err)
+			}
+			err = ValidateDeleteRoleInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "delete role", err)
+			}
+			return nil, NewDeleteRoleInternalError(&body)
+		case http.StatusBadRequest:
+			var (
+				body DeleteRoleInvalidParametersResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "delete role", err)
+			}
+			err = ValidateDeleteRoleInvalidParametersResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "delete role", err)
+			}
+			return nil, NewDeleteRoleInvalidParameters(&body)
+		case http.StatusForbidden:
+			var (
+				body DeleteRoleForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "delete role", err)
+			}
+			err = ValidateDeleteRoleForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "delete role", err)
+			}
+			return nil, NewDeleteRoleForbidden(&body)
+		case http.StatusUnauthorized:
+			var (
+				body DeleteRoleUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "delete role", err)
+			}
+			err = ValidateDeleteRoleUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "delete role", err)
+			}
+			return nil, NewDeleteRoleUnauthorized(&body)
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("roles", "delete role", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildAssignRoleToUserRequest instantiates a HTTP request object with method
+// and path set to call the "roles" service "assign role to user" endpoint
+func (c *Client) BuildAssignRoleToUserRequest(ctx context.Context, v any) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AssignRoleToUserRolesPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("roles", "assign role to user", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeAssignRoleToUserRequest returns an encoder for requests sent to the
+// roles assign role to user server.
+func EncodeAssignRoleToUserRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*roles.AssignRoleToUserPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("roles", "assign role to user", "*roles.AssignRoleToUserPayload", v)
+		}
+		body := NewAssignRoleToUserRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("roles", "assign role to user", err)
+		}
+		return nil
+	}
+}
+
+// DecodeAssignRoleToUserResponse returns a decoder for responses returned by
+// the roles assign role to user endpoint. restoreBody controls whether the
+// response body should be restored after having been read.
+// DecodeAssignRoleToUserResponse may return the following errors:
+//   - "user_not_found" (type *goa.ServiceError): http.StatusNotFound
+//   - "role_not_found" (type *goa.ServiceError): http.StatusNotFound
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
+//   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - error: internal error
+func DecodeAssignRoleToUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusNotFound:
+			en := resp.Header.Get("goa-error")
+			switch en {
+			case "user_not_found":
+				var (
+					body AssignRoleToUserUserNotFoundResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("roles", "assign role to user", err)
+				}
+				err = ValidateAssignRoleToUserUserNotFoundResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("roles", "assign role to user", err)
+				}
+				return nil, NewAssignRoleToUserUserNotFound(&body)
+			case "role_not_found":
+				var (
+					body AssignRoleToUserRoleNotFoundResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("roles", "assign role to user", err)
+				}
+				err = ValidateAssignRoleToUserRoleNotFoundResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("roles", "assign role to user", err)
+				}
+				return nil, NewAssignRoleToUserRoleNotFound(&body)
+			default:
+				body, _ := io.ReadAll(resp.Body)
+				return nil, goahttp.ErrInvalidResponse("roles", "assign role to user", resp.StatusCode, string(body))
+			}
+		case http.StatusInternalServerError:
+			var (
+				body AssignRoleToUserInternalErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "assign role to user", err)
+			}
+			err = ValidateAssignRoleToUserInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "assign role to user", err)
+			}
+			return nil, NewAssignRoleToUserInternalError(&body)
+		case http.StatusBadRequest:
+			var (
+				body AssignRoleToUserInvalidParametersResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "assign role to user", err)
+			}
+			err = ValidateAssignRoleToUserInvalidParametersResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "assign role to user", err)
+			}
+			return nil, NewAssignRoleToUserInvalidParameters(&body)
+		case http.StatusForbidden:
+			var (
+				body AssignRoleToUserForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "assign role to user", err)
+			}
+			err = ValidateAssignRoleToUserForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "assign role to user", err)
+			}
+			return nil, NewAssignRoleToUserForbidden(&body)
+		case http.StatusUnauthorized:
+			var (
+				body AssignRoleToUserUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "assign role to user", err)
+			}
+			err = ValidateAssignRoleToUserUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "assign role to user", err)
+			}
+			return nil, NewAssignRoleToUserUnauthorized(&body)
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("roles", "assign role to user", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildUnassignRoleToUserRequest instantiates a HTTP request object with
+// method and path set to call the "roles" service "unassign role to user"
+// endpoint
+func (c *Client) BuildUnassignRoleToUserRequest(ctx context.Context, v any) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UnassignRoleToUserRolesPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("roles", "unassign role to user", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeUnassignRoleToUserRequest returns an encoder for requests sent to the
+// roles unassign role to user server.
+func EncodeUnassignRoleToUserRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*roles.UnassignRoleToUserPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("roles", "unassign role to user", "*roles.UnassignRoleToUserPayload", v)
+		}
+		body := NewUnassignRoleToUserRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("roles", "unassign role to user", err)
+		}
+		return nil
+	}
+}
+
+// DecodeUnassignRoleToUserResponse returns a decoder for responses returned by
+// the roles unassign role to user endpoint. restoreBody controls whether the
+// response body should be restored after having been read.
+// DecodeUnassignRoleToUserResponse may return the following errors:
+//   - "user_not_found" (type *goa.ServiceError): http.StatusNotFound
+//   - "role_not_found" (type *goa.ServiceError): http.StatusNotFound
+//   - "internal_error" (type *goa.ServiceError): http.StatusInternalServerError
+//   - "invalid_parameters" (type *goa.ServiceError): http.StatusBadRequest
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - error: internal error
+func DecodeUnassignRoleToUserResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusNotFound:
+			en := resp.Header.Get("goa-error")
+			switch en {
+			case "user_not_found":
+				var (
+					body UnassignRoleToUserUserNotFoundResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("roles", "unassign role to user", err)
+				}
+				err = ValidateUnassignRoleToUserUserNotFoundResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("roles", "unassign role to user", err)
+				}
+				return nil, NewUnassignRoleToUserUserNotFound(&body)
+			case "role_not_found":
+				var (
+					body UnassignRoleToUserRoleNotFoundResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("roles", "unassign role to user", err)
+				}
+				err = ValidateUnassignRoleToUserRoleNotFoundResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("roles", "unassign role to user", err)
+				}
+				return nil, NewUnassignRoleToUserRoleNotFound(&body)
+			default:
+				body, _ := io.ReadAll(resp.Body)
+				return nil, goahttp.ErrInvalidResponse("roles", "unassign role to user", resp.StatusCode, string(body))
+			}
+		case http.StatusInternalServerError:
+			var (
+				body UnassignRoleToUserInternalErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "unassign role to user", err)
+			}
+			err = ValidateUnassignRoleToUserInternalErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "unassign role to user", err)
+			}
+			return nil, NewUnassignRoleToUserInternalError(&body)
+		case http.StatusBadRequest:
+			var (
+				body UnassignRoleToUserInvalidParametersResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "unassign role to user", err)
+			}
+			err = ValidateUnassignRoleToUserInvalidParametersResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "unassign role to user", err)
+			}
+			return nil, NewUnassignRoleToUserInvalidParameters(&body)
+		case http.StatusForbidden:
+			var (
+				body UnassignRoleToUserForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "unassign role to user", err)
+			}
+			err = ValidateUnassignRoleToUserForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "unassign role to user", err)
+			}
+			return nil, NewUnassignRoleToUserForbidden(&body)
+		case http.StatusUnauthorized:
+			var (
+				body UnassignRoleToUserUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("roles", "unassign role to user", err)
+			}
+			err = ValidateUnassignRoleToUserUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("roles", "unassign role to user", err)
+			}
+			return nil, NewUnassignRoleToUserUnauthorized(&body)
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("roles", "unassign role to user", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalRoleResponseToRolesRole builds a value of type *roles.Role from a
 // value of type *RoleResponse.
 func unmarshalRoleResponseToRolesRole(v *RoleResponse) *roles.Role {

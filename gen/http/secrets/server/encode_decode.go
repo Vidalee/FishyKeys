@@ -449,6 +449,29 @@ func marshalSecretsUserToUserResponse(v *secrets.User) *UserResponse {
 		CreatedAt: v.CreatedAt,
 		UpdatedAt: v.UpdatedAt,
 	}
+	if v.Roles != nil {
+		res.Roles = make([]*RoleResponse, len(v.Roles))
+		for i, val := range v.Roles {
+			res.Roles[i] = marshalSecretsRoleToRoleResponse(val)
+		}
+	} else {
+		res.Roles = []*RoleResponse{}
+	}
+
+	return res
+}
+
+// marshalSecretsRoleToRoleResponse builds a value of type *RoleResponse from a
+// value of type *secrets.Role.
+func marshalSecretsRoleToRoleResponse(v *secrets.Role) *RoleResponse {
+	res := &RoleResponse{
+		ID:        v.ID,
+		Name:      v.Name,
+		Color:     v.Color,
+		Admin:     v.Admin,
+		CreatedAt: v.CreatedAt,
+		UpdatedAt: v.UpdatedAt,
+	}
 
 	return res
 }
@@ -461,6 +484,14 @@ func marshalSecretsUserToUserResponseBody(v *secrets.User) *UserResponseBody {
 		Username:  v.Username,
 		CreatedAt: v.CreatedAt,
 		UpdatedAt: v.UpdatedAt,
+	}
+	if v.Roles != nil {
+		res.Roles = make([]*RoleResponseBody, len(v.Roles))
+		for i, val := range v.Roles {
+			res.Roles[i] = marshalSecretsRoleToRoleResponseBody(val)
+		}
+	} else {
+		res.Roles = []*RoleResponseBody{}
 	}
 
 	return res

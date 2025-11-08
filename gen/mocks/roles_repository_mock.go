@@ -110,6 +110,63 @@ func (_c *MockRolesRepository_CreateRole_Call) RunAndReturn(run func(ctx context
 	return _c
 }
 
+// DeleteRole provides a mock function for the type MockRolesRepository
+func (_mock *MockRolesRepository) DeleteRole(ctx context.Context, id int) error {
+	ret := _mock.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteRole")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int) error); ok {
+		r0 = returnFunc(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockRolesRepository_DeleteRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteRole'
+type MockRolesRepository_DeleteRole_Call struct {
+	*mock.Call
+}
+
+// DeleteRole is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id int
+func (_e *MockRolesRepository_Expecter) DeleteRole(ctx interface{}, id interface{}) *MockRolesRepository_DeleteRole_Call {
+	return &MockRolesRepository_DeleteRole_Call{Call: _e.mock.On("DeleteRole", ctx, id)}
+}
+
+func (_c *MockRolesRepository_DeleteRole_Call) Run(run func(ctx context.Context, id int)) *MockRolesRepository_DeleteRole_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 int
+		if args[1] != nil {
+			arg1 = args[1].(int)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockRolesRepository_DeleteRole_Call) Return(err error) *MockRolesRepository_DeleteRole_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockRolesRepository_DeleteRole_Call) RunAndReturn(run func(ctx context.Context, id int) error) *MockRolesRepository_DeleteRole_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetRoleByID provides a mock function for the type MockRolesRepository
 func (_mock *MockRolesRepository) GetRoleByID(ctx context.Context, id int) (*repository.Role, error) {
 	ret := _mock.Called(ctx, id)

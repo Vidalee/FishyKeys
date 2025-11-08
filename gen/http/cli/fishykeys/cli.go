@@ -26,7 +26,7 @@ import (
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
 	return `key-management (create-master-key|get-key-status|add-share|delete-share)
-roles list-roles
+roles (list-roles|create-role|delete-role|assign-role-to-user|unassign-role-to-user)
 secrets (list-secrets|get-secret-value|get-secret|create-secret)
 users (create-user|list-users|delete-user|auth-user|get-operator-token)
 `
@@ -76,6 +76,18 @@ func ParseEndpoint(
 
 		rolesListRolesFlags = flag.NewFlagSet("list-roles", flag.ExitOnError)
 
+		rolesCreateRoleFlags    = flag.NewFlagSet("create-role", flag.ExitOnError)
+		rolesCreateRoleBodyFlag = rolesCreateRoleFlags.String("body", "REQUIRED", "")
+
+		rolesDeleteRoleFlags  = flag.NewFlagSet("delete-role", flag.ExitOnError)
+		rolesDeleteRoleIDFlag = rolesDeleteRoleFlags.String("id", "REQUIRED", "ID of the role to delete")
+
+		rolesAssignRoleToUserFlags    = flag.NewFlagSet("assign-role-to-user", flag.ExitOnError)
+		rolesAssignRoleToUserBodyFlag = rolesAssignRoleToUserFlags.String("body", "REQUIRED", "")
+
+		rolesUnassignRoleToUserFlags    = flag.NewFlagSet("unassign-role-to-user", flag.ExitOnError)
+		rolesUnassignRoleToUserBodyFlag = rolesUnassignRoleToUserFlags.String("body", "REQUIRED", "")
+
 		secretsFlags = flag.NewFlagSet("secrets", flag.ContinueOnError)
 
 		secretsListSecretsFlags = flag.NewFlagSet("list-secrets", flag.ExitOnError)
@@ -112,6 +124,10 @@ func ParseEndpoint(
 
 	rolesFlags.Usage = rolesUsage
 	rolesListRolesFlags.Usage = rolesListRolesUsage
+	rolesCreateRoleFlags.Usage = rolesCreateRoleUsage
+	rolesDeleteRoleFlags.Usage = rolesDeleteRoleUsage
+	rolesAssignRoleToUserFlags.Usage = rolesAssignRoleToUserUsage
+	rolesUnassignRoleToUserFlags.Usage = rolesUnassignRoleToUserUsage
 
 	secretsFlags.Usage = secretsUsage
 	secretsListSecretsFlags.Usage = secretsListSecretsUsage
@@ -184,6 +200,18 @@ func ParseEndpoint(
 			switch epn {
 			case "list-roles":
 				epf = rolesListRolesFlags
+
+			case "create-role":
+				epf = rolesCreateRoleFlags
+
+			case "delete-role":
+				epf = rolesDeleteRoleFlags
+
+			case "assign-role-to-user":
+				epf = rolesAssignRoleToUserFlags
+
+			case "unassign-role-to-user":
+				epf = rolesUnassignRoleToUserFlags
 
 			}
 
@@ -262,6 +290,18 @@ func ParseEndpoint(
 			switch epn {
 			case "list-roles":
 				endpoint = c.ListRoles()
+			case "create-role":
+				endpoint = c.CreateRole()
+				data, err = rolesc.BuildCreateRolePayload(*rolesCreateRoleBodyFlag)
+			case "delete-role":
+				endpoint = c.DeleteRole()
+				data, err = rolesc.BuildDeleteRolePayload(*rolesDeleteRoleIDFlag)
+			case "assign-role-to-user":
+				endpoint = c.AssignRoleToUser()
+				data, err = rolesc.BuildAssignRoleToUserPayload(*rolesAssignRoleToUserBodyFlag)
+			case "unassign-role-to-user":
+				endpoint = c.UnassignRoleToUser()
+				data, err = rolesc.BuildUnassignRoleToUserPayload(*rolesUnassignRoleToUserBodyFlag)
 			}
 		case "secrets":
 			c := secretsc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -381,6 +421,10 @@ Usage:
 
 COMMAND:
     list-roles: List all roles
+    create-role: Create a new role
+    delete-role: Delete a role byd id
+    assign-role-to-user: Assign a role to a user
+    unassign-role-to-user: Unassign a role to a user
 
 Additional help:
     %[1]s roles COMMAND --help
@@ -393,6 +437,59 @@ List all roles
 
 Example:
     %[1]s roles list-roles
+`, os.Args[0])
+}
+
+func rolesCreateRoleUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] roles create-role -body JSON
+
+Create a new role
+    -body JSON: 
+
+Example:
+    %[1]s roles create-role --body '{
+      "color": "#33FF57",
+      "name": "team_sre"
+   }'
+`, os.Args[0])
+}
+
+func rolesDeleteRoleUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] roles delete-role -id INT
+
+Delete a role byd id
+    -id INT: ID of the role to delete
+
+Example:
+    %[1]s roles delete-role --id 2
+`, os.Args[0])
+}
+
+func rolesAssignRoleToUserUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] roles assign-role-to-user -body JSON
+
+Assign a role to a user
+    -body JSON: 
+
+Example:
+    %[1]s roles assign-role-to-user --body '{
+      "role_id": 1,
+      "user_id": 2
+   }'
+`, os.Args[0])
+}
+
+func rolesUnassignRoleToUserUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] roles unassign-role-to-user -body JSON
+
+Unassign a role to a user
+    -body JSON: 
+
+Example:
+    %[1]s roles unassign-role-to-user --body '{
+      "role_id": 1,
+      "user_id": 2
+   }'
 `, os.Args[0])
 }
 

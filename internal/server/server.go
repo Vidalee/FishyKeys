@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/base64"
 	gensecretspb "github.com/Vidalee/FishyKeys/gen/grpc/secrets/pb"
 	gensecretsserver "github.com/Vidalee/FishyKeys/gen/grpc/secrets/server"
 	keysvvr "github.com/Vidalee/FishyKeys/gen/http/key_management/server"
@@ -33,9 +34,9 @@ func NewServers(pool *pgxpool.Pool) (http.Handler, *grpc.Server) {
 	secretsAccessRepository := repository.NewSecretsAccessRepository(pool)
 
 	keyService := service.NewKeyManagementService(keyManager, globalSettingsRepo, usersRepo, rolesRepo, userRolesRepo, secretsRepo)
-	usersService := service.NewUsersService(keyManager, usersRepo, globalSettingsRepo, secretsRepo)
+	usersService := service.NewUsersService(keyManager, usersRepo, globalSettingsRepo, secretsRepo, rolesRepo, userRolesRepo)
 	secretsService := service.NewSecretsService(keyManager, usersRepo, rolesRepo, userRolesRepo, globalSettingsRepo, secretsRepo, secretsAccessRepository)
-	rolesService := service.NewRolesService(rolesRepo)
+	rolesService := service.NewRolesService(rolesRepo, usersRepo, userRolesRepo)
 
 	keyManagementEndpoints := keymanagement.NewEndpoints(keyService)
 	usersEndpoints := users.NewEndpoints(usersService, &ServerUsersInterceptors{
@@ -43,7 +44,10 @@ func NewServers(pool *pgxpool.Pool) (http.Handler, *grpc.Server) {
 		rolesRepository:     rolesRepo,
 	})
 	secretsEndpoints := secrets.NewEndpoints(secretsService, &ServerSecretsInterceptors{})
-	rolesEndpoints := roles.NewEndpoints(rolesService, &ServerRolesInterceptors{})
+	rolesEndpoints := roles.NewEndpoints(rolesService, &ServerRolesInterceptors{
+		userRolesRepository: userRolesRepo,
+		rolesRepository:     rolesRepo,
+	})
 
 	mux := goahttp.NewMuxer()
 	requestDecoder := goahttp.RequestDecoder

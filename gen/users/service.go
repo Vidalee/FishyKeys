@@ -93,6 +93,21 @@ type GetOperatorTokenResult struct {
 	Token *string
 }
 
+type Role struct {
+	// Unique identifier for the role
+	ID int
+	// Name of the role
+	Name string
+	// Color associated with the role
+	Color string
+	// Is this role an admin role?
+	Admin bool
+	// Role creation timestamp
+	CreatedAt string
+	// Role last update timestamp
+	UpdatedAt string
+}
+
 type User struct {
 	// Unique identifier for the user
 	ID int
@@ -102,6 +117,8 @@ type User struct {
 	CreatedAt string
 	// User last update timestamp
 	UpdatedAt string
+	// Roles assigned to the user
+	Roles []*Role
 }
 
 // MakeUsernameTaken builds a goa.ServiceError from an error.

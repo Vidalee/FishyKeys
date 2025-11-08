@@ -6,3 +6,96 @@
 // $ goa gen github.com/Vidalee/FishyKeys/design
 
 package client
+
+import (
+	"encoding/json"
+	"fmt"
+	"strconv"
+	"unicode/utf8"
+
+	roles "github.com/Vidalee/FishyKeys/gen/roles"
+	goa "goa.design/goa/v3/pkg"
+)
+
+// BuildCreateRolePayload builds the payload for the roles create role endpoint
+// from CLI flags.
+func BuildCreateRolePayload(rolesCreateRoleBody string) (*roles.CreateRolePayload, error) {
+	var err error
+	var body CreateRoleRequestBody
+	{
+		err = json.Unmarshal([]byte(rolesCreateRoleBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"color\": \"#33FF57\",\n      \"name\": \"team_sre\"\n   }'")
+		}
+		if utf8.RuneCountInString(body.Name) < 1 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 1, true))
+		}
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.color", body.Color, "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"))
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &roles.CreateRolePayload{
+		Name:  body.Name,
+		Color: body.Color,
+	}
+
+	return v, nil
+}
+
+// BuildDeleteRolePayload builds the payload for the roles delete role endpoint
+// from CLI flags.
+func BuildDeleteRolePayload(rolesDeleteRoleID string) (*roles.DeleteRolePayload, error) {
+	var err error
+	var id int
+	{
+		var v int64
+		v, err = strconv.ParseInt(rolesDeleteRoleID, 10, strconv.IntSize)
+		id = int(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for id, must be INT")
+		}
+	}
+	v := &roles.DeleteRolePayload{}
+	v.ID = id
+
+	return v, nil
+}
+
+// BuildAssignRoleToUserPayload builds the payload for the roles assign role to
+// user endpoint from CLI flags.
+func BuildAssignRoleToUserPayload(rolesAssignRoleToUserBody string) (*roles.AssignRoleToUserPayload, error) {
+	var err error
+	var body AssignRoleToUserRequestBody
+	{
+		err = json.Unmarshal([]byte(rolesAssignRoleToUserBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"role_id\": 1,\n      \"user_id\": 2\n   }'")
+		}
+	}
+	v := &roles.AssignRoleToUserPayload{
+		UserID: body.UserID,
+		RoleID: body.RoleID,
+	}
+
+	return v, nil
+}
+
+// BuildUnassignRoleToUserPayload builds the payload for the roles unassign
+// role to user endpoint from CLI flags.
+func BuildUnassignRoleToUserPayload(rolesUnassignRoleToUserBody string) (*roles.UnassignRoleToUserPayload, error) {
+	var err error
+	var body UnassignRoleToUserRequestBody
+	{
+		err = json.Unmarshal([]byte(rolesUnassignRoleToUserBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"role_id\": 1,\n      \"user_id\": 2\n   }'")
+		}
+	}
+	v := &roles.UnassignRoleToUserPayload{
+		UserID: body.UserID,
+		RoleID: body.RoleID,
+	}
+
+	return v, nil
+}

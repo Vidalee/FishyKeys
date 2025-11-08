@@ -15,21 +15,37 @@ import (
 
 // Endpoints wraps the "roles" service endpoints.
 type Endpoints struct {
-	ListRoles goa.Endpoint
+	ListRoles          goa.Endpoint
+	CreateRole         goa.Endpoint
+	DeleteRole         goa.Endpoint
+	AssignRoleToUser   goa.Endpoint
+	UnassignRoleToUser goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "roles" service with endpoints.
 func NewEndpoints(s Service, si ServerInterceptors) *Endpoints {
 	endpoints := &Endpoints{
-		ListRoles: NewListRolesEndpoint(s),
+		ListRoles:          NewListRolesEndpoint(s),
+		CreateRole:         NewCreateRoleEndpoint(s),
+		DeleteRole:         NewDeleteRoleEndpoint(s),
+		AssignRoleToUser:   NewAssignRoleToUserEndpoint(s),
+		UnassignRoleToUser: NewUnassignRoleToUserEndpoint(s),
 	}
 	endpoints.ListRoles = WrapListRolesEndpoint(endpoints.ListRoles, si)
+	endpoints.CreateRole = WrapCreateRoleEndpoint(endpoints.CreateRole, si)
+	endpoints.DeleteRole = WrapDeleteRoleEndpoint(endpoints.DeleteRole, si)
+	endpoints.AssignRoleToUser = WrapAssignRoleToUserEndpoint(endpoints.AssignRoleToUser, si)
+	endpoints.UnassignRoleToUser = WrapUnassignRoleToUserEndpoint(endpoints.UnassignRoleToUser, si)
 	return endpoints
 }
 
 // Use applies the given middleware to all the "roles" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.ListRoles = m(e.ListRoles)
+	e.CreateRole = m(e.CreateRole)
+	e.DeleteRole = m(e.DeleteRole)
+	e.AssignRoleToUser = m(e.AssignRoleToUser)
+	e.UnassignRoleToUser = m(e.UnassignRoleToUser)
 }
 
 // NewListRolesEndpoint returns an endpoint function that calls the method
@@ -37,5 +53,41 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 func NewListRolesEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		return s.ListRoles(ctx)
+	}
+}
+
+// NewCreateRoleEndpoint returns an endpoint function that calls the method
+// "create role" of service "roles".
+func NewCreateRoleEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*CreateRolePayload)
+		return s.CreateRole(ctx, p)
+	}
+}
+
+// NewDeleteRoleEndpoint returns an endpoint function that calls the method
+// "delete role" of service "roles".
+func NewDeleteRoleEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*DeleteRolePayload)
+		return nil, s.DeleteRole(ctx, p)
+	}
+}
+
+// NewAssignRoleToUserEndpoint returns an endpoint function that calls the
+// method "assign role to user" of service "roles".
+func NewAssignRoleToUserEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*AssignRoleToUserPayload)
+		return nil, s.AssignRoleToUser(ctx, p)
+	}
+}
+
+// NewUnassignRoleToUserEndpoint returns an endpoint function that calls the
+// method "unassign role to user" of service "roles".
+func NewUnassignRoleToUserEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*UnassignRoleToUserPayload)
+		return nil, s.UnassignRoleToUser(ctx, p)
 	}
 }

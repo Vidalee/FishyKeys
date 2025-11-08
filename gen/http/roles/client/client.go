@@ -21,6 +21,22 @@ type Client struct {
 	// endpoint.
 	ListRolesDoer goahttp.Doer
 
+	// CreateRole Doer is the HTTP client used to make requests to the create role
+	// endpoint.
+	CreateRoleDoer goahttp.Doer
+
+	// DeleteRole Doer is the HTTP client used to make requests to the delete role
+	// endpoint.
+	DeleteRoleDoer goahttp.Doer
+
+	// AssignRoleToUser Doer is the HTTP client used to make requests to the assign
+	// role to user endpoint.
+	AssignRoleToUserDoer goahttp.Doer
+
+	// UnassignRoleToUser Doer is the HTTP client used to make requests to the
+	// unassign role to user endpoint.
+	UnassignRoleToUserDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -44,13 +60,17 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		ListRolesDoer:       doer,
-		CORSDoer:            doer,
-		RestoreResponseBody: restoreBody,
-		scheme:              scheme,
-		host:                host,
-		decoder:             dec,
-		encoder:             enc,
+		ListRolesDoer:          doer,
+		CreateRoleDoer:         doer,
+		DeleteRoleDoer:         doer,
+		AssignRoleToUserDoer:   doer,
+		UnassignRoleToUserDoer: doer,
+		CORSDoer:               doer,
+		RestoreResponseBody:    restoreBody,
+		scheme:                 scheme,
+		host:                   host,
+		decoder:                dec,
+		encoder:                enc,
 	}
 }
 
@@ -68,6 +88,97 @@ func (c *Client) ListRoles() goa.Endpoint {
 		resp, err := c.ListRolesDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("roles", "list roles", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// CreateRole returns an endpoint that makes HTTP requests to the roles service
+// create role server.
+func (c *Client) CreateRole() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeCreateRoleRequest(c.encoder)
+		decodeResponse = DecodeCreateRoleResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildCreateRoleRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.CreateRoleDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("roles", "create role", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// DeleteRole returns an endpoint that makes HTTP requests to the roles service
+// delete role server.
+func (c *Client) DeleteRole() goa.Endpoint {
+	var (
+		decodeResponse = DecodeDeleteRoleResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildDeleteRoleRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DeleteRoleDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("roles", "delete role", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// AssignRoleToUser returns an endpoint that makes HTTP requests to the roles
+// service assign role to user server.
+func (c *Client) AssignRoleToUser() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeAssignRoleToUserRequest(c.encoder)
+		decodeResponse = DecodeAssignRoleToUserResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildAssignRoleToUserRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AssignRoleToUserDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("roles", "assign role to user", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// UnassignRoleToUser returns an endpoint that makes HTTP requests to the roles
+// service unassign role to user server.
+func (c *Client) UnassignRoleToUser() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeUnassignRoleToUserRequest(c.encoder)
+		decodeResponse = DecodeUnassignRoleToUserResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildUnassignRoleToUserRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.UnassignRoleToUserDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("roles", "unassign role to user", err)
 		}
 		return decodeResponse(resp)
 	}
