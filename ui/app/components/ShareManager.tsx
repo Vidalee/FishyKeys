@@ -1,9 +1,9 @@
 'use client'
 
 import {useEffect, useState} from 'react'
-import {KeyStatus, Share} from '../types'
-import {addShare, deleteShare} from '../api/keyManagement'
+import {addShare, deleteShare, KeyStatus} from '../api/keyManagement'
 import styles from './ShareManager.module.css'
+import {Share} from '../types'
 
 interface ShareManagerProps {
   keyStatus: KeyStatus

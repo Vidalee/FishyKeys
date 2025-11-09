@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {createSecret} from '../api/secrets';
-import {SecretOwner} from '../types';
+import {createSecret, SecretOwner} from '../api/secrets';
 import {listRoles, Role} from '../api/roles';
 
 interface CreateSecretModalProps {

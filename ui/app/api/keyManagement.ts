@@ -1,7 +1,17 @@
-import {KeyStatus, ShareResponse} from '../types'
+export interface KeyStatus {
+    is_locked: boolean
+    current_shares: number
+    min_shares: number
+    total_shares: number
+}
+
+
+export interface ShareResponse {
+    index: number
+    unlocked: boolean
+}
 
 const API_BASE = "/key_management"
-
 
 export async function getKeyStatus(): Promise<KeyStatus> {
   const response = await fetch(`${API_BASE}/status`);

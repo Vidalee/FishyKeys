@@ -1,4 +1,18 @@
-import {SecretInfoSummary, SecretOwner} from "../types";
+export interface SecretOwner {
+    id: number;
+    username: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface SecretInfoSummary {
+    path: string;
+    owner: SecretOwner;
+    created_at: string;
+    updated_at: string;
+    roles?: { id: number; name: string; color: string }[];
+    users?: { id: number; username: string }[];
+}
 
 const API_BASE = "/secrets"
 

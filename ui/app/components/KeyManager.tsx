@@ -1,11 +1,10 @@
 'use client'
 
 import {useEffect, useState} from 'react'
-import {KeyStatus} from '../types'
 import ShareManager from './ShareManager'
 import LoginScreen from './LoginScreen'
 import CreateMasterKey from './CreateMasterKey'
-import {getKeyStatus} from '../api/keyManagement'
+import {getKeyStatus, KeyStatus} from '../api/keyManagement'
 import styles from './KeyManager.module.css'
 
 export default function KeyManager() {

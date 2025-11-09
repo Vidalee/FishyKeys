@@ -1,8 +1,8 @@
 'use client'
 
 import React, {useEffect, useState} from 'react';
-import {getSecret, listSecrets} from '../api/secrets';
-import {FolderNode, SecretInfoSummary} from '../types';
+import {getSecret, listSecrets, SecretInfoSummary} from '../api/secrets';
+import {FolderNode} from '../types';
 import CreateSecretModal from './CreateSecretModal';
 import ManageRolesModal from './ManageRolesModal';
 import ManageUsersModal from './ManageUsersModal';
@@ -61,11 +61,94 @@ function FolderView({node, onSelectSecret}: { node: FolderNode; onSelectSecret: 
                     }}
                     onClick={() => onSelectSecret(secret)}
                 >
-                    <span style={{flex: 1, fontWeight: 500}}>{secret.path.split('/').pop()}</span>
+                    <span style={{fontWeight: 500, minWidth: 120}}>{secret.path.split('/').pop()}</span>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        flexWrap: 'wrap',
+                        flex: 1,
+                        marginLeft: 8
+                    }}>
+                        {secret.owner && (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 4,
+                                    padding: '2px 6px',
+                                    borderRadius: 4,
+                                    background: '#fef3c7',
+                                    border: '1px solid #fbbf24',
+                                    fontSize: 11,
+                                }}
+                                title={`Owner: ${secret.owner.username}`}
+                            >
+                                <span style={{color: '#92400e', fontSize: 10}}>👑</span>
+                                <span style={{fontWeight: 600, color: '#78350f'}}>{secret.owner.username}</span>
+                            </div>
+                        )}
+                        {secret.roles && secret.roles.length > 0 && (
+                            <>
+                                {secret.roles.map(role => (
+                                    <div
+                                        key={role.id}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 4,
+                                            padding: '2px 6px',
+                                            borderRadius: 4,
+                                            background: '#f9fafb',
+                                            border: '1px solid #e5e7eb',
+                                            fontSize: 11,
+                                        }}
+                                        title={`Role: ${role.name}`}
+                                    >
+                                        <div
+                                            style={{
+                                                width: 10,
+                                                height: 10,
+                                                borderRadius: 2,
+                                                background: role.color,
+                                                border: '1px solid #ccc',
+                                                flexShrink: 0
+                                            }}
+                                        />
+                                        <span style={{fontWeight: 500, color: '#374151'}}>{role.name}</span>
+                                    </div>
+                                ))}
+                            </>
+                        )}
+                        {secret.users && secret.users.length > 0 && (
+                            <>
+                                {secret.users.map(user => (
+                                    <div
+                                        key={user.id}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 4,
+                                            padding: '2px 6px',
+                                            borderRadius: 4,
+                                            background: '#f0f9ff',
+                                            border: '1px solid #bae6fd',
+                                            fontSize: 11,
+                                        }}
+                                        title={`User: ${user.username}`}
+                                    >
+                                        <span style={{color: '#0369a1', fontSize: 10}}>👤</span>
+                                        <span style={{fontWeight: 500, color: '#0c4a6e'}}>{user.username}</span>
+                                    </div>
+                                ))}
+                            </>
+                        )}
+                    </div>
                     <span style={{
                         color: '#888',
                         fontSize: 12,
-                        marginLeft: 8
+                        marginLeft: 8,
+                        whiteSpace: 'nowrap'
                     }}>Last updated: {new Date(secret.updated_at).toLocaleString()}</span>
                 </div>
             ))}
