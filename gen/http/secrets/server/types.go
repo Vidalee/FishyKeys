@@ -377,6 +377,10 @@ type SecretInfoSummaryResponse struct {
 	CreatedAt string `form:"created_at" json:"created_at" xml:"created_at"`
 	// Last update timestamp of the secret
 	UpdatedAt string `form:"updated_at" json:"updated_at" xml:"updated_at"`
+	// Users authorized to access the secret
+	Users []*UserResponse `form:"users" json:"users" xml:"users"`
+	// Roles authorized to access the secret
+	Roles []*RoleResponse `form:"roles" json:"roles" xml:"roles"`
 }
 
 // UserResponse is used to define fields on response body types.

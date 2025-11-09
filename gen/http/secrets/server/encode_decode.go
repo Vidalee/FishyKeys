@@ -436,6 +436,22 @@ func marshalSecretsSecretInfoSummaryToSecretInfoSummaryResponse(v *secrets.Secre
 	if v.Owner != nil {
 		res.Owner = marshalSecretsUserToUserResponse(v.Owner)
 	}
+	if v.Users != nil {
+		res.Users = make([]*UserResponse, len(v.Users))
+		for i, val := range v.Users {
+			res.Users[i] = marshalSecretsUserToUserResponse(val)
+		}
+	} else {
+		res.Users = []*UserResponse{}
+	}
+	if v.Roles != nil {
+		res.Roles = make([]*RoleResponse, len(v.Roles))
+		for i, val := range v.Roles {
+			res.Roles[i] = marshalSecretsRoleToRoleResponse(val)
+		}
+	} else {
+		res.Roles = []*RoleResponse{}
+	}
 
 	return res
 }

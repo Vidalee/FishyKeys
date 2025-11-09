@@ -377,6 +377,10 @@ type SecretInfoSummaryResponse struct {
 	CreatedAt *string `form:"created_at,omitempty" json:"created_at,omitempty" xml:"created_at,omitempty"`
 	// Last update timestamp of the secret
 	UpdatedAt *string `form:"updated_at,omitempty" json:"updated_at,omitempty" xml:"updated_at,omitempty"`
+	// Users authorized to access the secret
+	Users []*UserResponse `form:"users,omitempty" json:"users,omitempty" xml:"users,omitempty"`
+	// Roles authorized to access the secret
+	Roles []*RoleResponse `form:"roles,omitempty" json:"roles,omitempty" xml:"roles,omitempty"`
 }
 
 // UserResponse is used to define fields on response body types.
@@ -1229,9 +1233,29 @@ func ValidateSecretInfoSummaryResponse(body *SecretInfoSummaryResponse) (err err
 	if body.UpdatedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("updated_at", "body"))
 	}
+	if body.Users == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("users", "body"))
+	}
+	if body.Roles == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("roles", "body"))
+	}
 	if body.Owner != nil {
 		if err2 := ValidateUserResponse(body.Owner); err2 != nil {
 			err = goa.MergeErrors(err, err2)
+		}
+	}
+	for _, e := range body.Users {
+		if e != nil {
+			if err2 := ValidateUserResponse(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	for _, e := range body.Roles {
+		if e != nil {
+			if err2 := ValidateRoleResponse(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
 	return

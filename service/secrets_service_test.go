@@ -393,6 +393,7 @@ func TestSecretsService_ListSecrets(t *testing.T) {
 		paths := make([]string, 0, len(secrets))
 		for _, s := range secrets {
 			paths = append(paths, s.Path)
+			assert.Equal(t, s.Owner.ID, userID1)
 		}
 		assert.ElementsMatch(t, []string{"/owned/secret", "/user/secret", "/role/secret"}, paths)
 	})
@@ -405,6 +406,9 @@ func TestSecretsService_ListSecrets(t *testing.T) {
 		paths := make([]string, 0, len(secrets))
 		for _, s := range secrets {
 			paths = append(paths, s.Path)
+			assert.Equal(t, s.Owner.ID, userID1)
+			assert.ElementsMatch(t, usersToIds(s.Users), []int{userID2})
+			assert.ElementsMatch(t, rolesToIds(s.Roles), []string{})
 		}
 		assert.ElementsMatch(t, []string{"/user/secret"}, paths)
 	})
@@ -417,6 +421,9 @@ func TestSecretsService_ListSecrets(t *testing.T) {
 		paths := make([]string, 0, len(secrets))
 		for _, s := range secrets {
 			paths = append(paths, s.Path)
+			assert.Equal(t, s.Owner.ID, userID1)
+			assert.ElementsMatch(t, usersToIds(s.Users), []int{})
+			assert.ElementsMatch(t, rolesToIds(s.Roles), []int{roleID1})
 		}
 		assert.ElementsMatch(t, []string{"/role/secret"}, paths)
 	})
@@ -428,4 +435,20 @@ func TestSecretsService_ListSecrets(t *testing.T) {
 		assert.NotNil(t, secrets)
 		assert.Empty(t, secrets)
 	})
+}
+
+func usersToIds(users []*gensecrets.User) []int {
+	ids := make([]int, 0, len(users))
+	for _, u := range users {
+		ids = append(ids, u.ID)
+	}
+	return ids
+}
+
+func rolesToIds(roles []*gensecrets.Role) []int {
+	ids := make([]int, 0, len(roles))
+	for _, r := range roles {
+		ids = append(ids, r.ID)
+	}
+	return ids
 }

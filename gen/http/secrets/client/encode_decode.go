@@ -537,6 +537,14 @@ func unmarshalSecretInfoSummaryResponseToSecretsSecretInfoSummary(v *SecretInfoS
 		UpdatedAt: *v.UpdatedAt,
 	}
 	res.Owner = unmarshalUserResponseToSecretsUser(v.Owner)
+	res.Users = make([]*secrets.User, len(v.Users))
+	for i, val := range v.Users {
+		res.Users[i] = unmarshalUserResponseToSecretsUser(val)
+	}
+	res.Roles = make([]*secrets.Role, len(v.Roles))
+	for i, val := range v.Roles {
+		res.Roles[i] = unmarshalRoleResponseToSecretsRole(val)
+	}
 
 	return res
 }

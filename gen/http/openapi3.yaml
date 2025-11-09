@@ -119,7 +119,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/AddShareResponseBody'
                             example:
-                              index: 292269787529135470
+                              index: 4413501202617169754
                               unlocked: true
                 "400":
                     description: 'wrong_shares: The key recombined from the shares is not the correct key'
@@ -160,10 +160,10 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/GetKeyStatusResponseBody'
                             example:
-                              current_shares: 5117056083765439164
+                              current_shares: 3571465081279942681
                               is_locked: false
-                              min_shares: 908568140735950639
-                              total_shares: 3571465081279942681
+                              min_shares: 6887987368142988941
+                              total_shares: 2167945761760457450
                 "404":
                     description: 'no_key_set: No master key has been set'
                     content:
@@ -193,32 +193,38 @@ paths:
                   items:
                     $ref: '#/components/schemas/Role'
                   example:
-                    - admin: true
+                    - admin: false
                       color: '#FF5733'
                       created_at: "2025-06-30T12:00:00Z"
                       id: 1
                       name: admin
                       updated_at: "2025-06-30T15:00:00Z"
-                    - admin: true
+                    - admin: false
                       color: '#FF5733'
                       created_at: "2025-06-30T12:00:00Z"
                       id: 1
                       name: admin
                       updated_at: "2025-06-30T15:00:00Z"
-                    - admin: true
+                    - admin: false
+                      color: '#FF5733'
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
+                      name: admin
+                      updated_at: "2025-06-30T15:00:00Z"
+                    - admin: false
                       color: '#FF5733'
                       created_at: "2025-06-30T12:00:00Z"
                       id: 1
                       name: admin
                       updated_at: "2025-06-30T15:00:00Z"
                 example:
-                  - admin: true
+                  - admin: false
                     color: '#FF5733'
                     created_at: "2025-06-30T12:00:00Z"
                     id: 1
                     name: admin
                     updated_at: "2025-06-30T15:00:00Z"
-                  - admin: true
+                  - admin: false
                     color: '#FF5733'
                     created_at: "2025-06-30T12:00:00Z"
                     id: 1
@@ -464,13 +470,25 @@ paths:
                         created_at: "2025-06-30T12:00:00Z"
                         id: 1
                         roles:
-                          - admin: true
+                          - admin: false
                             color: '#FF5733'
                             created_at: "2025-06-30T12:00:00Z"
                             id: 1
                             name: admin
                             updated_at: "2025-06-30T15:00:00Z"
-                          - admin: true
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
                             color: '#FF5733'
                             created_at: "2025-06-30T12:00:00Z"
                             id: 1
@@ -479,19 +497,161 @@ paths:
                         updated_at: "2025-06-30T15:00:00Z"
                         username: alice
                       path: customers/google/api_key
+                      roles:
+                        - admin: false
+                          color: '#FF5733'
+                          created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          name: admin
+                          updated_at: "2025-06-30T15:00:00Z"
+                        - admin: false
+                          color: '#FF5733'
+                          created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          name: admin
+                          updated_at: "2025-06-30T15:00:00Z"
                       updated_at: "2025-06-30T15:00:00Z"
+                      users:
+                        - created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          roles:
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                          updated_at: "2025-06-30T15:00:00Z"
+                          username: alice
+                        - created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          roles:
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                          updated_at: "2025-06-30T15:00:00Z"
+                          username: alice
+                        - created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          roles:
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                          updated_at: "2025-06-30T15:00:00Z"
+                          username: alice
+                        - created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          roles:
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                          updated_at: "2025-06-30T15:00:00Z"
+                          username: alice
                     - created_at: "2025-06-30T12:00:00Z"
                       owner:
                         created_at: "2025-06-30T12:00:00Z"
                         id: 1
                         roles:
-                          - admin: true
+                          - admin: false
                             color: '#FF5733'
                             created_at: "2025-06-30T12:00:00Z"
                             id: 1
                             name: admin
                             updated_at: "2025-06-30T15:00:00Z"
-                          - admin: true
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
                             color: '#FF5733'
                             created_at: "2025-06-30T12:00:00Z"
                             id: 1
@@ -500,40 +660,161 @@ paths:
                         updated_at: "2025-06-30T15:00:00Z"
                         username: alice
                       path: customers/google/api_key
+                      roles:
+                        - admin: false
+                          color: '#FF5733'
+                          created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          name: admin
+                          updated_at: "2025-06-30T15:00:00Z"
+                        - admin: false
+                          color: '#FF5733'
+                          created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          name: admin
+                          updated_at: "2025-06-30T15:00:00Z"
                       updated_at: "2025-06-30T15:00:00Z"
+                      users:
+                        - created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          roles:
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                          updated_at: "2025-06-30T15:00:00Z"
+                          username: alice
+                        - created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          roles:
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                          updated_at: "2025-06-30T15:00:00Z"
+                          username: alice
+                        - created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          roles:
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                          updated_at: "2025-06-30T15:00:00Z"
+                          username: alice
+                        - created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          roles:
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                          updated_at: "2025-06-30T15:00:00Z"
+                          username: alice
                     - created_at: "2025-06-30T12:00:00Z"
                       owner:
                         created_at: "2025-06-30T12:00:00Z"
                         id: 1
                         roles:
-                          - admin: true
+                          - admin: false
                             color: '#FF5733'
                             created_at: "2025-06-30T12:00:00Z"
                             id: 1
                             name: admin
                             updated_at: "2025-06-30T15:00:00Z"
-                          - admin: true
+                          - admin: false
                             color: '#FF5733'
                             created_at: "2025-06-30T12:00:00Z"
                             id: 1
                             name: admin
                             updated_at: "2025-06-30T15:00:00Z"
-                        updated_at: "2025-06-30T15:00:00Z"
-                        username: alice
-                      path: customers/google/api_key
-                      updated_at: "2025-06-30T15:00:00Z"
-                    - created_at: "2025-06-30T12:00:00Z"
-                      owner:
-                        created_at: "2025-06-30T12:00:00Z"
-                        id: 1
-                        roles:
-                          - admin: true
+                          - admin: false
                             color: '#FF5733'
                             created_at: "2025-06-30T12:00:00Z"
                             id: 1
                             name: admin
                             updated_at: "2025-06-30T15:00:00Z"
-                          - admin: true
+                          - admin: false
                             color: '#FF5733'
                             created_at: "2025-06-30T12:00:00Z"
                             id: 1
@@ -542,20 +823,162 @@ paths:
                         updated_at: "2025-06-30T15:00:00Z"
                         username: alice
                       path: customers/google/api_key
+                      roles:
+                        - admin: false
+                          color: '#FF5733'
+                          created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          name: admin
+                          updated_at: "2025-06-30T15:00:00Z"
+                        - admin: false
+                          color: '#FF5733'
+                          created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          name: admin
+                          updated_at: "2025-06-30T15:00:00Z"
                       updated_at: "2025-06-30T15:00:00Z"
+                      users:
+                        - created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          roles:
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                          updated_at: "2025-06-30T15:00:00Z"
+                          username: alice
+                        - created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          roles:
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                          updated_at: "2025-06-30T15:00:00Z"
+                          username: alice
+                        - created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          roles:
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                          updated_at: "2025-06-30T15:00:00Z"
+                          username: alice
+                        - created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          roles:
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                            - admin: false
+                              color: '#FF5733'
+                              created_at: "2025-06-30T12:00:00Z"
+                              id: 1
+                              name: admin
+                              updated_at: "2025-06-30T15:00:00Z"
+                          updated_at: "2025-06-30T15:00:00Z"
+                          username: alice
                 example:
                   - created_at: "2025-06-30T12:00:00Z"
                     owner:
                       created_at: "2025-06-30T12:00:00Z"
                       id: 1
                       roles:
-                        - admin: true
+                        - admin: false
                           color: '#FF5733'
                           created_at: "2025-06-30T12:00:00Z"
                           id: 1
                           name: admin
                           updated_at: "2025-06-30T15:00:00Z"
-                        - admin: true
+                        - admin: false
+                          color: '#FF5733'
+                          created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          name: admin
+                          updated_at: "2025-06-30T15:00:00Z"
+                        - admin: false
+                          color: '#FF5733'
+                          created_at: "2025-06-30T12:00:00Z"
+                          id: 1
+                          name: admin
+                          updated_at: "2025-06-30T15:00:00Z"
+                        - admin: false
                           color: '#FF5733'
                           created_at: "2025-06-30T12:00:00Z"
                           id: 1
@@ -564,40 +987,161 @@ paths:
                       updated_at: "2025-06-30T15:00:00Z"
                       username: alice
                     path: customers/google/api_key
+                    roles:
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
                     updated_at: "2025-06-30T15:00:00Z"
+                    users:
+                      - created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        roles:
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                        updated_at: "2025-06-30T15:00:00Z"
+                        username: alice
+                      - created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        roles:
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                        updated_at: "2025-06-30T15:00:00Z"
+                        username: alice
+                      - created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        roles:
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                        updated_at: "2025-06-30T15:00:00Z"
+                        username: alice
+                      - created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        roles:
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                        updated_at: "2025-06-30T15:00:00Z"
+                        username: alice
                   - created_at: "2025-06-30T12:00:00Z"
                     owner:
                       created_at: "2025-06-30T12:00:00Z"
                       id: 1
                       roles:
-                        - admin: true
+                        - admin: false
                           color: '#FF5733'
                           created_at: "2025-06-30T12:00:00Z"
                           id: 1
                           name: admin
                           updated_at: "2025-06-30T15:00:00Z"
-                        - admin: true
+                        - admin: false
                           color: '#FF5733'
                           created_at: "2025-06-30T12:00:00Z"
                           id: 1
                           name: admin
                           updated_at: "2025-06-30T15:00:00Z"
-                      updated_at: "2025-06-30T15:00:00Z"
-                      username: alice
-                    path: customers/google/api_key
-                    updated_at: "2025-06-30T15:00:00Z"
-                  - created_at: "2025-06-30T12:00:00Z"
-                    owner:
-                      created_at: "2025-06-30T12:00:00Z"
-                      id: 1
-                      roles:
-                        - admin: true
+                        - admin: false
                           color: '#FF5733'
                           created_at: "2025-06-30T12:00:00Z"
                           id: 1
                           name: admin
                           updated_at: "2025-06-30T15:00:00Z"
-                        - admin: true
+                        - admin: false
                           color: '#FF5733'
                           created_at: "2025-06-30T12:00:00Z"
                           id: 1
@@ -606,7 +1150,137 @@ paths:
                       updated_at: "2025-06-30T15:00:00Z"
                       username: alice
                     path: customers/google/api_key
+                    roles:
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
                     updated_at: "2025-06-30T15:00:00Z"
+                    users:
+                      - created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        roles:
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                        updated_at: "2025-06-30T15:00:00Z"
+                        username: alice
+                      - created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        roles:
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                        updated_at: "2025-06-30T15:00:00Z"
+                        username: alice
+                      - created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        roles:
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                        updated_at: "2025-06-30T15:00:00Z"
+                        username: alice
+                      - created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        roles:
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                          - admin: false
+                            color: '#FF5733'
+                            created_at: "2025-06-30T12:00:00Z"
+                            id: 1
+                            name: admin
+                            updated_at: "2025-06-30T15:00:00Z"
+                        updated_at: "2025-06-30T15:00:00Z"
+                        username: alice
           "401":
             description: 'unauthorized: Unauthorized access'
             content:
@@ -701,13 +1375,25 @@ paths:
                                 $ref: '#/components/schemas/SecretInfo'
                             example:
                               authorized_roles:
-                                - admin: false
+                                - admin: true
                                   color: '#FF5733'
                                   created_at: "2025-06-30T12:00:00Z"
                                   id: 1
                                   name: admin
                                   updated_at: "2025-06-30T15:00:00Z"
-                                - admin: false
+                                - admin: true
+                                  color: '#FF5733'
+                                  created_at: "2025-06-30T12:00:00Z"
+                                  id: 1
+                                  name: admin
+                                  updated_at: "2025-06-30T15:00:00Z"
+                                - admin: true
+                                  color: '#FF5733'
+                                  created_at: "2025-06-30T12:00:00Z"
+                                  id: 1
+                                  name: admin
+                                  updated_at: "2025-06-30T15:00:00Z"
+                                - admin: true
                                   color: '#FF5733'
                                   created_at: "2025-06-30T12:00:00Z"
                                   id: 1
@@ -717,25 +1403,25 @@ paths:
                                 - created_at: "2025-06-30T12:00:00Z"
                                   id: 1
                                   roles:
-                                    - admin: false
+                                    - admin: true
                                       color: '#FF5733'
                                       created_at: "2025-06-30T12:00:00Z"
                                       id: 1
                                       name: admin
                                       updated_at: "2025-06-30T15:00:00Z"
-                                    - admin: false
+                                    - admin: true
                                       color: '#FF5733'
                                       created_at: "2025-06-30T12:00:00Z"
                                       id: 1
                                       name: admin
                                       updated_at: "2025-06-30T15:00:00Z"
-                                    - admin: false
+                                    - admin: true
                                       color: '#FF5733'
                                       created_at: "2025-06-30T12:00:00Z"
                                       id: 1
                                       name: admin
                                       updated_at: "2025-06-30T15:00:00Z"
-                                    - admin: false
+                                    - admin: true
                                       color: '#FF5733'
                                       created_at: "2025-06-30T12:00:00Z"
                                       id: 1
@@ -746,25 +1432,25 @@ paths:
                                     - created_at: "2025-06-30T12:00:00Z"
                                       id: 1
                                       roles:
-                                        - admin: false
+                                        - admin: true
                                           color: '#FF5733'
                                           created_at: "2025-06-30T12:00:00Z"
                                           id: 1
                                           name: admin
                                           updated_at: "2025-06-30T15:00:00Z"
-                                        - admin: false
+                                        - admin: true
                                           color: '#FF5733'
                                           created_at: "2025-06-30T12:00:00Z"
                                           id: 1
                                           name: admin
                                           updated_at: "2025-06-30T15:00:00Z"
-                                        - admin: false
+                                        - admin: true
                                           color: '#FF5733'
                                           created_at: "2025-06-30T12:00:00Z"
                                           id: 1
                                           name: admin
                                           updated_at: "2025-06-30T15:00:00Z"
-                                        - admin: false
+                                        - admin: true
                                           color: '#FF5733'
                                           created_at: "2025-06-30T12:00:00Z"
                                           id: 1
@@ -775,25 +1461,54 @@ paths:
                                     - created_at: "2025-06-30T12:00:00Z"
                                       id: 1
                                       roles:
-                                        - admin: false
+                                        - admin: true
                                           color: '#FF5733'
                                           created_at: "2025-06-30T12:00:00Z"
                                           id: 1
                                           name: admin
                                           updated_at: "2025-06-30T15:00:00Z"
-                                        - admin: false
+                                        - admin: true
                                           color: '#FF5733'
                                           created_at: "2025-06-30T12:00:00Z"
                                           id: 1
                                           name: admin
                                           updated_at: "2025-06-30T15:00:00Z"
-                                        - admin: false
+                                        - admin: true
                                           color: '#FF5733'
                                           created_at: "2025-06-30T12:00:00Z"
                                           id: 1
                                           name: admin
                                           updated_at: "2025-06-30T15:00:00Z"
-                                        - admin: false
+                                        - admin: true
+                                          color: '#FF5733'
+                                          created_at: "2025-06-30T12:00:00Z"
+                                          id: 1
+                                          name: admin
+                                          updated_at: "2025-06-30T15:00:00Z"
+                                      updated_at: "2025-06-30T15:00:00Z"
+                                      username: alice
+                                - created_at: "2025-06-30T12:00:00Z"
+                                  id: 1
+                                  roles:
+                                    - admin: true
+                                      color: '#FF5733'
+                                      created_at: "2025-06-30T12:00:00Z"
+                                      id: 1
+                                      name: admin
+                                      updated_at: "2025-06-30T15:00:00Z"
+                                    - admin: true
+                                      color: '#FF5733'
+                                      created_at: "2025-06-30T12:00:00Z"
+                                      id: 1
+                                      name: admin
+                                      updated_at: "2025-06-30T15:00:00Z"
+                                    - admin: true
+                                      color: '#FF5733'
+                                      created_at: "2025-06-30T12:00:00Z"
+                                      id: 1
+                                      name: admin
+                                      updated_at: "2025-06-30T15:00:00Z"
+                                    - admin: true
                                           color: '#FF5733'
                                           created_at: "2025-06-30T12:00:00Z"
                                           id: 1
@@ -806,25 +1521,25 @@ paths:
                                     created_at: "2025-06-30T12:00:00Z"
                                     id: 1
                                     roles:
-                                      - admin: false
+                                      - admin: true
                                         color: '#FF5733'
                                         created_at: "2025-06-30T12:00:00Z"
                                         id: 1
                                         name: admin
                                         updated_at: "2025-06-30T15:00:00Z"
-                                      - admin: false
+                                      - admin: true
                                         color: '#FF5733'
                                         created_at: "2025-06-30T12:00:00Z"
                                         id: 1
                                         name: admin
                                         updated_at: "2025-06-30T15:00:00Z"
-                                      - admin: false
+                                      - admin: true
                                         color: '#FF5733'
                                         created_at: "2025-06-30T12:00:00Z"
                                         id: 1
                                         name: admin
                                         updated_at: "2025-06-30T15:00:00Z"
-                                      - admin: false
+                                      - admin: true
                                         color: '#FF5733'
                                         created_at: "2025-06-30T12:00:00Z"
                                         id: 1
@@ -942,13 +1657,25 @@ paths:
                                     - created_at: "2025-06-30T12:00:00Z"
                                       id: 1
                                       roles:
-                                        - admin: true
+                                        - admin: false
                                           color: '#FF5733'
                                           created_at: "2025-06-30T12:00:00Z"
                                           id: 1
                                           name: admin
                                           updated_at: "2025-06-30T15:00:00Z"
-                                        - admin: true
+                                        - admin: false
+                                          color: '#FF5733'
+                                          created_at: "2025-06-30T12:00:00Z"
+                                          id: 1
+                                          name: admin
+                                          updated_at: "2025-06-30T15:00:00Z"
+                                        - admin: false
+                                          color: '#FF5733'
+                                          created_at: "2025-06-30T12:00:00Z"
+                                          id: 1
+                                          name: admin
+                                          updated_at: "2025-06-30T15:00:00Z"
+                                        - admin: false
                                           color: '#FF5733'
                                           created_at: "2025-06-30T12:00:00Z"
                                           id: 1
@@ -959,13 +1686,25 @@ paths:
                                     - created_at: "2025-06-30T12:00:00Z"
                                       id: 1
                                       roles:
-                                        - admin: true
+                                        - admin: false
                                           color: '#FF5733'
                                           created_at: "2025-06-30T12:00:00Z"
                                           id: 1
                                           name: admin
                                           updated_at: "2025-06-30T15:00:00Z"
-                                        - admin: true
+                                        - admin: false
+                                          color: '#FF5733'
+                                          created_at: "2025-06-30T12:00:00Z"
+                                          id: 1
+                                          name: admin
+                                          updated_at: "2025-06-30T15:00:00Z"
+                                        - admin: false
+                                          color: '#FF5733'
+                                          created_at: "2025-06-30T12:00:00Z"
+                                          id: 1
+                                          name: admin
+                                          updated_at: "2025-06-30T15:00:00Z"
+                                        - admin: false
                                           color: '#FF5733'
                                           created_at: "2025-06-30T12:00:00Z"
                                           id: 1
@@ -976,13 +1715,54 @@ paths:
                                     - created_at: "2025-06-30T12:00:00Z"
                                       id: 1
                                       roles:
-                                        - admin: true
+                                        - admin: false
                                           color: '#FF5733'
                                           created_at: "2025-06-30T12:00:00Z"
                                           id: 1
                                           name: admin
                                           updated_at: "2025-06-30T15:00:00Z"
-                                        - admin: true
+                                        - admin: false
+                                          color: '#FF5733'
+                                          created_at: "2025-06-30T12:00:00Z"
+                                          id: 1
+                                          name: admin
+                                          updated_at: "2025-06-30T15:00:00Z"
+                                        - admin: false
+                                          color: '#FF5733'
+                                          created_at: "2025-06-30T12:00:00Z"
+                                          id: 1
+                                          name: admin
+                                          updated_at: "2025-06-30T15:00:00Z"
+                                        - admin: false
+                                          color: '#FF5733'
+                                          created_at: "2025-06-30T12:00:00Z"
+                                          id: 1
+                                          name: admin
+                                          updated_at: "2025-06-30T15:00:00Z"
+                                      updated_at: "2025-06-30T15:00:00Z"
+                                      username: alice
+                                    - created_at: "2025-06-30T12:00:00Z"
+                                      id: 1
+                                      roles:
+                                        - admin: false
+                                          color: '#FF5733'
+                                          created_at: "2025-06-30T12:00:00Z"
+                                          id: 1
+                                          name: admin
+                                          updated_at: "2025-06-30T15:00:00Z"
+                                        - admin: false
+                                          color: '#FF5733'
+                                          created_at: "2025-06-30T12:00:00Z"
+                                          id: 1
+                                          name: admin
+                                          updated_at: "2025-06-30T15:00:00Z"
+                                        - admin: false
+                                          color: '#FF5733'
+                                          created_at: "2025-06-30T12:00:00Z"
+                                          id: 1
+                                          name: admin
+                                          updated_at: "2025-06-30T15:00:00Z"
+                                        - admin: false
                                           color: '#FF5733'
                                           created_at: "2025-06-30T12:00:00Z"
                                           id: 1
@@ -994,13 +1774,25 @@ paths:
                               - created_at: "2025-06-30T12:00:00Z"
                                 id: 1
                                 roles:
-                                  - admin: true
+                                  - admin: false
                                     color: '#FF5733'
                                     created_at: "2025-06-30T12:00:00Z"
                                     id: 1
                                     name: admin
                                     updated_at: "2025-06-30T15:00:00Z"
-                                  - admin: true
+                                  - admin: false
+                                    color: '#FF5733'
+                                    created_at: "2025-06-30T12:00:00Z"
+                                    id: 1
+                                    name: admin
+                                    updated_at: "2025-06-30T15:00:00Z"
+                                  - admin: false
+                                    color: '#FF5733'
+                                    created_at: "2025-06-30T12:00:00Z"
+                                    id: 1
+                                    name: admin
+                                    updated_at: "2025-06-30T15:00:00Z"
+                                  - admin: false
                                     color: '#FF5733'
                                     created_at: "2025-06-30T12:00:00Z"
                                     id: 1
@@ -1011,13 +1803,25 @@ paths:
                                 - created_at: "2025-06-30T12:00:00Z"
                                   id: 1
                                   roles:
-                                    - admin: true
+                                    - admin: false
                                       color: '#FF5733'
                                       created_at: "2025-06-30T12:00:00Z"
                                       id: 1
                                       name: admin
                                       updated_at: "2025-06-30T15:00:00Z"
-                                    - admin: true
+                                    - admin: false
+                                      color: '#FF5733'
+                                      created_at: "2025-06-30T12:00:00Z"
+                                      id: 1
+                                      name: admin
+                                      updated_at: "2025-06-30T15:00:00Z"
+                                    - admin: false
+                                      color: '#FF5733'
+                                      created_at: "2025-06-30T12:00:00Z"
+                                      id: 1
+                                      name: admin
+                                      updated_at: "2025-06-30T15:00:00Z"
+                                    - admin: false
                                       color: '#FF5733'
                                       created_at: "2025-06-30T12:00:00Z"
                                       id: 1
@@ -1028,13 +1832,25 @@ paths:
                               - created_at: "2025-06-30T12:00:00Z"
                                 id: 1
                                 roles:
-                                  - admin: true
+                                  - admin: false
                                     color: '#FF5733'
                                     created_at: "2025-06-30T12:00:00Z"
                                     id: 1
                                     name: admin
                                     updated_at: "2025-06-30T15:00:00Z"
-                                  - admin: true
+                                  - admin: false
+                                    color: '#FF5733'
+                                    created_at: "2025-06-30T12:00:00Z"
+                                    id: 1
+                                    name: admin
+                                    updated_at: "2025-06-30T15:00:00Z"
+                                  - admin: false
+                                    color: '#FF5733'
+                                    created_at: "2025-06-30T12:00:00Z"
+                                    id: 1
+                                    name: admin
+                                    updated_at: "2025-06-30T15:00:00Z"
+                                  - admin: false
                                     color: '#FF5733'
                                     created_at: "2025-06-30T12:00:00Z"
                                     id: 1
@@ -1045,13 +1861,25 @@ paths:
                                 - created_at: "2025-06-30T12:00:00Z"
                                   id: 1
                                   roles:
-                                    - admin: true
+                                    - admin: false
                                       color: '#FF5733'
                                       created_at: "2025-06-30T12:00:00Z"
                                       id: 1
                                       name: admin
                                       updated_at: "2025-06-30T15:00:00Z"
-                                    - admin: true
+                                    - admin: false
+                                      color: '#FF5733'
+                                      created_at: "2025-06-30T12:00:00Z"
+                                      id: 1
+                                      name: admin
+                                      updated_at: "2025-06-30T15:00:00Z"
+                                    - admin: false
+                                      color: '#FF5733'
+                                      created_at: "2025-06-30T12:00:00Z"
+                                      id: 1
+                                      name: admin
+                                      updated_at: "2025-06-30T15:00:00Z"
+                                    - admin: false
                                       color: '#FF5733'
                                       created_at: "2025-06-30T12:00:00Z"
                                       id: 1
@@ -1251,14 +2079,14 @@ components:
                 index:
                     type: integer
                     description: The index of the share added
-                    example: 908796951079181226
+                    example: 5856351231608225095
                     format: int64
                 unlocked:
                     type: boolean
                     description: Whether the master key has been unlocked
-                    example: false
+                    example: true
             example:
-              index: 2634242440342999069
+              index: 2470061380290127912
               unlocked: true
             required:
                 - index
@@ -1355,7 +2183,7 @@ components:
                     type: array
                     items:
                         type: string
-                        example: Eos est sit dignissimos ex.
+                        example: Sint molestiae adipisci.
                     description: The generated key shares
                     example:
                         - EXAMPLEA5ZKwDn8Zotr3B+d+F+UzrcJ1Yhl2rU0
@@ -1417,7 +2245,7 @@ components:
                     type: array
                     items:
                         type: integer
-                        example: 516397163871956071
+                        example: 247912361538423798
                         format: int64
                     description: Role IDs authorized to access the secret
                     example:
@@ -1427,7 +2255,7 @@ components:
                     type: array
                     items:
                         type: integer
-                        example: 341127503104855258
+                        example: 7344200345253913702
                         format: int64
                     description: Users IDs authorized to access the secret
                     example:
@@ -1529,19 +2357,19 @@ components:
                 temporary:
                     type: boolean
                     description: Is the error temporary?
-                    example: false
+                    example: true
                 timeout:
                     type: boolean
                     description: Is the error a timeout?
                     example: true
             description: Invalid parameters provided
             example:
-              fault: true
+              fault: false
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
-              timeout: false
+              temporary: true
+              timeout: true
             required:
                 - name
                 - id
@@ -1555,7 +2383,7 @@ components:
                 current_shares:
                     type: integer
                     description: Number of shares currently held
-                    example: 2900553972583198744
+                    example: 825571482638184979
                     format: int64
                 is_locked:
                     type: boolean
@@ -1564,18 +2392,18 @@ components:
                 min_shares:
                     type: integer
                     description: Minimum number of shares required
-                    example: 2431615301122470772
+                    example: 2634242440342999069
                     format: int64
                 total_shares:
                     type: integer
                     description: Total number of shares
-                    example: 4042449222842363142
+                    example: 7926837356895559462
                     format: int64
             example:
-              current_shares: 7259916586993169848
-              is_locked: false
-              min_shares: 7162640890096176202
-              total_shares: 6020274338472822433
+              current_shares: 2792794677446550089
+              is_locked: true
+              min_shares: 341127503104855258
+              total_shares: 516397163871956071
             required:
                 - is_locked
                 - current_shares
@@ -1602,7 +2430,7 @@ components:
                 type: boolean
                 description: Is this role an admin role?
                 default: false
-                example: false
+                example: true
               color:
                 type: string
                 description: Color associated with the role
@@ -1625,7 +2453,7 @@ components:
                 description: Role last update timestamp
                 example: "2025-06-30T15:00:00Z"
             example:
-              admin: false
+              admin: true
               color: '#FF5733'
               created_at: "2025-06-30T12:00:00Z"
                 id: 1
@@ -1658,6 +2486,18 @@ components:
                         created_at: "2025-06-30T12:00:00Z"
                         id: 1
                           name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
                         updated_at: "2025-06-30T15:00:00Z"
                 authorized_users:
                   type: array
@@ -1801,7 +2641,13 @@ components:
                     color: '#FF5733'
                     created_at: "2025-06-30T12:00:00Z"
                     id: 1
-                      name: admin
+                    name: admin
+                    updated_at: "2025-06-30T15:00:00Z"
+                  - admin: false
+                    color: '#FF5733'
+                    created_at: "2025-06-30T12:00:00Z"
+                    id: 1
+                    name: admin
                     updated_at: "2025-06-30T15:00:00Z"
                   - admin: false
                     color: '#FF5733'
@@ -1816,35 +2662,6 @@ components:
                     name: admin
                     updated_at: "2025-06-30T15:00:00Z"
                 authorized_users:
-                  - created_at: "2025-06-30T12:00:00Z"
-                    id: 1
-                    roles:
-                      - admin: false
-                        color: '#FF5733'
-                        created_at: "2025-06-30T12:00:00Z"
-                        id: 1
-                        name: admin
-                        updated_at: "2025-06-30T15:00:00Z"
-                      - admin: false
-                        color: '#FF5733'
-                        created_at: "2025-06-30T12:00:00Z"
-                        id: 1
-                        name: admin
-                        updated_at: "2025-06-30T15:00:00Z"
-                      - admin: false
-                        color: '#FF5733'
-                        created_at: "2025-06-30T12:00:00Z"
-                        id: 1
-                        name: admin
-                        updated_at: "2025-06-30T15:00:00Z"
-                      - admin: false
-                        color: '#FF5733'
-                        created_at: "2025-06-30T12:00:00Z"
-                        id: 1
-                        name: admin
-                        updated_at: "2025-06-30T15:00:00Z"
-                    updated_at: "2025-06-30T15:00:00Z"
-                    username: alice
                   - created_at: "2025-06-30T12:00:00Z"
                     id: 1
                     roles:
@@ -1956,10 +2773,121 @@ components:
               type: string
               description: The original path of the secret
               example: customers/google/api_key
+            roles:
+              type: array
+              items:
+                $ref: '#/components/schemas/Role'
+              description: Roles authorized to access the secret
+              example:
+                - admin: false
+                  color: '#FF5733'
+                  created_at: "2025-06-30T12:00:00Z"
+                  id: 1
+                  name: admin
+                  updated_at: "2025-06-30T15:00:00Z"
+                - admin: false
+                  color: '#FF5733'
+                  created_at: "2025-06-30T12:00:00Z"
+                  id: 1
+                  name: admin
+                  updated_at: "2025-06-30T15:00:00Z"
             updated_at:
               type: string
               description: Last update timestamp of the secret
               example: "2025-06-30T15:00:00Z"
+            users:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+              description: Users authorized to access the secret
+              example:
+                - created_at: "2025-06-30T12:00:00Z"
+                  id: 1
+                  roles:
+                    - admin: false
+                      color: '#FF5733'
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
+                      name: admin
+                      updated_at: "2025-06-30T15:00:00Z"
+                    - admin: false
+                      color: '#FF5733'
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
+                      name: admin
+                      updated_at: "2025-06-30T15:00:00Z"
+                    - admin: false
+                      color: '#FF5733'
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
+                      name: admin
+                      updated_at: "2025-06-30T15:00:00Z"
+                    - admin: false
+                      color: '#FF5733'
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
+                      name: admin
+                      updated_at: "2025-06-30T15:00:00Z"
+                  updated_at: "2025-06-30T15:00:00Z"
+                  username: alice
+                - created_at: "2025-06-30T12:00:00Z"
+                  id: 1
+                  roles:
+                    - admin: false
+                      color: '#FF5733'
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
+                      name: admin
+                      updated_at: "2025-06-30T15:00:00Z"
+                    - admin: false
+                      color: '#FF5733'
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
+                      name: admin
+                      updated_at: "2025-06-30T15:00:00Z"
+                    - admin: false
+                      color: '#FF5733'
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
+                      name: admin
+                      updated_at: "2025-06-30T15:00:00Z"
+                    - admin: false
+                      color: '#FF5733'
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
+                      name: admin
+                      updated_at: "2025-06-30T15:00:00Z"
+                  updated_at: "2025-06-30T15:00:00Z"
+                  username: alice
+                - created_at: "2025-06-30T12:00:00Z"
+                  id: 1
+                  roles:
+                    - admin: false
+                      color: '#FF5733'
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
+                      name: admin
+                      updated_at: "2025-06-30T15:00:00Z"
+                    - admin: false
+                      color: '#FF5733'
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
+                      name: admin
+                      updated_at: "2025-06-30T15:00:00Z"
+                    - admin: false
+                      color: '#FF5733'
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
+                      name: admin
+                      updated_at: "2025-06-30T15:00:00Z"
+                    - admin: false
+                      color: '#FF5733'
+                      created_at: "2025-06-30T12:00:00Z"
+                      id: 1
+                      name: admin
+                      updated_at: "2025-06-30T15:00:00Z"
+                  updated_at: "2025-06-30T15:00:00Z"
+                  username: alice
           example:
                 created_at: "2025-06-30T12:00:00Z"
                 owner:
@@ -1993,12 +2921,156 @@ components:
                     updated_at: "2025-06-30T15:00:00Z"
                     username: alice
                 path: customers/google/api_key
+                roles:
+                  - admin: false
+                    color: '#FF5733'
+                    created_at: "2025-06-30T12:00:00Z"
+                    id: 1
+                    name: admin
+                    updated_at: "2025-06-30T15:00:00Z"
+                  - admin: false
+                    color: '#FF5733'
+                    created_at: "2025-06-30T12:00:00Z"
+                    id: 1
+                    name: admin
+                    updated_at: "2025-06-30T15:00:00Z"
+                  - admin: false
+                    color: '#FF5733'
+                    created_at: "2025-06-30T12:00:00Z"
+                    id: 1
+                    name: admin
+                    updated_at: "2025-06-30T15:00:00Z"
+                  - admin: false
+                    color: '#FF5733'
+                    created_at: "2025-06-30T12:00:00Z"
+                    id: 1
+                    name: admin
+                    updated_at: "2025-06-30T15:00:00Z"
                 updated_at: "2025-06-30T15:00:00Z"
+                users:
+                  - created_at: "2025-06-30T12:00:00Z"
+                    id: 1
+                    roles:
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                    updated_at: "2025-06-30T15:00:00Z"
+                    username: alice
+                  - created_at: "2025-06-30T12:00:00Z"
+                    id: 1
+                    roles:
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                    updated_at: "2025-06-30T15:00:00Z"
+                    username: alice
+                  - created_at: "2025-06-30T12:00:00Z"
+                    id: 1
+                    roles:
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                    updated_at: "2025-06-30T15:00:00Z"
+                    username: alice
+                  - created_at: "2025-06-30T12:00:00Z"
+                    id: 1
+                    roles:
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                      - admin: false
+                        color: '#FF5733'
+                        created_at: "2025-06-30T12:00:00Z"
+                        id: 1
+                        name: admin
+                        updated_at: "2025-06-30T15:00:00Z"
+                    updated_at: "2025-06-30T15:00:00Z"
+                    username: alice
             required:
                 - path
                 - owner
                 - created_at
                 - updated_at
+                - users
+                - roles
         User:
             type: object
             properties:
@@ -2029,12 +3101,6 @@ components:
                       id: 1
                       name: admin
                       updated_at: "2025-06-30T15:00:00Z"
-                    - admin: false
-                      color: '#FF5733'
-                      created_at: "2025-06-30T12:00:00Z"
-                      id: 1
-                      name: admin
-                      updated_at: "2025-06-30T15:00:00Z"
                 updated_at:
                     type: string
                     description: User last update timestamp
@@ -2048,6 +3114,12 @@ components:
                 created_at: "2025-06-30T12:00:00Z"
                 id: 1
                 roles:
+                  - admin: false
+                    color: '#FF5733'
+                    created_at: "2025-06-30T12:00:00Z"
+                    id: 1
+                    name: admin
+                    updated_at: "2025-06-30T15:00:00Z"
                   - admin: false
                     color: '#FF5733'
                     created_at: "2025-06-30T12:00:00Z"

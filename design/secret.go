@@ -35,7 +35,10 @@ var SecretInfoSummaryType = Type("SecretInfoSummary", func() {
 		Example("2025-06-30T15:00:00Z")
 	})
 
-	Required("path", "owner", "created_at", "updated_at")
+	Attribute("users", ArrayOf(UserType), "Users authorized to access the secret")
+	Attribute("roles", ArrayOf(RoleType), "Roles authorized to access the secret")
+
+	Required("path", "owner", "created_at", "updated_at", "users", "roles")
 })
 
 var _ = Service("secrets", func() {

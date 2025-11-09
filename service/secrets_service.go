@@ -50,11 +50,59 @@ func (s *SecretsService) ListSecrets(ctx context.Context) ([]*gensecrets.SecretI
 		return nil, gensecrets.MakeInternalError(fmt.Errorf("error listing secrets: %w", err))
 	}
 
+	// Retrieve all roles and users to build maps for easy lookup when listing access for each secret
+	roles, err := s.rolesRepository.ListRoles(ctx)
+	if err != nil {
+		return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving roles: %w", err))
+	}
+	users, err := s.usersRepository.ListUsers(ctx)
+	if err != nil {
+		return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving users: %w", err))
+	}
+	roleMap := make(map[int]gensecrets.Role)
+	for _, role := range roles {
+		roleMap[role.ID] = gensecrets.Role{
+			ID:        role.ID,
+			Name:      role.Name,
+			Color:     role.Color,
+			Admin:     role.Admin,
+			CreatedAt: role.CreatedAt.Format("2006-01-02T15:04:05Z"),
+			UpdatedAt: role.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+		}
+	}
+	userMap := make(map[int]gensecrets.User)
+	for _, user := range users {
+		userMap[user.ID] = gensecrets.User{
+			ID:        user.ID,
+			Username:  user.Username,
+			CreatedAt: user.CreatedAt.Format("2006-01-02T15:04:05Z"),
+			UpdatedAt: user.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+		}
+	}
+
 	secretInfos := make([]*gensecrets.SecretInfoSummary, 0, len(secrets))
 	for _, secret := range secrets {
 		owner, err := s.usersRepository.GetUserByID(ctx, secret.OwnerUserId)
 		if err != nil {
 			return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving secret owner: %w", err))
+		}
+
+		secretUserIds, roleUserIds, err := s.secretsAccessRepository.GetAccessesBySecretPath(ctx, secret.Path)
+		if err != nil {
+			return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving secret accesses for secret %s: %w", secret.Path, err))
+		}
+
+		var secretRoles []*gensecrets.Role
+		for _, roleID := range roleUserIds {
+			if role, exists := roleMap[roleID]; exists {
+				secretRoles = append(secretRoles, &role)
+			}
+		}
+		var secretUsers []*gensecrets.User
+		for _, userID := range secretUserIds {
+			if user, exists := userMap[userID]; exists {
+				secretUsers = append(secretUsers, &user)
+			}
 		}
 
 		secretInfos = append(secretInfos, &gensecrets.SecretInfoSummary{
@@ -67,6 +115,8 @@ func (s *SecretsService) ListSecrets(ctx context.Context) ([]*gensecrets.SecretI
 			},
 			CreatedAt: secret.CreatedAt.Format("2006-01-02T15:04:05Z"),
 			UpdatedAt: secret.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+			Roles:     secretRoles,
+			Users:     secretUsers,
 		})
 	}
 

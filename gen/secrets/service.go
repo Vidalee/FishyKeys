@@ -135,6 +135,10 @@ type SecretInfoSummary struct {
 	CreatedAt string
 	// Last update timestamp of the secret
 	UpdatedAt string
+	// Users authorized to access the secret
+	Users []*User
+	// Roles authorized to access the secret
+	Roles []*Role
 }
 
 type User struct {
