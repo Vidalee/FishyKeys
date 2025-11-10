@@ -452,3 +452,276 @@ func rolesToIds(roles []*gensecrets.Role) []int {
 	}
 	return ids
 }
+
+func TestSecretsService_UpdateSecret(t *testing.T) {
+	service := setupSecretsTestService(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		name                    string
+		path                    string
+		initialValue            string
+		updatedValue            string
+		accessAsUserNumber      int
+		initialAuthorizedUsers  []int
+		initialAuthorizedRoles  []int
+		updateAuthorizedUsers   []int
+		updateAuthorizedRoles   []int
+		expectedAuthorizedUsers []int
+		expectedAuthorizedRoles []int
+		createSecret            bool
+		expectedError           bool
+		expectedErrorText       string
+	}{
+		{
+			name:                    "owner updates value only",
+			path:                    "/test/secret1",
+			initialValue:            "initial_value",
+			updatedValue:            "updated_value",
+			accessAsUserNumber:      0,
+			initialAuthorizedUsers:  []int{},
+			initialAuthorizedRoles:  []int{},
+			updateAuthorizedUsers:   []int{},
+			updateAuthorizedRoles:   []int{},
+			expectedAuthorizedUsers: []int{},
+			expectedAuthorizedRoles: []int{},
+			createSecret:            true,
+		},
+		{
+			name:                    "owner adds user access",
+			path:                    "/test/secret1",
+			initialValue:            "initial_value",
+			updatedValue:            "updated_value",
+			accessAsUserNumber:      0,
+			initialAuthorizedUsers:  []int{},
+			initialAuthorizedRoles:  []int{},
+			updateAuthorizedUsers:   []int{1},
+			updateAuthorizedRoles:   []int{},
+			expectedAuthorizedUsers: []int{1},
+			expectedAuthorizedRoles: []int{},
+			createSecret:            true,
+		},
+		{
+			name:                    "owner removes user access",
+			path:                    "/test/secret1",
+			initialValue:            "initial_value",
+			updatedValue:            "updated_value",
+			accessAsUserNumber:      0,
+			initialAuthorizedUsers:  []int{1},
+			initialAuthorizedRoles:  []int{},
+			updateAuthorizedUsers:   []int{1},
+			updateAuthorizedRoles:   []int{},
+			expectedAuthorizedUsers: []int{},
+			expectedAuthorizedRoles: []int{},
+			createSecret:            true,
+		},
+		{
+			name:                    "owner adds role access",
+			path:                    "/test/secret1",
+			initialValue:            "initial_value",
+			updatedValue:            "updated_value",
+			accessAsUserNumber:      0,
+			initialAuthorizedUsers:  []int{},
+			initialAuthorizedRoles:  []int{},
+			updateAuthorizedUsers:   []int{},
+			updateAuthorizedRoles:   []int{0},
+			expectedAuthorizedUsers: []int{},
+			expectedAuthorizedRoles: []int{0},
+			createSecret:            true,
+		},
+		{
+			name:                    "owner removes role access",
+			path:                    "/test/secret1",
+			initialValue:            "initial_value",
+			updatedValue:            "updated_value",
+			accessAsUserNumber:      0,
+			initialAuthorizedUsers:  []int{},
+			initialAuthorizedRoles:  []int{0},
+			updateAuthorizedUsers:   []int{},
+			updateAuthorizedRoles:   []int{0},
+			expectedAuthorizedUsers: []int{},
+			expectedAuthorizedRoles: []int{},
+			createSecret:            true,
+		},
+		{
+			name:                    "owner toggles multiple users and roles",
+			path:                    "/test/secret1",
+			initialValue:            "initial_value",
+			updatedValue:            "updated_value",
+			accessAsUserNumber:      0,
+			initialAuthorizedUsers:  []int{1},
+			initialAuthorizedRoles:  []int{0},
+			updateAuthorizedUsers:   []int{1, 2}, // remove 1, add 2
+			updateAuthorizedRoles:   []int{0, 1}, // remove 0, add 1
+			expectedAuthorizedUsers: []int{2},
+			expectedAuthorizedRoles: []int{1},
+			createSecret:            true,
+		},
+		{
+			name:                    "authorized user updates value",
+			path:                    "/test/secret1",
+			initialValue:            "initial_value",
+			updatedValue:            "updated_value",
+			accessAsUserNumber:      1,
+			initialAuthorizedUsers:  []int{1},
+			initialAuthorizedRoles:  []int{},
+			updateAuthorizedUsers:   []int{},
+			updateAuthorizedRoles:   []int{},
+			expectedAuthorizedUsers: []int{1},
+			expectedAuthorizedRoles: []int{},
+			createSecret:            true,
+		},
+		{
+			name:                   "authorized user cannot update secret they don't have access to",
+			path:                   "/test/secret1",
+			initialValue:           "initial_value",
+			updatedValue:           "updated_value",
+			accessAsUserNumber:     2,
+			initialAuthorizedUsers: []int{1},
+			initialAuthorizedRoles: []int{},
+			updateAuthorizedUsers:  []int{},
+			updateAuthorizedRoles:  []int{},
+			createSecret:           true,
+			expectedError:          true,
+			expectedErrorText:      "you do not have access to this secret",
+		},
+		{
+			name:                    "user with role access can update",
+			path:                    "/test/secret1",
+			initialValue:            "initial_value",
+			updatedValue:            "updated_value",
+			accessAsUserNumber:      2,
+			initialAuthorizedUsers:  []int{},
+			initialAuthorizedRoles:  []int{0},
+			updateAuthorizedUsers:   []int{},
+			updateAuthorizedRoles:   []int{},
+			expectedAuthorizedUsers: []int{},
+			expectedAuthorizedRoles: []int{0},
+			createSecret:            true,
+		},
+		{
+			name:                   "non-existent secret",
+			path:                   "/test/secret1",
+			initialValue:           "initial_value",
+			updatedValue:           "updated_value",
+			accessAsUserNumber:     0,
+			initialAuthorizedUsers: []int{},
+			initialAuthorizedRoles: []int{},
+			updateAuthorizedUsers:  []int{},
+			updateAuthorizedRoles:  []int{},
+			createSecret:           false,
+			expectedError:          true,
+			expectedErrorText:      "you do not have access to this secret",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			clearSecretsServiceTables(t, ctx)
+
+			userID1, err := service.usersRepository.CreateUser(ctx, "user1", "password1")
+			require.NoError(t, err, "failed to create user1")
+			userID2, err := service.usersRepository.CreateUser(ctx, "user2", "password2")
+			require.NoError(t, err, "failed to create user2")
+			userID3, err := service.usersRepository.CreateUser(ctx, "user3", "password3")
+			require.NoError(t, err, "failed to create user3")
+			roleID1, err := service.rolesRepository.CreateRole(ctx, "role1", "#FFFFFF")
+			require.NoError(t, err, "failed to create role1")
+			roleID2, err := service.rolesRepository.CreateRole(ctx, "role2", "#000000")
+			require.NoError(t, err, "failed to create role2")
+			err = service.userRolesRepository.AssignRoleToUser(ctx, userID3, roleID1)
+			require.NoError(t, err, "failed to assign role1 to user3")
+
+			users := []int{userID1, userID2, userID3}
+			roles := []int{roleID1, roleID2}
+
+			if tt.createSecret {
+				_, err = service.secretsRepository.CreateSecret(ctx, service.keyManager, tt.path, userID1, tt.initialValue)
+				require.NoError(t, err, "failed to create secret")
+
+				// Map test indices to actual IDs
+				initialUsers := make([]int, 0)
+				for _, idx := range tt.initialAuthorizedUsers {
+					if idx < len(users) {
+						initialUsers = append(initialUsers, users[idx])
+					}
+				}
+				initialRoles := make([]int, 0)
+				for _, idx := range tt.initialAuthorizedRoles {
+					if idx < len(roles) {
+						initialRoles = append(initialRoles, roles[idx])
+					}
+				}
+
+				if len(initialUsers) > 0 {
+					err = service.secretsAccessRepository.GrantUsersAccess(ctx, tt.path, initialUsers)
+					require.NoError(t, err, "failed to grant initial user access")
+				}
+				if len(initialRoles) > 0 {
+					err = service.secretsAccessRepository.GrantRolesAccess(ctx, tt.path, initialRoles)
+					require.NoError(t, err, "failed to grant initial role access")
+				}
+			}
+
+			ctxWithToken := context.WithValue(ctx, "token", &JwtClaims{
+				UserID: users[tt.accessAsUserNumber],
+			})
+
+			// Map test indices to actual IDs for update payload
+			updateUsers := make([]int, 0)
+			for _, idx := range tt.updateAuthorizedUsers {
+				if idx < len(users) {
+					updateUsers = append(updateUsers, users[idx])
+				}
+			}
+			updateRoles := make([]int, 0)
+			for _, idx := range tt.updateAuthorizedRoles {
+				if idx < len(roles) {
+					updateRoles = append(updateRoles, roles[idx])
+				}
+			}
+
+			payload := &gensecrets.UpdateSecretPayload{
+				Path:            tt.path,
+				Value:           tt.updatedValue,
+				AuthorizedUsers: updateUsers,
+				AuthorizedRoles: updateRoles,
+			}
+
+			err = service.UpdateSecret(ctxWithToken, payload)
+
+			if tt.expectedError {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedErrorText, err.Error())
+			} else {
+				assert.NoError(t, err)
+
+				// Verify secret value was updated
+				secret, err := service.secretsRepository.GetSecretByPath(ctx, service.keyManager, tt.path)
+				require.NoError(t, err)
+				assert.Equal(t, tt.updatedValue, secret.DecryptedValue)
+
+				// Verify access was updated correctly
+				authorizedUserIds, authorizedRoleIds, err := service.secretsAccessRepository.GetAccessesBySecretPath(ctx, tt.path)
+				require.NoError(t, err)
+
+				// Map expected indices to actual IDs
+				expectedUsers := make([]int, 0)
+				for _, idx := range tt.expectedAuthorizedUsers {
+					if idx < len(users) {
+						expectedUsers = append(expectedUsers, users[idx])
+					}
+				}
+				expectedRoles := make([]int, 0)
+				for _, idx := range tt.expectedAuthorizedRoles {
+					if idx < len(roles) {
+						expectedRoles = append(expectedRoles, roles[idx])
+					}
+				}
+
+				assert.ElementsMatch(t, expectedUsers, authorizedUserIds, "authorized users should match")
+				assert.ElementsMatch(t, expectedRoles, authorizedRoleIds, "authorized roles should match")
+			}
+		})
+	}
+}

@@ -33,6 +33,10 @@ type Client struct {
 	// secret endpoint.
 	CreateSecretDoer goahttp.Doer
 
+	// UpdateSecret Doer is the HTTP client used to make requests to the update
+	// secret endpoint.
+	UpdateSecretDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -60,6 +64,7 @@ func NewClient(
 		GetSecretValueDoer:  doer,
 		GetSecretDoer:       doer,
 		CreateSecretDoer:    doer,
+		UpdateSecretDoer:    doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -145,6 +150,30 @@ func (c *Client) CreateSecret() goa.Endpoint {
 		resp, err := c.CreateSecretDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("secrets", "create secret", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// UpdateSecret returns an endpoint that makes HTTP requests to the secrets
+// service update secret server.
+func (c *Client) UpdateSecret() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeUpdateSecretRequest(c.encoder)
+		decodeResponse = DecodeUpdateSecretResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildUpdateSecretRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.UpdateSecretDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("secrets", "update secret", err)
 		}
 		return decodeResponse(resp)
 	}

@@ -30,3 +30,8 @@ func GetSecretSecretsPath(path string) string {
 func CreateSecretSecretsPath() string {
 	return "/secrets"
 }
+
+// UpdateSecretSecretsPath returns the URL path to the secrets service update secret HTTP endpoint.
+func UpdateSecretSecretsPath() string {
+	return "/secrets"
+}

@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"slices"
 
 	gensecrets "github.com/Vidalee/FishyKeys/gen/secrets"
 	"github.com/Vidalee/FishyKeys/internal/crypto"
@@ -306,4 +307,67 @@ func (s *SecretsService) getSecretValue(ctx context.Context, userID int, path st
 	}
 
 	return decryptedSecret.DecryptedValue, decodedPathStr, nil
+}
+
+func (s *SecretsService) UpdateSecret(ctx context.Context, payload *gensecrets.UpdateSecretPayload) error {
+	// Guaranteed by the Authentified interceptor
+	jwtClaims := ctx.Value("token").(*JwtClaims)
+
+	secrets, err := s.secretsRepository.ListSecretsForUser(ctx, jwtClaims.UserID)
+	if err != nil {
+		return gensecrets.MakeInternalError(fmt.Errorf("error listing secrets: %w", err))
+	}
+
+	var secretToUpdate *repository.Secret
+	for i := range secrets {
+		if secrets[i].Path == payload.Path {
+			secretToUpdate = &secrets[i]
+			break
+		}
+	}
+	if secretToUpdate == nil {
+		return gensecrets.MakeForbidden(fmt.Errorf("you do not have access to this secret"))
+	}
+
+	err = s.secretsRepository.UpdateSecret(ctx, s.keyManager, payload.Path, payload.Value)
+	if err != nil {
+		return gensecrets.MakeInternalError(fmt.Errorf("error updating secret: %w", err))
+	}
+
+	authorizedUsersIds, authorizedRolesIds, err := s.secretsAccessRepository.GetAccessesBySecretPath(ctx, payload.Path)
+	if err != nil {
+		return gensecrets.MakeInternalError(fmt.Errorf("error retrieving current secret accesses: %w", err))
+	}
+
+	for _, newUserId := range payload.AuthorizedUsers {
+		found := slices.Contains(authorizedUsersIds, newUserId)
+		if !found {
+			err = s.secretsAccessRepository.GrantUsersAccess(ctx, payload.Path, []int{newUserId})
+			if err != nil {
+				return gensecrets.MakeInternalError(fmt.Errorf("error adding authorized user %d: %w", newUserId, err))
+			}
+		} else {
+			err = s.secretsAccessRepository.RevokeUserAccess(ctx, payload.Path, newUserId)
+			if err != nil {
+				return gensecrets.MakeInternalError(fmt.Errorf("error removing authorized user %d: %w", newUserId, err))
+			}
+		}
+	}
+
+	for _, newRoleId := range payload.AuthorizedRoles {
+		found := slices.Contains(authorizedRolesIds, newRoleId)
+		if !found {
+			err = s.secretsAccessRepository.GrantRolesAccess(ctx, payload.Path, []int{newRoleId})
+			if err != nil {
+				return gensecrets.MakeInternalError(fmt.Errorf("error adding authorized role %d: %w", newRoleId, err))
+			}
+		} else {
+			err = s.secretsAccessRepository.RevokeRoleAccess(ctx, payload.Path, newRoleId)
+			if err != nil {
+				return gensecrets.MakeInternalError(fmt.Errorf("error removing authorized role %d: %w", newRoleId, err))
+			}
+		}
+	}
+
+	return nil
 }

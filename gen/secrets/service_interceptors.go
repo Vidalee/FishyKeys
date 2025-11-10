@@ -62,6 +62,13 @@ func WrapCreateSecretEndpoint(endpoint goa.Endpoint, i ServerInterceptors) goa.E
 	return endpoint
 }
 
+// WrapUpdateSecretEndpoint wraps the update secret endpoint with the
+// server-side interceptors defined in the design.
+func WrapUpdateSecretEndpoint(endpoint goa.Endpoint, i ServerInterceptors) goa.Endpoint {
+	endpoint = wrapUpdateSecretAuthentified(endpoint, i)
+	return endpoint
+}
+
 // Public accessor methods for Info types
 
 // Service returns the name of the service handling the request.

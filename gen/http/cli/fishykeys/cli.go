@@ -27,7 +27,7 @@ import (
 func UsageCommands() string {
 	return `key-management (create-master-key|get-key-status|add-share|delete-share)
 roles (list-roles|create-role|delete-role|assign-role-to-user|unassign-role-to-user)
-secrets (list-secrets|get-secret-value|get-secret|create-secret)
+secrets (list-secrets|get-secret-value|get-secret|create-secret|update-secret)
 users (create-user|list-users|delete-user|auth-user|get-operator-token)
 `
 }
@@ -101,6 +101,9 @@ func ParseEndpoint(
 		secretsCreateSecretFlags    = flag.NewFlagSet("create-secret", flag.ExitOnError)
 		secretsCreateSecretBodyFlag = secretsCreateSecretFlags.String("body", "REQUIRED", "")
 
+		secretsUpdateSecretFlags    = flag.NewFlagSet("update-secret", flag.ExitOnError)
+		secretsUpdateSecretBodyFlag = secretsUpdateSecretFlags.String("body", "REQUIRED", "")
+
 		usersFlags = flag.NewFlagSet("users", flag.ContinueOnError)
 
 		usersCreateUserFlags    = flag.NewFlagSet("create-user", flag.ExitOnError)
@@ -134,6 +137,7 @@ func ParseEndpoint(
 	secretsGetSecretValueFlags.Usage = secretsGetSecretValueUsage
 	secretsGetSecretFlags.Usage = secretsGetSecretUsage
 	secretsCreateSecretFlags.Usage = secretsCreateSecretUsage
+	secretsUpdateSecretFlags.Usage = secretsUpdateSecretUsage
 
 	usersFlags.Usage = usersUsage
 	usersCreateUserFlags.Usage = usersCreateUserUsage
@@ -229,6 +233,9 @@ func ParseEndpoint(
 			case "create-secret":
 				epf = secretsCreateSecretFlags
 
+			case "update-secret":
+				epf = secretsUpdateSecretFlags
+
 			}
 
 		case "users":
@@ -317,6 +324,9 @@ func ParseEndpoint(
 			case "create-secret":
 				endpoint = c.CreateSecret()
 				data, err = secretsc.BuildCreateSecretPayload(*secretsCreateSecretBodyFlag)
+			case "update-secret":
+				endpoint = c.UpdateSecret()
+				data, err = secretsc.BuildUpdateSecretPayload(*secretsUpdateSecretBodyFlag)
 			}
 		case "users":
 			c := usersc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -504,6 +514,7 @@ COMMAND:
     get-secret-value: Retrieve a secret value
     get-secret: Retrieve a secret's information
     create-secret: Create a secret
+    update-secret: Update a secret
 
 Additional help:
     %[1]s secrets COMMAND --help
@@ -549,6 +560,29 @@ Create a secret
 
 Example:
     %[1]s secrets create-secret --body '{
+      "authorized_roles": [
+         1,
+         2
+      ],
+      "authorized_users": [
+         1,
+         2,
+         3
+      ],
+      "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==",
+      "value": "SECRET_API_KEY123"
+   }'
+`, os.Args[0])
+}
+
+func secretsUpdateSecretUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] secrets update-secret -body JSON
+
+Update a secret
+    -body JSON: 
+
+Example:
+    %[1]s secrets update-secret --body '{
       "authorized_roles": [
          1,
          2

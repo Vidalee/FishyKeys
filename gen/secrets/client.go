@@ -20,16 +20,18 @@ type Client struct {
 	OperatorGetSecretValueEndpoint goa.Endpoint
 	GetSecretEndpoint              goa.Endpoint
 	CreateSecretEndpoint           goa.Endpoint
+	UpdateSecretEndpoint           goa.Endpoint
 }
 
 // NewClient initializes a "secrets" service client given the endpoints.
-func NewClient(listSecrets, getSecretValue, operatorGetSecretValue, getSecret, createSecret goa.Endpoint) *Client {
+func NewClient(listSecrets, getSecretValue, operatorGetSecretValue, getSecret, createSecret, updateSecret goa.Endpoint) *Client {
 	return &Client{
 		ListSecretsEndpoint:            listSecrets,
 		GetSecretValueEndpoint:         getSecretValue,
 		OperatorGetSecretValueEndpoint: operatorGetSecretValue,
 		GetSecretEndpoint:              getSecret,
 		CreateSecretEndpoint:           createSecret,
+		UpdateSecretEndpoint:           updateSecret,
 	}
 }
 
@@ -112,5 +114,18 @@ func (c *Client) GetSecret(ctx context.Context, p *GetSecretPayload) (res *Secre
 //   - error: internal error
 func (c *Client) CreateSecret(ctx context.Context, p *CreateSecretPayload) (err error) {
 	_, err = c.CreateSecretEndpoint(ctx, p)
+	return
+}
+
+// UpdateSecret calls the "update secret" endpoint of the "secrets" service.
+// UpdateSecret may return the following errors:
+//   - "secret_not_found" (type *goa.ServiceError): Secret not found
+//   - "invalid_parameters" (type *goa.ServiceError): Invalid token path
+//   - "unauthorized" (type *goa.ServiceError): Unauthorized access
+//   - "forbidden" (type *goa.ServiceError): Forbidden access
+//   - "internal_error" (type *goa.ServiceError): Internal server error
+//   - error: internal error
+func (c *Client) UpdateSecret(ctx context.Context, p *UpdateSecretPayload) (err error) {
+	_, err = c.UpdateSecretEndpoint(ctx, p)
 	return
 }

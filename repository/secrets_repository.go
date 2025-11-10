@@ -44,6 +44,7 @@ type SecretsRepository interface {
 	ListSecretsForUser(ctx context.Context, userID int) ([]Secret, error)
 	DeleteSecret(ctx context.Context, path string) error
 	HasAccess(ctx context.Context, secretPath string, userID *int, roleIDs []int) (bool, error)
+	UpdateSecret(ctx context.Context, keyManager *crypto.KeyManager, path string, newValue string) error
 }
 
 type secretsRepository struct {
@@ -234,4 +235,37 @@ LIMIT 1
 		return false, err
 	}
 	return true, nil
+}
+
+func (r *secretsRepository) UpdateSecret(ctx context.Context, keyManager *crypto.KeyManager, path string, newValue string) error {
+	encryptionKey, err := crypto.GenerateSecret()
+	if err != nil {
+		return err
+	}
+
+	encryptedValue, err := crypto.EncryptWithKey(encryptionKey, []byte(newValue))
+	if err != nil {
+		return err
+	}
+
+	encryptedEncryptionKey, err := crypto.Encrypt(keyManager, encryptionKey)
+	if err != nil {
+		return err
+	}
+
+	query := `
+UPDATE secrets
+SET encrypted_encryption_key = $1,
+    encrypted_value = $2,
+    updated_at = $3
+WHERE path = $4
+`
+	cmd, err := r.pool.Exec(ctx, query, encryptedEncryptionKey, encryptedValue, time.Now().UTC(), path)
+	if err != nil {
+		return err
+	}
+	if cmd.RowsAffected() == 0 {
+		return ErrSecretNotFound
+	}
+	return nil
 }

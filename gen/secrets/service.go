@@ -25,6 +25,8 @@ type Service interface {
 	GetSecret(context.Context, *GetSecretPayload) (res *SecretInfo, err error)
 	// Create a secret
 	CreateSecret(context.Context, *CreateSecretPayload) (err error)
+	// Update a secret
+	UpdateSecret(context.Context, *UpdateSecretPayload) (err error)
 }
 
 // APIName is the name of the API as defined in the design.
@@ -41,7 +43,7 @@ const ServiceName = "secrets"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [5]string{"list secrets", "get secret value", "operator get secret value", "get secret", "create secret"}
+var MethodNames = [6]string{"list secrets", "get secret value", "operator get secret value", "get secret", "create secret", "update secret"}
 
 // CreateSecretPayload is the payload type of the secrets service create secret
 // method.
@@ -139,6 +141,19 @@ type SecretInfoSummary struct {
 	Users []*User
 	// Roles authorized to access the secret
 	Roles []*Role
+}
+
+// UpdateSecretPayload is the payload type of the secrets service update secret
+// method.
+type UpdateSecretPayload struct {
+	// Base64 encoded secret's path
+	Path string
+	// The secret value
+	Value string
+	// Users IDs authorized to access the secret
+	AuthorizedUsers []int
+	// Role IDs authorized to access the secret
+	AuthorizedRoles []int
 }
 
 type User struct {
