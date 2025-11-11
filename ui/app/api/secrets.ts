@@ -117,4 +117,42 @@ export async function createSecret({path, value, authorized_users, authorized_ro
         }
         throw {status: response.status, body: errorBody};
     }
+}
+
+export async function updateSecret({path, value, authorized_users, authorized_roles}: {
+    path: string;
+    value: string;
+    authorized_users: number[];
+    authorized_roles: number[]
+}): Promise<void> {
+    const baseHeaders: Record<string, string> = {
+        'Content-Type': 'application/json',
+    };
+    const headers: Record<string, string> = {...baseHeaders, ...getAuthHeaders()};
+    // Path must be base64 encoded
+    const encodedPath = btoa(path);
+    const body = JSON.stringify({
+        path: encodedPath,
+        value,
+        authorized_users,
+        authorized_roles,
+    });
+    const response = await fetch(`${API_BASE}`, {
+        method: 'PATCH',
+        headers,
+        credentials: 'include',
+        body,
+    });
+    if (!response.ok) {
+        let errorBody: any = null;
+        try {
+            errorBody = await response.text();
+            try {
+                errorBody = JSON.parse(errorBody);
+            } catch {
+            }
+        } catch {
+        }
+        throw {status: response.status, body: errorBody};
+    }
 } 

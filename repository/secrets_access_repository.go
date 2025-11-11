@@ -87,6 +87,7 @@ func (r *secretsAccessRepository) RevokeRoleAccess(ctx context.Context, secretPa
 	`, secretPath, roleID)
 	return err
 }
+
 func (r *secretsAccessRepository) GrantUsersAccess(ctx context.Context, secretPath string, userIDs []int) error {
 	if secretPath == "" {
 		return errors.New("secretPath must not be empty")

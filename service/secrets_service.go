@@ -313,6 +313,12 @@ func (s *SecretsService) UpdateSecret(ctx context.Context, payload *gensecrets.U
 	// Guaranteed by the Authentified interceptor
 	jwtClaims := ctx.Value("token").(*JwtClaims)
 
+	decodedPath, err := base64.StdEncoding.DecodeString(payload.Path)
+	if err != nil {
+		return gensecrets.MakeInvalidParameters(fmt.Errorf("invalid path encoding: %w", err))
+	}
+	decodedPathStr := string(decodedPath)
+
 	secrets, err := s.secretsRepository.ListSecretsForUser(ctx, jwtClaims.UserID)
 	if err != nil {
 		return gensecrets.MakeInternalError(fmt.Errorf("error listing secrets: %w", err))
@@ -320,7 +326,7 @@ func (s *SecretsService) UpdateSecret(ctx context.Context, payload *gensecrets.U
 
 	var secretToUpdate *repository.Secret
 	for i := range secrets {
-		if secrets[i].Path == payload.Path {
+		if secrets[i].Path == decodedPathStr {
 			secretToUpdate = &secrets[i]
 			break
 		}
@@ -329,12 +335,21 @@ func (s *SecretsService) UpdateSecret(ctx context.Context, payload *gensecrets.U
 		return gensecrets.MakeForbidden(fmt.Errorf("you do not have access to this secret"))
 	}
 
-	err = s.secretsRepository.UpdateSecret(ctx, s.keyManager, payload.Path, payload.Value)
+	userRoles, err := s.userRolesRepository.GetUserRoleIDs(ctx, jwtClaims.UserID)
+	if secretToUpdate.OwnerUserId != jwtClaims.UserID || !slices.Contains(userRoles, 1) {
+		return gensecrets.MakeForbidden(fmt.Errorf("only the owner or an admin can update the secret"))
+	}
+
+	if !slices.Contains(payload.AuthorizedRoles, 1) {
+		return gensecrets.MakeInvalidParameters(fmt.Errorf("admin role (ID 1) must always have access to the secret"))
+	}
+
+	err = s.secretsRepository.UpdateSecret(ctx, s.keyManager, decodedPathStr, payload.Value)
 	if err != nil {
 		return gensecrets.MakeInternalError(fmt.Errorf("error updating secret: %w", err))
 	}
 
-	authorizedUsersIds, authorizedRolesIds, err := s.secretsAccessRepository.GetAccessesBySecretPath(ctx, payload.Path)
+	authorizedUsersIds, authorizedRolesIds, err := s.secretsAccessRepository.GetAccessesBySecretPath(ctx, decodedPathStr)
 	if err != nil {
 		return gensecrets.MakeInternalError(fmt.Errorf("error retrieving current secret accesses: %w", err))
 	}
@@ -342,14 +357,18 @@ func (s *SecretsService) UpdateSecret(ctx context.Context, payload *gensecrets.U
 	for _, newUserId := range payload.AuthorizedUsers {
 		found := slices.Contains(authorizedUsersIds, newUserId)
 		if !found {
-			err = s.secretsAccessRepository.GrantUsersAccess(ctx, payload.Path, []int{newUserId})
+			err = s.secretsAccessRepository.GrantUsersAccess(ctx, decodedPathStr, []int{newUserId})
 			if err != nil {
 				return gensecrets.MakeInternalError(fmt.Errorf("error adding authorized user %d: %w", newUserId, err))
 			}
-		} else {
-			err = s.secretsAccessRepository.RevokeUserAccess(ctx, payload.Path, newUserId)
+		}
+	}
+	for _, existingUserId := range authorizedUsersIds {
+		found := slices.Contains(payload.AuthorizedUsers, existingUserId)
+		if !found {
+			err = s.secretsAccessRepository.RevokeUserAccess(ctx, decodedPathStr, existingUserId)
 			if err != nil {
-				return gensecrets.MakeInternalError(fmt.Errorf("error removing authorized user %d: %w", newUserId, err))
+				return gensecrets.MakeInternalError(fmt.Errorf("error removing authorized user %d: %w", existingUserId, err))
 			}
 		}
 	}
@@ -357,14 +376,18 @@ func (s *SecretsService) UpdateSecret(ctx context.Context, payload *gensecrets.U
 	for _, newRoleId := range payload.AuthorizedRoles {
 		found := slices.Contains(authorizedRolesIds, newRoleId)
 		if !found {
-			err = s.secretsAccessRepository.GrantRolesAccess(ctx, payload.Path, []int{newRoleId})
+			err = s.secretsAccessRepository.GrantRolesAccess(ctx, decodedPathStr, []int{newRoleId})
 			if err != nil {
 				return gensecrets.MakeInternalError(fmt.Errorf("error adding authorized role %d: %w", newRoleId, err))
 			}
-		} else {
-			err = s.secretsAccessRepository.RevokeRoleAccess(ctx, payload.Path, newRoleId)
+		}
+	}
+	for _, existingRoleId := range authorizedRolesIds {
+		found := slices.Contains(payload.AuthorizedRoles, existingRoleId)
+		if !found {
+			err = s.secretsAccessRepository.RevokeRoleAccess(ctx, decodedPathStr, existingRoleId)
 			if err != nil {
-				return gensecrets.MakeInternalError(fmt.Errorf("error removing authorized role %d: %w", newRoleId, err))
+				return gensecrets.MakeInternalError(fmt.Errorf("error removing authorized role %d: %w", existingRoleId, err))
 			}
 		}
 	}

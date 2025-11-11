@@ -1,7 +1,9 @@
 'use client'
 
 import React, {useEffect, useState} from 'react';
-import {getSecret, listSecrets, SecretInfoSummary} from '../api/secrets';
+import {getSecret, listSecrets, SecretInfoSummary, updateSecret} from '../api/secrets';
+import {listUsers, User} from '../api/users';
+import {listRoles, Role} from '../api/roles';
 import {FolderNode} from '../types';
 import CreateSecretModal from './CreateSecretModal';
 import ManageRolesModal from './ManageRolesModal';
@@ -172,6 +174,16 @@ export default function Dashboard() {
     const [secretValueLoading, setSecretValueLoading] = useState(false);
     const [secretValueError, setSecretValueError] = useState<string | null>(null);
     const [secretValueCopied, setSecretValueCopied] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editValue, setEditValue] = useState('');
+    const [editSelectedUsers, setEditSelectedUsers] = useState<number[]>([]);
+    const [editSelectedRoles, setEditSelectedRoles] = useState<number[]>([]);
+    const [editUsers, setEditUsers] = useState<User[]>([]);
+    const [editRoles, setEditRoles] = useState<Role[]>([]);
+    const [editLoading, setEditLoading] = useState(false);
+    const [editError, setEditError] = useState<string | null>(null);
+    const [showUserSelector, setShowUserSelector] = useState(false);
+    const [showRoleSelector, setShowRoleSelector] = useState(false);
 
     const fetchSecrets = async () => {
         setLoading(true);
@@ -197,6 +209,7 @@ export default function Dashboard() {
             setShowValue(false);
             setSecretValue(null);
             setSecretValueError(null);
+            setIsEditing(false);
             return;
         }
         setSecretInfoLoading(true);
@@ -205,11 +218,65 @@ export default function Dashboard() {
         setShowValue(false);
         setSecretValue(null);
         setSecretValueError(null);
+        setIsEditing(false);
         getSecret(btoa(selectedSecret.path))
             .then(info => setSecretInfo(info))
             .catch(e => setSecretInfoError(e?.body || 'Failed to fetch secret info'))
             .finally(() => setSecretInfoLoading(false));
     }, [selectedSecret]);
+
+    useEffect(() => {
+        if (!isEditing || !selectedSecret) return;
+
+        async function fetchUsers() {
+            try {
+                const data = await listUsers();
+                setEditUsers(data);
+            } catch (e: any) {
+                setEditError('Failed to load users');
+            }
+        }
+
+        async function fetchRoles() {
+            try {
+                const data = await listRoles();
+                setEditRoles(data);
+            } catch (e: any) {
+                setEditError('Failed to load roles');
+            }
+        }
+
+        fetchUsers();
+        fetchRoles();
+    }, [isEditing, selectedSecret]);
+
+    // Pre-populate form when entering edit mode
+    useEffect(() => {
+        if (isEditing && secretInfo && secretValue !== null) {
+            setEditValue(secretValue);
+            setEditSelectedUsers(secretInfo.authorized_users?.map((u: any) => u.id) || []);
+            setEditSelectedRoles(secretInfo.authorized_roles?.map((r: any) => r.id) || []);
+        }
+    }, [isEditing, secretInfo, secretValue]);
+
+    // Close selectors when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (showUserSelector || showRoleSelector) {
+                const target = event.target as HTMLElement;
+                if (!target.closest('[data-user-selector]') && !target.closest('[data-role-selector]')) {
+                    setShowUserSelector(false);
+                    setShowRoleSelector(false);
+                }
+            }
+        };
+        if (showUserSelector || showRoleSelector) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => {
+                document.removeEventListener('mousedown', handleClickOutside);
+            };
+        }
+    }, [showUserSelector, showRoleSelector]);
 
     const handleShowValue = async () => {
         if (!selectedSecret) return;
@@ -258,6 +325,115 @@ export default function Dashboard() {
                 setTimeout(() => setSecretValueCopied(false), 1500);
             } catch {
             }
+        }
+    };
+
+    const handleStartEdit = async () => {
+        if (!selectedSecret || !secretInfo) return;
+        // Need to fetch the value first if not already loaded
+        if (!secretValue) {
+            setSecretValueLoading(true);
+            setSecretValueError(null);
+            try {
+                const encodedPath = btoa(selectedSecret.path);
+                const headers: Record<string, string> = {
+                    'Content-Type': 'application/json',
+                    ...(localStorage.getItem('authToken') ? {'Authorization': `Bearer ${localStorage.getItem('authToken')}`} : {}),
+                };
+                const resp = await fetch(`/secrets/${encodedPath}/value`, {
+                    method: 'GET',
+                    headers,
+                    credentials: 'include',
+                });
+                if (!resp.ok) {
+                    let errorBody: any = null;
+                    try {
+                        errorBody = await resp.text();
+                        try {
+                            errorBody = JSON.parse(errorBody);
+                        } catch {
+                        }
+                    } catch {
+                    }
+                    throw {status: resp.status, body: errorBody};
+                }
+                const data = await resp.json();
+                setSecretValue(data.value);
+            } catch (e: any) {
+                setSecretValueError(e?.body || 'Failed to fetch secret value');
+                setSecretValueLoading(false);
+                return;
+            } finally {
+                setSecretValueLoading(false);
+            }
+        }
+        setIsEditing(true);
+        setEditError(null);
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setEditError(null);
+        setEditValue('');
+        setEditSelectedUsers([]);
+        setEditSelectedRoles([]);
+        setShowUserSelector(false);
+        setShowRoleSelector(false);
+    };
+
+    const handleRemoveUser = (userId: number) => {
+        setEditSelectedUsers(prev => prev.filter(id => id !== userId));
+    };
+
+    const handleAddUser = (userId: number) => {
+        if (!editSelectedUsers.includes(userId)) {
+            setEditSelectedUsers(prev => [...prev, userId]);
+        }
+        setShowUserSelector(false);
+    };
+
+    const handleRemoveRole = (roleId: number) => {
+        setEditSelectedRoles(prev => prev.filter(id => id !== roleId));
+    };
+
+    const handleAddRole = (roleId: number) => {
+        if (!editSelectedRoles.includes(roleId)) {
+            setEditSelectedRoles(prev => [...prev, roleId]);
+        }
+        setShowRoleSelector(false);
+    };
+
+    const getAvailableUsers = (): User[] => {
+        return editUsers.filter(u => !editSelectedUsers.includes(u.id));
+    };
+
+    const getAvailableRoles = (): Role[] => {
+        return editRoles.filter(r => !editSelectedRoles.includes(r.id));
+    };
+
+    const handleSubmitEdit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedSecret) return;
+        setEditLoading(true);
+        setEditError(null);
+        try {
+            await updateSecret({
+                path: selectedSecret.path,
+                value: editValue,
+                authorized_users: editSelectedUsers,
+                authorized_roles: editSelectedRoles,
+            });
+            setIsEditing(false);
+            // Refresh secret info and list
+            await fetchSecrets();
+            if (selectedSecret) {
+                const info = await getSecret(btoa(selectedSecret.path));
+                setSecretInfo(info);
+            }
+        } catch (e: any) {
+            setEditError(e?.body?.message || e?.message || 'Failed to update secret');
+        } finally {
+            setEditLoading(false);
         }
     };
 
@@ -316,75 +492,457 @@ export default function Dashboard() {
                         <div style={{color: 'red'}}>{secretInfoError}</div>
                     ) : secretInfo ? (
                         <>
-                            <div><b>Owner:</b> {secretInfo.owner?.username}</div>
-                            <div><b>Created:</b> {new Date(secretInfo.created_at).toLocaleString()}</div>
-                            <div><b>Last Updated:</b> {new Date(secretInfo.updated_at).toLocaleString()}</div>
-                            <div style={{marginTop: 12}}><b>Authorized
-                                Users:</b> {secretInfo.authorized_users && secretInfo.authorized_users.length > 0 ? secretInfo.authorized_users.map((u: any) => u.username).join(', ') : 'None'}
-                            </div>
-                            <div><b>Authorized
-                                Roles:</b> {secretInfo.authorized_roles && secretInfo.authorized_roles.length > 0 ? secretInfo.authorized_roles.map((r: any) => r.name).join(', ') : 'None'}
-                            </div>
-                            <div style={{marginTop: 18}}>
-                                <button onClick={handleShowValue} disabled={secretValueLoading} style={{
-                                    padding: '6px 16px',
-                                    fontSize: 15,
-                                    borderRadius: 5,
-                                    border: '1px solid #ccc',
-                                    background: '#f5f5f5',
-                                    marginRight: 10
-                                }}>
-                                    {secretValueLoading ? 'Loading...' : (showValue ? 'Refresh Value' : 'Show Value')}
-                                </button>
-                                {showValue && (
-                                    <span style={{marginLeft: 8, display: 'flex', alignItems: 'center', gap: 8}}>
-                                        {secretValueError ? (
-                                            <span style={{color: 'red'}}>{secretValueError}</span>
-                                        ) : secretValue !== null ? (
-                                            <>
-                                                <textarea
-                                                    value={secretValue}
-                                                    readOnly
-                                                    style={{
-                                                        fontFamily: 'monospace',
-                                                        background: '#f5f5f5',
-                                                        padding: '8px',
-                                                        borderRadius: 4,
-                                                        minWidth: 260,
-                                                        minHeight: 60,
-                                                        resize: 'vertical',
-                                                        border: '1px solid #ccc',
-                                                        marginTop: 4,
-                                                        display: 'block',
-                                                    }}
-                                                />
+                            {!isEditing ? (
+                                <>
+                                    <div><b>Owner:</b> {secretInfo.owner?.username}</div>
+                                    <div><b>Created:</b> {new Date(secretInfo.created_at).toLocaleString()}</div>
+                                    <div><b>Last Updated:</b> {new Date(secretInfo.updated_at).toLocaleString()}</div>
+                                    <div style={{marginTop: 12}}><b>Authorized
+                                        Users:</b> {secretInfo.authorized_users && secretInfo.authorized_users.length > 0 ? secretInfo.authorized_users.map((u: any) => u.username).join(', ') : 'None'}
+                                    </div>
+                                    <div><b>Authorized
+                                        Roles:</b> {secretInfo.authorized_roles && secretInfo.authorized_roles.length > 0 ? secretInfo.authorized_roles.map((r: any) => r.name).join(', ') : 'None'}
+                                    </div>
+                                    <div style={{marginTop: 18}}>
+                                        <button onClick={handleShowValue} disabled={secretValueLoading} style={{
+                                            padding: '6px 16px',
+                                            fontSize: 15,
+                                            borderRadius: 5,
+                                            border: '1px solid #ccc',
+                                            background: '#f5f5f5',
+                                            marginRight: 10
+                                        }}>
+                                            {secretValueLoading ? 'Loading...' : (showValue ? 'Refresh Value' : 'Show Value')}
+                                        </button>
+                                        {showValue && (
+                                            <span
+                                                style={{marginLeft: 8, display: 'flex', alignItems: 'center', gap: 8}}>
+                                                {secretValueError ? (
+                                                    <span style={{color: 'red'}}>{secretValueError}</span>
+                                                ) : secretValue !== null ? (
+                                                    <>
+                                                        <textarea
+                                                            value={secretValue}
+                                                            readOnly
+                                                            style={{
+                                                                fontFamily: 'monospace',
+                                                                background: '#f5f5f5',
+                                                                padding: '8px',
+                                                                borderRadius: 4,
+                                                                minWidth: 260,
+                                                                minHeight: 60,
+                                                                resize: 'vertical',
+                                                                border: '1px solid #ccc',
+                                                                marginTop: 4,
+                                                                display: 'block',
+                                                            }}
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={handleCopySecretValue}
+                                                            style={{
+                                                                marginLeft: 6,
+                                                                padding: '6px 12px',
+                                                                borderRadius: 4,
+                                                                border: '1px solid #bbb',
+                                                                background: secretValueCopied ? '#d1fae5' : '#f5f5f5',
+                                                                color: '#222',
+                                                                fontWeight: 500,
+                                                                cursor: 'pointer',
+                                                                transition: 'background 0.18s',
+                                                            }}
+                                                            disabled={secretValueCopied}
+                                                            title="Copy to clipboard"
+                                                        >
+                                                            {secretValueCopied ? 'Copied!' : 'Copy'}
+                                                        </button>
+                                                    </>
+                                                ) : null}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div style={{marginTop: 18}}>
+                                        <button onClick={handleStartEdit} style={{
+                                            padding: '6px 16px',
+                                            fontSize: 15,
+                                            borderRadius: 5,
+                                            border: '1px solid #2563eb',
+                                            background: '#2563eb',
+                                            color: '#fff',
+                                            fontWeight: 500,
+                                            cursor: 'pointer',
+                                        }}>
+                                            Edit Secret
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <form onSubmit={handleSubmitEdit} style={{marginTop: 12}}>
+                                    <div style={{marginBottom: 12}}>
+                                        <label style={{
+                                            display: 'block',
+                                            marginBottom: 4,
+                                            fontSize: 14,
+                                            fontWeight: 500
+                                        }}>Value</label>
+                                        <textarea
+                                            value={editValue}
+                                            onChange={e => setEditValue(e.target.value)}
+                                            placeholder="Secret value"
+                                            style={{
+                                                width: '100%',
+                                                padding: 8,
+                                                borderRadius: 5,
+                                                border: '1px solid #ccc',
+                                                minHeight: 60,
+                                                fontFamily: 'monospace',
+                                                resize: 'vertical',
+                                            }}
+                                            required
+                                        />
+                                    </div>
+                                    <div style={{marginBottom: 12}}>
+                                        <label
+                                            style={{display: 'block', marginBottom: 4, fontSize: 14, fontWeight: 500}}>Authorized
+                                            Users</label>
+                                        <div style={{
+                                            display: 'flex',
+                                            flexWrap: 'wrap',
+                                            gap: 6,
+                                            alignItems: 'center',
+                                            minHeight: 40,
+                                            padding: '8px',
+                                            borderRadius: 5,
+                                            border: '1px solid #ccc',
+                                            background: '#fff'
+                                        }}>
+                                            {editSelectedUsers.map(userId => {
+                                                const user = editUsers.find(u => u.id === userId);
+                                                if (!user) return null;
+                                                return (
+                                                    <div
+                                                        key={user.id}
+                                                        style={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: 4,
+                                                            padding: '4px 8px',
+                                                            borderRadius: 4,
+                                                            background: '#f0f9ff',
+                                                            border: '1px solid #bae6fd',
+                                                            fontSize: 12
+                                                        }}
+                                                    >
+                                                        <span style={{color: '#0369a1', fontSize: 10}}>👤</span>
+                                                        <span style={{
+                                                            fontWeight: 500,
+                                                            color: '#0c4a6e'
+                                                        }}>{user.username}</span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveUser(user.id)}
+                                                            style={{
+                                                                marginLeft: 4,
+                                                                padding: '2px 4px',
+                                                                border: 'none',
+                                                                background: 'transparent',
+                                                                color: '#dc2626',
+                                                                cursor: 'pointer',
+                                                                fontSize: 14,
+                                                                lineHeight: 1,
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center'
+                                                            }}
+                                                            title="Remove user"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })}
+                                            <div style={{position: 'relative', display: 'inline-block'}}
+                                                 data-user-selector>
                                                 <button
                                                     type="button"
-                                                    onClick={handleCopySecretValue}
+                                                    onClick={() => setShowUserSelector(!showUserSelector)}
                                                     style={{
-                                                        marginLeft: 6,
-                                                        padding: '6px 12px',
+                                                        padding: '4px 8px',
                                                         borderRadius: 4,
-                                                        border: '1px solid #bbb',
-                                                        background: secretValueCopied ? '#d1fae5' : '#f5f5f5',
-                                                        color: '#222',
+                                                        border: '1px solid #2563eb',
+                                                        background: '#fff',
+                                                        color: '#2563eb',
+                                                        fontSize: 12,
                                                         fontWeight: 500,
-                                                        cursor: 'pointer',
-                                                        transition: 'background 0.18s',
+                                                        cursor: 'pointer'
                                                     }}
-                                                    disabled={secretValueCopied}
-                                                    title="Copy to clipboard"
                                                 >
-                                                    {secretValueCopied ? 'Copied!' : 'Copy'}
+                                                    + Add User
                                                 </button>
-                                            </>
-                                        ) : null}
-                                    </span>
-                                )}
-                            </div>
+                                                {showUserSelector && (
+                                                    <div style={{
+                                                        position: 'absolute',
+                                                        top: '100%',
+                                                        left: 0,
+                                                        marginTop: 4,
+                                                        padding: 8,
+                                                        background: '#fff',
+                                                        border: '1px solid #e5e7eb',
+                                                        borderRadius: 6,
+                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                                        zIndex: 1001,
+                                                        maxHeight: 200,
+                                                        overflowY: 'auto',
+                                                        minWidth: 200
+                                                    }}>
+                                                        {getAvailableUsers().length === 0 ? (
+                                                            <div style={{fontSize: 12, color: '#666', padding: 8}}>No
+                                                                available users</div>
+                                                        ) : (
+                                                            getAvailableUsers().map(user => (
+                                                                <button
+                                                                    key={user.id}
+                                                                    type="button"
+                                                                    onClick={() => handleAddUser(user.id)}
+                                                                    style={{
+                                                                        width: '100%',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        gap: 8,
+                                                                        padding: '6px 8px',
+                                                                        border: 'none',
+                                                                        background: 'transparent',
+                                                                        cursor: 'pointer',
+                                                                        fontSize: 12,
+                                                                        textAlign: 'left'
+                                                                    }}
+                                                                    onMouseEnter={(e) => {
+                                                                        e.currentTarget.style.background = '#f9fafb';
+                                                                    }}
+                                                                    onMouseLeave={(e) => {
+                                                                        e.currentTarget.style.background = 'transparent';
+                                                                    }}
+                                                                >
+                                                                    <span
+                                                                        style={{fontWeight: 500}}>{user.username}</span>
+                                                                </button>
+                                                            ))
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{marginBottom: 12}}>
+                                        <label
+                                            style={{display: 'block', marginBottom: 4, fontSize: 14, fontWeight: 500}}>Authorized
+                                            Roles</label>
+                                        <div style={{
+                                            display: 'flex',
+                                            flexWrap: 'wrap',
+                                            gap: 6,
+                                            alignItems: 'center',
+                                            minHeight: 40,
+                                            padding: '8px',
+                                            borderRadius: 5,
+                                            border: '1px solid #ccc',
+                                            background: '#fff'
+                                        }}>
+                                            {editSelectedRoles.map(roleId => {
+                                                const role = editRoles.find(r => r.id === roleId);
+                                                if (!role) return null;
+                                                return (
+                                                    <div
+                                                        key={role.id}
+                                                        style={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: 4,
+                                                            padding: '4px 8px',
+                                                            borderRadius: 4,
+                                                            background: '#f9fafb',
+                                                            border: '1px solid #e5e7eb',
+                                                            fontSize: 12
+                                                        }}
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                width: 12,
+                                                                height: 12,
+                                                                borderRadius: 3,
+                                                                background: role.color,
+                                                                border: '1px solid #ccc',
+                                                                flexShrink: 0
+                                                            }}
+                                                        />
+                                                        <span style={{
+                                                            fontWeight: 500,
+                                                            color: '#374151'
+                                                        }}>{role.name}</span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveRole(role.id)}
+                                                            style={{
+                                                                marginLeft: 4,
+                                                                padding: '2px 4px',
+                                                                border: 'none',
+                                                                background: 'transparent',
+                                                                color: '#dc2626',
+                                                                cursor: 'pointer',
+                                                                fontSize: 14,
+                                                                lineHeight: 1,
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center'
+                                                            }}
+                                                            title="Remove role"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })}
+                                            <div style={{position: 'relative', display: 'inline-block'}}
+                                                 data-role-selector>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowRoleSelector(!showRoleSelector)}
+                                                    style={{
+                                                        padding: '4px 8px',
+                                                        borderRadius: 4,
+                                                        border: '1px solid #2563eb',
+                                                        background: '#fff',
+                                                        color: '#2563eb',
+                                                        fontSize: 12,
+                                                        fontWeight: 500,
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    + Add Role
+                                                </button>
+                                                {showRoleSelector && (
+                                                    <div style={{
+                                                        position: 'absolute',
+                                                        top: '100%',
+                                                        left: 0,
+                                                        marginTop: 4,
+                                                        padding: 8,
+                                                        background: '#fff',
+                                                        border: '1px solid #e5e7eb',
+                                                        borderRadius: 6,
+                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                                        zIndex: 1001,
+                                                        maxHeight: 200,
+                                                        overflowY: 'auto',
+                                                        minWidth: 200
+                                                    }}>
+                                                        {getAvailableRoles().length === 0 ? (
+                                                            <div style={{fontSize: 12, color: '#666', padding: 8}}>No
+                                                                available roles</div>
+                                                        ) : (
+                                                            getAvailableRoles().map(role => (
+                                                                <button
+                                                                    key={role.id}
+                                                                    type="button"
+                                                                    onClick={() => handleAddRole(role.id)}
+                                                                    style={{
+                                                                        width: '100%',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        gap: 8,
+                                                                        padding: '6px 8px',
+                                                                        border: 'none',
+                                                                        background: 'transparent',
+                                                                        cursor: 'pointer',
+                                                                        fontSize: 12,
+                                                                        textAlign: 'left'
+                                                                    }}
+                                                                    onMouseEnter={(e) => {
+                                                                        e.currentTarget.style.background = '#f9fafb';
+                                                                    }}
+                                                                    onMouseLeave={(e) => {
+                                                                        e.currentTarget.style.background = 'transparent';
+                                                                    }}
+                                                                >
+                                                                    <div
+                                                                        style={{
+                                                                            width: 12,
+                                                                            height: 12,
+                                                                            borderRadius: 3,
+                                                                            background: role.color,
+                                                                            border: '1px solid #ccc',
+                                                                            flexShrink: 0
+                                                                        }}
+                                                                    />
+                                                                    <span style={{fontWeight: 500}}>{role.name}</span>
+                                                                    {role.admin && (
+                                                                        <span style={{
+                                                                            fontSize: 10,
+                                                                            padding: '1px 4px',
+                                                                            borderRadius: 3,
+                                                                            background: '#fef3c7',
+                                                                            color: '#92400e',
+                                                                            fontWeight: 600,
+                                                                            marginLeft: 'auto'
+                                                                        }}>
+                                                                            ADMIN
+                                                                        </span>
+                                                                    )}
+                                                                </button>
+                                                            ))
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {editError && (
+                                        <div style={{color: 'red', marginBottom: 10, fontSize: 14}}>{editError}</div>
+                                    )}
+                                    <div style={{display: 'flex', gap: 12, marginTop: 18}}>
+                                        <button
+                                            type="button"
+                                            onClick={handleCancelEdit}
+                                            disabled={editLoading}
+                                            style={{
+                                                flex: 1,
+                                                padding: 10,
+                                                borderRadius: 5,
+                                                border: '1px solid #ccc',
+                                                background: '#f5f5f5',
+                                                cursor: editLoading ? 'not-allowed' : 'pointer'
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={editLoading}
+                                            style={{
+                                                flex: 2,
+                                                padding: 10,
+                                                borderRadius: 5,
+                                                border: 'none',
+                                                background: '#2563eb',
+                                                color: '#fff',
+                                                fontWeight: 600,
+                                                cursor: editLoading ? 'not-allowed' : 'pointer'
+                                            }}
+                                        >
+                                            {editLoading ? 'Updating...' : 'Update Secret'}
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
                         </>
                     ) : null}
-                    <button style={{marginTop: 16}} onClick={() => setSelectedSecret(null)}>Close</button>
+                    <button style={{marginTop: 16}} onClick={() => {
+                        setSelectedSecret(null);
+                        setIsEditing(false);
+                        setShowUserSelector(false);
+                        setShowRoleSelector(false);
+                    }}>Close
+                    </button>
                 </div>
             )}
             <CreateSecretModal open={showCreateModal} onClose={() => setShowCreateModal(false)}
