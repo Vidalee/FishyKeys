@@ -105,3 +105,53 @@ func BuildCreateSecretPayload(secretsCreateSecretBody string) (*secrets.CreateSe
 
 	return v, nil
 }
+
+// BuildUpdateSecretPayload builds the payload for the secrets update secret
+// endpoint from CLI flags.
+func BuildUpdateSecretPayload(secretsUpdateSecretBody string) (*secrets.UpdateSecretPayload, error) {
+	var err error
+	var body UpdateSecretRequestBody
+	{
+		err = json.Unmarshal([]byte(secretsUpdateSecretBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"authorized_roles\": [\n         1,\n         2\n      ],\n      \"authorized_users\": [\n         1,\n         2,\n         3\n      ],\n      \"path\": \"L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==\",\n      \"value\": \"SECRET_API_KEY123\"\n   }'")
+		}
+		if body.AuthorizedUsers == nil {
+			err = goa.MergeErrors(err, goa.MissingFieldError("authorized_users", "body"))
+		}
+		if body.AuthorizedRoles == nil {
+			err = goa.MergeErrors(err, goa.MissingFieldError("authorized_roles", "body"))
+		}
+		if utf8.RuneCountInString(body.Path) < 2 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.path", body.Path, utf8.RuneCountInString(body.Path), 2, true))
+		}
+		if utf8.RuneCountInString(body.Value) < 1 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.value", body.Value, utf8.RuneCountInString(body.Value), 1, true))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &secrets.UpdateSecretPayload{
+		Path:  body.Path,
+		Value: body.Value,
+	}
+	if body.AuthorizedUsers != nil {
+		v.AuthorizedUsers = make([]int, len(body.AuthorizedUsers))
+		for i, val := range body.AuthorizedUsers {
+			v.AuthorizedUsers[i] = val
+		}
+	} else {
+		v.AuthorizedUsers = []int{}
+	}
+	if body.AuthorizedRoles != nil {
+		v.AuthorizedRoles = make([]int, len(body.AuthorizedRoles))
+		for i, val := range body.AuthorizedRoles {
+			v.AuthorizedRoles[i] = val
+		}
+	} else {
+		v.AuthorizedRoles = []int{}
+	}
+
+	return v, nil
+}

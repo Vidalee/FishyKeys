@@ -1,4 +1,18 @@
-import {SecretInfoSummary, SecretOwner} from "../types";
+export interface SecretOwner {
+    id: number;
+    username: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface SecretInfoSummary {
+    path: string;
+    owner: SecretOwner;
+    created_at: string;
+    updated_at: string;
+    roles?: { id: number; name: string; color: string }[];
+    users?: { id: number; username: string }[];
+}
 
 const API_BASE = "/secrets"
 
@@ -87,6 +101,44 @@ export async function createSecret({path, value, authorized_users, authorized_ro
     });
     const response = await fetch(`${API_BASE}`, {
         method: 'POST',
+        headers,
+        credentials: 'include',
+        body,
+    });
+    if (!response.ok) {
+        let errorBody: any = null;
+        try {
+            errorBody = await response.text();
+            try {
+                errorBody = JSON.parse(errorBody);
+            } catch {
+            }
+        } catch {
+        }
+        throw {status: response.status, body: errorBody};
+    }
+}
+
+export async function updateSecret({path, value, authorized_users, authorized_roles}: {
+    path: string;
+    value: string;
+    authorized_users: number[];
+    authorized_roles: number[]
+}): Promise<void> {
+    const baseHeaders: Record<string, string> = {
+        'Content-Type': 'application/json',
+    };
+    const headers: Record<string, string> = {...baseHeaders, ...getAuthHeaders()};
+    // Path must be base64 encoded
+    const encodedPath = btoa(path);
+    const body = JSON.stringify({
+        path: encodedPath,
+        value,
+        authorized_users,
+        authorized_roles,
+    });
+    const response = await fetch(`${API_BASE}`, {
+        method: 'PATCH',
         headers,
         credentials: 'include',
         body,

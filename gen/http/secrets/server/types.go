@@ -27,6 +27,19 @@ type CreateSecretRequestBody struct {
 	AuthorizedRoles []int `form:"authorized_roles,omitempty" json:"authorized_roles,omitempty" xml:"authorized_roles,omitempty"`
 }
 
+// UpdateSecretRequestBody is the type of the "secrets" service "update secret"
+// endpoint HTTP request body.
+type UpdateSecretRequestBody struct {
+	// Base64 encoded secret's path
+	Path *string `form:"path,omitempty" json:"path,omitempty" xml:"path,omitempty"`
+	// The secret value
+	Value *string `form:"value,omitempty" json:"value,omitempty" xml:"value,omitempty"`
+	// Users IDs authorized to access the secret
+	AuthorizedUsers []int `form:"authorized_users,omitempty" json:"authorized_users,omitempty" xml:"authorized_users,omitempty"`
+	// Role IDs authorized to access the secret
+	AuthorizedRoles []int `form:"authorized_roles,omitempty" json:"authorized_roles,omitempty" xml:"authorized_roles,omitempty"`
+}
+
 // ListSecretsResponseBody is the type of the "secrets" service "list secrets"
 // endpoint HTTP response body.
 type ListSecretsResponseBody []*SecretInfoSummaryResponse
@@ -367,6 +380,97 @@ type CreateSecretInternalErrorResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// UpdateSecretSecretNotFoundResponseBody is the type of the "secrets" service
+// "update secret" endpoint HTTP response body for the "secret_not_found" error.
+type UpdateSecretSecretNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateSecretInvalidParametersResponseBody is the type of the "secrets"
+// service "update secret" endpoint HTTP response body for the
+// "invalid_parameters" error.
+type UpdateSecretInvalidParametersResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateSecretUnauthorizedResponseBody is the type of the "secrets" service
+// "update secret" endpoint HTTP response body for the "unauthorized" error.
+type UpdateSecretUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateSecretForbiddenResponseBody is the type of the "secrets" service
+// "update secret" endpoint HTTP response body for the "forbidden" error.
+type UpdateSecretForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UpdateSecretInternalErrorResponseBody is the type of the "secrets" service
+// "update secret" endpoint HTTP response body for the "internal_error" error.
+type UpdateSecretInternalErrorResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // SecretInfoSummaryResponse is used to define fields on response body types.
 type SecretInfoSummaryResponse struct {
 	// The original path of the secret
@@ -377,6 +481,10 @@ type SecretInfoSummaryResponse struct {
 	CreatedAt string `form:"created_at" json:"created_at" xml:"created_at"`
 	// Last update timestamp of the secret
 	UpdatedAt string `form:"updated_at" json:"updated_at" xml:"updated_at"`
+	// Users authorized to access the secret
+	Users []*UserResponse `form:"users" json:"users" xml:"users"`
+	// Roles authorized to access the secret
+	Roles []*RoleResponse `form:"roles" json:"roles" xml:"roles"`
 }
 
 // UserResponse is used to define fields on response body types.
@@ -727,6 +835,76 @@ func NewCreateSecretInternalErrorResponseBody(res *goa.ServiceError) *CreateSecr
 	return body
 }
 
+// NewUpdateSecretSecretNotFoundResponseBody builds the HTTP response body from
+// the result of the "update secret" endpoint of the "secrets" service.
+func NewUpdateSecretSecretNotFoundResponseBody(res *goa.ServiceError) *UpdateSecretSecretNotFoundResponseBody {
+	body := &UpdateSecretSecretNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUpdateSecretInvalidParametersResponseBody builds the HTTP response body
+// from the result of the "update secret" endpoint of the "secrets" service.
+func NewUpdateSecretInvalidParametersResponseBody(res *goa.ServiceError) *UpdateSecretInvalidParametersResponseBody {
+	body := &UpdateSecretInvalidParametersResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUpdateSecretUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "update secret" endpoint of the "secrets" service.
+func NewUpdateSecretUnauthorizedResponseBody(res *goa.ServiceError) *UpdateSecretUnauthorizedResponseBody {
+	body := &UpdateSecretUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUpdateSecretForbiddenResponseBody builds the HTTP response body from the
+// result of the "update secret" endpoint of the "secrets" service.
+func NewUpdateSecretForbiddenResponseBody(res *goa.ServiceError) *UpdateSecretForbiddenResponseBody {
+	body := &UpdateSecretForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewUpdateSecretInternalErrorResponseBody builds the HTTP response body from
+// the result of the "update secret" endpoint of the "secrets" service.
+func NewUpdateSecretInternalErrorResponseBody(res *goa.ServiceError) *UpdateSecretInternalErrorResponseBody {
+	body := &UpdateSecretInternalErrorResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewGetSecretValuePayload builds a secrets service get secret value endpoint
 // payload.
 func NewGetSecretValuePayload(path string) *secrets.GetSecretValuePayload {
@@ -763,9 +941,56 @@ func NewCreateSecretPayload(body *CreateSecretRequestBody) *secrets.CreateSecret
 	return v
 }
 
+// NewUpdateSecretPayload builds a secrets service update secret endpoint
+// payload.
+func NewUpdateSecretPayload(body *UpdateSecretRequestBody) *secrets.UpdateSecretPayload {
+	v := &secrets.UpdateSecretPayload{
+		Path:  *body.Path,
+		Value: *body.Value,
+	}
+	v.AuthorizedUsers = make([]int, len(body.AuthorizedUsers))
+	for i, val := range body.AuthorizedUsers {
+		v.AuthorizedUsers[i] = val
+	}
+	v.AuthorizedRoles = make([]int, len(body.AuthorizedRoles))
+	for i, val := range body.AuthorizedRoles {
+		v.AuthorizedRoles[i] = val
+	}
+
+	return v
+}
+
 // ValidateCreateSecretRequestBody runs the validations defined on Create
 // SecretRequestBody
 func ValidateCreateSecretRequestBody(body *CreateSecretRequestBody) (err error) {
+	if body.Path == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("path", "body"))
+	}
+	if body.Value == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("value", "body"))
+	}
+	if body.AuthorizedUsers == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("authorized_users", "body"))
+	}
+	if body.AuthorizedRoles == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("authorized_roles", "body"))
+	}
+	if body.Path != nil {
+		if utf8.RuneCountInString(*body.Path) < 2 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.path", *body.Path, utf8.RuneCountInString(*body.Path), 2, true))
+		}
+	}
+	if body.Value != nil {
+		if utf8.RuneCountInString(*body.Value) < 1 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.value", *body.Value, utf8.RuneCountInString(*body.Value), 1, true))
+		}
+	}
+	return
+}
+
+// ValidateUpdateSecretRequestBody runs the validations defined on Update
+// SecretRequestBody
+func ValidateUpdateSecretRequestBody(body *UpdateSecretRequestBody) (err error) {
 	if body.Path == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("path", "body"))
 	}

@@ -35,7 +35,10 @@ var SecretInfoSummaryType = Type("SecretInfoSummary", func() {
 		Example("2025-06-30T15:00:00Z")
 	})
 
-	Required("path", "owner", "created_at", "updated_at")
+	Attribute("users", ArrayOf(UserType), "Users authorized to access the secret")
+	Attribute("roles", ArrayOf(RoleType), "Roles authorized to access the secret")
+
+	Required("path", "owner", "created_at", "updated_at", "users", "roles")
 })
 
 var _ = Service("secrets", func() {
@@ -169,6 +172,39 @@ var _ = Service("secrets", func() {
 		HTTP(func() {
 			POST("/secrets")
 			Response(StatusCreated)
+			Response("invalid_parameters", StatusBadRequest)
+			Response("unauthorized", StatusUnauthorized)
+			Response("forbidden", StatusForbidden)
+			Response("internal_error", StatusInternalServerError)
+		})
+	})
+
+	Method("update secret", func() {
+		ServerInterceptor(Authentified)
+
+		Description("Update a secret")
+		Payload(func() {
+			Attribute("path", String, "Base64 encoded secret's path", func() {
+				Example("L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==")
+				MinLength(2)
+			})
+			Attribute("value", String, "The secret value", func() {
+				Example("SECRET_API_KEY123")
+				MinLength(1)
+			})
+			Attribute("authorized_users", ArrayOf(Int), "Users IDs authorized to access the secret", func() {
+				Example([]int{1, 2, 3})
+			})
+			Attribute("authorized_roles", ArrayOf(Int), "Role IDs authorized to access the secret", func() {
+				Example([]int{1, 2})
+			})
+			Required("path", "value", "authorized_users", "authorized_roles")
+		})
+		Error("secret_not_found", ErrorResult, "Secret not found")
+		HTTP(func() {
+			PATCH("/secrets")
+			Response(StatusCreated)
+			Response("secret_not_found", StatusNotFound)
 			Response("invalid_parameters", StatusBadRequest)
 			Response("unauthorized", StatusUnauthorized)
 			Response("forbidden", StatusForbidden)

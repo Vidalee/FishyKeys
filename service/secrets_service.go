@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"slices"
 
 	gensecrets "github.com/Vidalee/FishyKeys/gen/secrets"
 	"github.com/Vidalee/FishyKeys/internal/crypto"
@@ -50,11 +51,59 @@ func (s *SecretsService) ListSecrets(ctx context.Context) ([]*gensecrets.SecretI
 		return nil, gensecrets.MakeInternalError(fmt.Errorf("error listing secrets: %w", err))
 	}
 
+	// Retrieve all roles and users to build maps for easy lookup when listing access for each secret
+	roles, err := s.rolesRepository.ListRoles(ctx)
+	if err != nil {
+		return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving roles: %w", err))
+	}
+	users, err := s.usersRepository.ListUsers(ctx)
+	if err != nil {
+		return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving users: %w", err))
+	}
+	roleMap := make(map[int]gensecrets.Role)
+	for _, role := range roles {
+		roleMap[role.ID] = gensecrets.Role{
+			ID:        role.ID,
+			Name:      role.Name,
+			Color:     role.Color,
+			Admin:     role.Admin,
+			CreatedAt: role.CreatedAt.Format("2006-01-02T15:04:05Z"),
+			UpdatedAt: role.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+		}
+	}
+	userMap := make(map[int]gensecrets.User)
+	for _, user := range users {
+		userMap[user.ID] = gensecrets.User{
+			ID:        user.ID,
+			Username:  user.Username,
+			CreatedAt: user.CreatedAt.Format("2006-01-02T15:04:05Z"),
+			UpdatedAt: user.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+		}
+	}
+
 	secretInfos := make([]*gensecrets.SecretInfoSummary, 0, len(secrets))
 	for _, secret := range secrets {
 		owner, err := s.usersRepository.GetUserByID(ctx, secret.OwnerUserId)
 		if err != nil {
 			return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving secret owner: %w", err))
+		}
+
+		secretUserIds, roleUserIds, err := s.secretsAccessRepository.GetAccessesBySecretPath(ctx, secret.Path)
+		if err != nil {
+			return nil, gensecrets.MakeInternalError(fmt.Errorf("error retrieving secret accesses for secret %s: %w", secret.Path, err))
+		}
+
+		var secretRoles []*gensecrets.Role
+		for _, roleID := range roleUserIds {
+			if role, exists := roleMap[roleID]; exists {
+				secretRoles = append(secretRoles, &role)
+			}
+		}
+		var secretUsers []*gensecrets.User
+		for _, userID := range secretUserIds {
+			if user, exists := userMap[userID]; exists {
+				secretUsers = append(secretUsers, &user)
+			}
 		}
 
 		secretInfos = append(secretInfos, &gensecrets.SecretInfoSummary{
@@ -67,6 +116,8 @@ func (s *SecretsService) ListSecrets(ctx context.Context) ([]*gensecrets.SecretI
 			},
 			CreatedAt: secret.CreatedAt.Format("2006-01-02T15:04:05Z"),
 			UpdatedAt: secret.UpdatedAt.Format("2006-01-02T15:04:05Z"),
+			Roles:     secretRoles,
+			Users:     secretUsers,
 		})
 	}
 
@@ -256,4 +307,90 @@ func (s *SecretsService) getSecretValue(ctx context.Context, userID int, path st
 	}
 
 	return decryptedSecret.DecryptedValue, decodedPathStr, nil
+}
+
+func (s *SecretsService) UpdateSecret(ctx context.Context, payload *gensecrets.UpdateSecretPayload) error {
+	// Guaranteed by the Authentified interceptor
+	jwtClaims := ctx.Value("token").(*JwtClaims)
+
+	decodedPath, err := base64.StdEncoding.DecodeString(payload.Path)
+	if err != nil {
+		return gensecrets.MakeInvalidParameters(fmt.Errorf("invalid path encoding: %w", err))
+	}
+	decodedPathStr := string(decodedPath)
+
+	secrets, err := s.secretsRepository.ListSecretsForUser(ctx, jwtClaims.UserID)
+	if err != nil {
+		return gensecrets.MakeInternalError(fmt.Errorf("error listing secrets: %w", err))
+	}
+
+	var secretToUpdate *repository.Secret
+	for i := range secrets {
+		if secrets[i].Path == decodedPathStr {
+			secretToUpdate = &secrets[i]
+			break
+		}
+	}
+	if secretToUpdate == nil {
+		return gensecrets.MakeForbidden(fmt.Errorf("you do not have access to this secret"))
+	}
+
+	userRoles, err := s.userRolesRepository.GetUserRoleIDs(ctx, jwtClaims.UserID)
+	if secretToUpdate.OwnerUserId != jwtClaims.UserID || !slices.Contains(userRoles, 1) {
+		return gensecrets.MakeForbidden(fmt.Errorf("only the owner or an admin can update the secret"))
+	}
+
+	if !slices.Contains(payload.AuthorizedRoles, 1) {
+		return gensecrets.MakeInvalidParameters(fmt.Errorf("admin role (ID 1) must always have access to the secret"))
+	}
+
+	err = s.secretsRepository.UpdateSecret(ctx, s.keyManager, decodedPathStr, payload.Value)
+	if err != nil {
+		return gensecrets.MakeInternalError(fmt.Errorf("error updating secret: %w", err))
+	}
+
+	authorizedUsersIds, authorizedRolesIds, err := s.secretsAccessRepository.GetAccessesBySecretPath(ctx, decodedPathStr)
+	if err != nil {
+		return gensecrets.MakeInternalError(fmt.Errorf("error retrieving current secret accesses: %w", err))
+	}
+
+	for _, newUserId := range payload.AuthorizedUsers {
+		found := slices.Contains(authorizedUsersIds, newUserId)
+		if !found {
+			err = s.secretsAccessRepository.GrantUsersAccess(ctx, decodedPathStr, []int{newUserId})
+			if err != nil {
+				return gensecrets.MakeInternalError(fmt.Errorf("error adding authorized user %d: %w", newUserId, err))
+			}
+		}
+	}
+	for _, existingUserId := range authorizedUsersIds {
+		found := slices.Contains(payload.AuthorizedUsers, existingUserId)
+		if !found {
+			err = s.secretsAccessRepository.RevokeUserAccess(ctx, decodedPathStr, existingUserId)
+			if err != nil {
+				return gensecrets.MakeInternalError(fmt.Errorf("error removing authorized user %d: %w", existingUserId, err))
+			}
+		}
+	}
+
+	for _, newRoleId := range payload.AuthorizedRoles {
+		found := slices.Contains(authorizedRolesIds, newRoleId)
+		if !found {
+			err = s.secretsAccessRepository.GrantRolesAccess(ctx, decodedPathStr, []int{newRoleId})
+			if err != nil {
+				return gensecrets.MakeInternalError(fmt.Errorf("error adding authorized role %d: %w", newRoleId, err))
+			}
+		}
+	}
+	for _, existingRoleId := range authorizedRolesIds {
+		found := slices.Contains(payload.AuthorizedRoles, existingRoleId)
+		if !found {
+			err = s.secretsAccessRepository.RevokeRoleAccess(ctx, decodedPathStr, existingRoleId)
+			if err != nil {
+				return gensecrets.MakeInternalError(fmt.Errorf("error removing authorized role %d: %w", existingRoleId, err))
+			}
+		}
+	}
+
+	return nil
 }

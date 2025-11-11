@@ -20,6 +20,7 @@ type Endpoints struct {
 	OperatorGetSecretValue goa.Endpoint
 	GetSecret              goa.Endpoint
 	CreateSecret           goa.Endpoint
+	UpdateSecret           goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "secrets" service with endpoints.
@@ -30,11 +31,13 @@ func NewEndpoints(s Service, si ServerInterceptors) *Endpoints {
 		OperatorGetSecretValue: NewOperatorGetSecretValueEndpoint(s),
 		GetSecret:              NewGetSecretEndpoint(s),
 		CreateSecret:           NewCreateSecretEndpoint(s),
+		UpdateSecret:           NewUpdateSecretEndpoint(s),
 	}
 	endpoints.ListSecrets = WrapListSecretsEndpoint(endpoints.ListSecrets, si)
 	endpoints.GetSecretValue = WrapGetSecretValueEndpoint(endpoints.GetSecretValue, si)
 	endpoints.GetSecret = WrapGetSecretEndpoint(endpoints.GetSecret, si)
 	endpoints.CreateSecret = WrapCreateSecretEndpoint(endpoints.CreateSecret, si)
+	endpoints.UpdateSecret = WrapUpdateSecretEndpoint(endpoints.UpdateSecret, si)
 	return endpoints
 }
 
@@ -45,6 +48,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.OperatorGetSecretValue = m(e.OperatorGetSecretValue)
 	e.GetSecret = m(e.GetSecret)
 	e.CreateSecret = m(e.CreateSecret)
+	e.UpdateSecret = m(e.UpdateSecret)
 }
 
 // NewListSecretsEndpoint returns an endpoint function that calls the method
@@ -88,5 +92,14 @@ func NewCreateSecretEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*CreateSecretPayload)
 		return nil, s.CreateSecret(ctx, p)
+	}
+}
+
+// NewUpdateSecretEndpoint returns an endpoint function that calls the method
+// "update secret" of service "secrets".
+func NewUpdateSecretEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*UpdateSecretPayload)
+		return nil, s.UpdateSecret(ctx, p)
 	}
 }

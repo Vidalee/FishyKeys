@@ -424,6 +424,125 @@ func EncodeCreateSecretError(encoder func(context.Context, http.ResponseWriter) 
 	}
 }
 
+// EncodeUpdateSecretResponse returns an encoder for responses returned by the
+// secrets update secret endpoint.
+func EncodeUpdateSecretResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+	return func(ctx context.Context, w http.ResponseWriter, v any) error {
+		w.WriteHeader(http.StatusCreated)
+		return nil
+	}
+}
+
+// DecodeUpdateSecretRequest returns a decoder for requests sent to the secrets
+// update secret endpoint.
+func DecodeUpdateSecretRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
+	return func(r *http.Request) (any, error) {
+		var (
+			body UpdateSecretRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			var gerr *goa.ServiceError
+			if errors.As(err, &gerr) {
+				return nil, gerr
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateUpdateSecretRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewUpdateSecretPayload(&body)
+
+		return payload, nil
+	}
+}
+
+// EncodeUpdateSecretError returns an encoder for errors returned by the update
+// secret secrets endpoint.
+func EncodeUpdateSecretError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(ctx context.Context, err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		var en goa.GoaErrorNamer
+		if !errors.As(v, &en) {
+			return encodeError(ctx, w, v)
+		}
+		switch en.GoaErrorName() {
+		case "secret_not_found":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewUpdateSecretSecretNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "invalid_parameters":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewUpdateSecretInvalidParametersResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "unauthorized":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewUpdateSecretUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		case "forbidden":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewUpdateSecretForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "internal_error":
+			var res *goa.ServiceError
+			errors.As(v, &res)
+			enc := encoder(ctx, w)
+			var body any
+			if formatter != nil {
+				body = formatter(ctx, res)
+			} else {
+				body = NewUpdateSecretInternalErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.GoaErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // marshalSecretsSecretInfoSummaryToSecretInfoSummaryResponse builds a value of
 // type *SecretInfoSummaryResponse from a value of type
 // *secrets.SecretInfoSummary.
@@ -435,6 +554,22 @@ func marshalSecretsSecretInfoSummaryToSecretInfoSummaryResponse(v *secrets.Secre
 	}
 	if v.Owner != nil {
 		res.Owner = marshalSecretsUserToUserResponse(v.Owner)
+	}
+	if v.Users != nil {
+		res.Users = make([]*UserResponse, len(v.Users))
+		for i, val := range v.Users {
+			res.Users[i] = marshalSecretsUserToUserResponse(val)
+		}
+	} else {
+		res.Users = []*UserResponse{}
+	}
+	if v.Roles != nil {
+		res.Roles = make([]*RoleResponse, len(v.Roles))
+		for i, val := range v.Roles {
+			res.Roles[i] = marshalSecretsRoleToRoleResponse(val)
+		}
+	} else {
+		res.Roles = []*RoleResponse{}
 	}
 
 	return res

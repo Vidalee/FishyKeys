@@ -183,7 +183,7 @@
                   "$ref": "#/components/schemas/AddShareResponseBody"
                 },
                 "example": {
-                  "index": 292269787529135470,
+                  "index": 4413501202617169754,
                   "unlocked": true
                 }
               }
@@ -249,10 +249,10 @@
                   "$ref": "#/components/schemas/GetKeyStatusResponseBody"
                 },
                 "example": {
-                  "current_shares": 5117056083765439164,
+                  "current_shares": 3571465081279942681,
                   "is_locked": false,
-                  "min_shares": 908568140735950639,
-                  "total_shares": 3571465081279942681
+                  "min_shares": 6887987368142988941,
+                  "total_shares": 2167945761760457450
                 }
               }
             }
@@ -300,7 +300,7 @@
                   },
                   "example": [
                     {
-                      "admin": true,
+                      "admin": false,
                       "color": "#FF5733",
                       "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
@@ -308,7 +308,7 @@
                       "updated_at": "2025-06-30T15:00:00Z"
                     },
                     {
-                      "admin": true,
+                      "admin": false,
                       "color": "#FF5733",
                       "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
@@ -316,7 +316,15 @@
                       "updated_at": "2025-06-30T15:00:00Z"
                     },
                     {
-                      "admin": true,
+                      "admin": false,
+                      "color": "#FF5733",
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "id": 1,
+                      "name": "admin",
+                      "updated_at": "2025-06-30T15:00:00Z"
+                    },
+                    {
+                      "admin": false,
                       "color": "#FF5733",
                       "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
@@ -327,7 +335,7 @@
                 },
                 "example": [
                   {
-                    "admin": true,
+                    "admin": false,
                     "color": "#FF5733",
                     "created_at": "2025-06-30T12:00:00Z",
                     "id": 1,
@@ -335,7 +343,7 @@
                     "updated_at": "2025-06-30T15:00:00Z"
                   },
                   {
-                    "admin": true,
+                    "admin": false,
                     "color": "#FF5733",
                     "created_at": "2025-06-30T12:00:00Z",
                     "id": 1,
@@ -723,7 +731,7 @@
                         "id": 1,
                         "roles": [
                           {
-                            "admin": true,
+                            "admin": false,
                             "color": "#FF5733",
                             "created_at": "2025-06-30T12:00:00Z",
                             "id": 1,
@@ -731,7 +739,23 @@
                             "updated_at": "2025-06-30T15:00:00Z"
                           },
                           {
-                            "admin": true,
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
                             "color": "#FF5733",
                             "created_at": "2025-06-30T12:00:00Z",
                             "id": 1,
@@ -743,7 +767,187 @@
                         "username": "alice"
                       },
                       "path": "customers/google/api_key",
-                      "updated_at": "2025-06-30T15:00:00Z"
+                      "roles": [
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        }
+                      ],
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "users": [
+                        {
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "roles": [
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            }
+                          ],
+                          "updated_at": "2025-06-30T15:00:00Z",
+                          "username": "alice"
+                        },
+                        {
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "roles": [
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            }
+                          ],
+                          "updated_at": "2025-06-30T15:00:00Z",
+                          "username": "alice"
+                        },
+                        {
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "roles": [
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            }
+                          ],
+                          "updated_at": "2025-06-30T15:00:00Z",
+                          "username": "alice"
+                        },
+                        {
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "roles": [
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            }
+                          ],
+                          "updated_at": "2025-06-30T15:00:00Z",
+                          "username": "alice"
+                        }
+                      ]
                     },
                     {
                       "created_at": "2025-06-30T12:00:00Z",
@@ -752,7 +956,7 @@
                         "id": 1,
                         "roles": [
                           {
-                            "admin": true,
+                            "admin": false,
                             "color": "#FF5733",
                             "created_at": "2025-06-30T12:00:00Z",
                             "id": 1,
@@ -760,7 +964,23 @@
                             "updated_at": "2025-06-30T15:00:00Z"
                           },
                           {
-                            "admin": true,
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
                             "color": "#FF5733",
                             "created_at": "2025-06-30T12:00:00Z",
                             "id": 1,
@@ -772,7 +992,187 @@
                         "username": "alice"
                       },
                       "path": "customers/google/api_key",
-                      "updated_at": "2025-06-30T15:00:00Z"
+                      "roles": [
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        }
+                      ],
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "users": [
+                        {
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "roles": [
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            }
+                          ],
+                          "updated_at": "2025-06-30T15:00:00Z",
+                          "username": "alice"
+                        },
+                        {
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "roles": [
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            }
+                          ],
+                          "updated_at": "2025-06-30T15:00:00Z",
+                          "username": "alice"
+                        },
+                        {
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "roles": [
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            }
+                          ],
+                          "updated_at": "2025-06-30T15:00:00Z",
+                          "username": "alice"
+                        },
+                        {
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "roles": [
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            }
+                          ],
+                          "updated_at": "2025-06-30T15:00:00Z",
+                          "username": "alice"
+                        }
+                      ]
                     },
                     {
                       "created_at": "2025-06-30T12:00:00Z",
@@ -781,7 +1181,7 @@
                         "id": 1,
                         "roles": [
                           {
-                            "admin": true,
+                            "admin": false,
                             "color": "#FF5733",
                             "created_at": "2025-06-30T12:00:00Z",
                             "id": 1,
@@ -789,7 +1189,23 @@
                             "updated_at": "2025-06-30T15:00:00Z"
                           },
                           {
-                            "admin": true,
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
                             "color": "#FF5733",
                             "created_at": "2025-06-30T12:00:00Z",
                             "id": 1,
@@ -801,36 +1217,187 @@
                         "username": "alice"
                       },
                       "path": "customers/google/api_key",
-                      "updated_at": "2025-06-30T15:00:00Z"
-                    },
-                    {
-                      "created_at": "2025-06-30T12:00:00Z",
-                      "owner": {
-                        "created_at": "2025-06-30T12:00:00Z",
-                        "id": 1,
-                        "roles": [
-                          {
-                            "admin": true,
-                            "color": "#FF5733",
-                            "created_at": "2025-06-30T12:00:00Z",
-                            "id": 1,
-                            "name": "admin",
-                            "updated_at": "2025-06-30T15:00:00Z"
-                          },
-                          {
-                            "admin": true,
-                            "color": "#FF5733",
-                            "created_at": "2025-06-30T12:00:00Z",
-                            "id": 1,
-                            "name": "admin",
-                            "updated_at": "2025-06-30T15:00:00Z"
-                          }
-                        ],
-                        "updated_at": "2025-06-30T15:00:00Z",
-                        "username": "alice"
-                      },
-                      "path": "customers/google/api_key",
-                      "updated_at": "2025-06-30T15:00:00Z"
+                      "roles": [
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        }
+                      ],
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "users": [
+                        {
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "roles": [
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            }
+                          ],
+                          "updated_at": "2025-06-30T15:00:00Z",
+                          "username": "alice"
+                        },
+                        {
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "roles": [
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            }
+                          ],
+                          "updated_at": "2025-06-30T15:00:00Z",
+                          "username": "alice"
+                        },
+                        {
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "roles": [
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            }
+                          ],
+                          "updated_at": "2025-06-30T15:00:00Z",
+                          "username": "alice"
+                        },
+                        {
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "roles": [
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            },
+                            {
+                              "admin": false,
+                              "color": "#FF5733",
+                              "created_at": "2025-06-30T12:00:00Z",
+                              "id": 1,
+                              "name": "admin",
+                              "updated_at": "2025-06-30T15:00:00Z"
+                            }
+                          ],
+                          "updated_at": "2025-06-30T15:00:00Z",
+                          "username": "alice"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -842,7 +1409,7 @@
                       "id": 1,
                       "roles": [
                         {
-                          "admin": true,
+                          "admin": false,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -850,7 +1417,23 @@
                           "updated_at": "2025-06-30T15:00:00Z"
                         },
                         {
-                          "admin": true,
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -862,7 +1445,187 @@
                       "username": "alice"
                     },
                     "path": "customers/google/api_key",
-                    "updated_at": "2025-06-30T15:00:00Z"
+                    "roles": [
+                      {
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      }
+                    ],
+                    "updated_at": "2025-06-30T15:00:00Z",
+                    "users": [
+                      {
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "roles": [
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          }
+                        ],
+                        "updated_at": "2025-06-30T15:00:00Z",
+                        "username": "alice"
+                      },
+                      {
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "roles": [
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          }
+                        ],
+                        "updated_at": "2025-06-30T15:00:00Z",
+                        "username": "alice"
+                      },
+                      {
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "roles": [
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          }
+                        ],
+                        "updated_at": "2025-06-30T15:00:00Z",
+                        "username": "alice"
+                      },
+                      {
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "roles": [
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          }
+                        ],
+                        "updated_at": "2025-06-30T15:00:00Z",
+                        "username": "alice"
+                      }
+                    ]
                   },
                   {
                     "created_at": "2025-06-30T12:00:00Z",
@@ -871,7 +1634,7 @@
                       "id": 1,
                       "roles": [
                         {
-                          "admin": true,
+                          "admin": false,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -879,7 +1642,23 @@
                           "updated_at": "2025-06-30T15:00:00Z"
                         },
                         {
-                          "admin": true,
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -891,36 +1670,187 @@
                       "username": "alice"
                     },
                     "path": "customers/google/api_key",
-                    "updated_at": "2025-06-30T15:00:00Z"
-                  },
-                  {
-                    "created_at": "2025-06-30T12:00:00Z",
-                    "owner": {
-                      "created_at": "2025-06-30T12:00:00Z",
-                      "id": 1,
-                      "roles": [
-                        {
-                          "admin": true,
-                          "color": "#FF5733",
-                          "created_at": "2025-06-30T12:00:00Z",
-                          "id": 1,
-                          "name": "admin",
-                          "updated_at": "2025-06-30T15:00:00Z"
-                        },
-                        {
-                          "admin": true,
-                          "color": "#FF5733",
-                          "created_at": "2025-06-30T12:00:00Z",
-                          "id": 1,
-                          "name": "admin",
-                          "updated_at": "2025-06-30T15:00:00Z"
-                        }
-                      ],
-                      "updated_at": "2025-06-30T15:00:00Z",
-                      "username": "alice"
-                    },
-                    "path": "customers/google/api_key",
-                    "updated_at": "2025-06-30T15:00:00Z"
+                    "roles": [
+                      {
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      }
+                    ],
+                    "updated_at": "2025-06-30T15:00:00Z",
+                    "users": [
+                      {
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "roles": [
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          }
+                        ],
+                        "updated_at": "2025-06-30T15:00:00Z",
+                        "username": "alice"
+                      },
+                      {
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "roles": [
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          }
+                        ],
+                        "updated_at": "2025-06-30T15:00:00Z",
+                        "username": "alice"
+                      },
+                      {
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "roles": [
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          }
+                        ],
+                        "updated_at": "2025-06-30T15:00:00Z",
+                        "username": "alice"
+                      },
+                      {
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "roles": [
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          },
+                          {
+                            "admin": false,
+                            "color": "#FF5733",
+                            "created_at": "2025-06-30T12:00:00Z",
+                            "id": 1,
+                            "name": "admin",
+                            "updated_at": "2025-06-30T15:00:00Z"
+                          }
+                        ],
+                        "updated_at": "2025-06-30T15:00:00Z",
+                        "username": "alice"
+                      }
+                    ]
                   }
                 ]
               }
@@ -938,6 +1868,92 @@
           },
           "403": {
             "description": "forbidden: Forbidden access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "internal_error: Internal server error",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "secrets"
+        ],
+        "summary": "update secret secrets",
+        "description": "Update a secret",
+        "operationId": "secrets#update secret",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSecretRequestBody"
+              },
+              "example": {
+                "authorized_roles": [
+                  1,
+                  2
+                ],
+                "authorized_users": [
+                  1,
+                  2,
+                  3
+                ],
+                "path": "L2N1c3RvbWVycy9nb29nbGUvYXBpX2tleQ==",
+                "value": "SECRET_API_KEY123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created response."
+          },
+          "400": {
+            "description": "invalid_parameters: Invalid token path",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized: Unauthorized access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "forbidden: Forbidden access",
+            "content": {
+              "application/vnd.goa.error": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "secret_not_found: Secret not found",
             "content": {
               "application/vnd.goa.error": {
                 "schema": {
@@ -1069,7 +2085,7 @@
                 "example": {
                   "authorized_roles": [
                     {
-                      "admin": false,
+                      "admin": true,
                       "color": "#FF5733",
                       "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
@@ -1077,7 +2093,23 @@
                       "updated_at": "2025-06-30T15:00:00Z"
                     },
                     {
-                      "admin": false,
+                      "admin": true,
+                      "color": "#FF5733",
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "id": 1,
+                      "name": "admin",
+                      "updated_at": "2025-06-30T15:00:00Z"
+                    },
+                    {
+                      "admin": true,
+                      "color": "#FF5733",
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "id": 1,
+                      "name": "admin",
+                      "updated_at": "2025-06-30T15:00:00Z"
+                    },
+                    {
+                      "admin": true,
                       "color": "#FF5733",
                       "created_at": "2025-06-30T12:00:00Z",
                       "id": 1,
@@ -1091,7 +2123,7 @@
                       "id": 1,
                       "roles": [
                         {
-                          "admin": false,
+                          "admin": true,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1099,7 +2131,7 @@
                           "updated_at": "2025-06-30T15:00:00Z"
                         },
                         {
-                          "admin": false,
+                          "admin": true,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1107,7 +2139,7 @@
                           "updated_at": "2025-06-30T15:00:00Z"
                         },
                         {
-                          "admin": false,
+                          "admin": true,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1115,7 +2147,7 @@
                           "updated_at": "2025-06-30T15:00:00Z"
                         },
                         {
-                          "admin": false,
+                          "admin": true,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1131,7 +2163,7 @@
                       "id": 1,
                       "roles": [
                         {
-                          "admin": false,
+                          "admin": true,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1139,7 +2171,7 @@
                           "updated_at": "2025-06-30T15:00:00Z"
                         },
                         {
-                          "admin": false,
+                          "admin": true,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1147,7 +2179,7 @@
                           "updated_at": "2025-06-30T15:00:00Z"
                         },
                         {
-                          "admin": false,
+                          "admin": true,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1155,7 +2187,7 @@
                           "updated_at": "2025-06-30T15:00:00Z"
                         },
                         {
-                          "admin": false,
+                          "admin": true,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1171,7 +2203,7 @@
                       "id": 1,
                       "roles": [
                         {
-                          "admin": false,
+                          "admin": true,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1179,7 +2211,7 @@
                           "updated_at": "2025-06-30T15:00:00Z"
                         },
                         {
-                          "admin": false,
+                          "admin": true,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1187,7 +2219,7 @@
                           "updated_at": "2025-06-30T15:00:00Z"
                         },
                         {
-                          "admin": false,
+                          "admin": true,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1195,7 +2227,47 @@
                           "updated_at": "2025-06-30T15:00:00Z"
                         },
                         {
-                          "admin": false,
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        }
+                      ],
+                      "updated_at": "2025-06-30T15:00:00Z",
+                      "username": "alice"
+                    },
+                    {
+                      "created_at": "2025-06-30T12:00:00Z",
+                      "id": 1,
+                      "roles": [
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": true,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": true,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1213,7 +2285,7 @@
                     "id": 1,
                     "roles": [
                       {
-                        "admin": false,
+                        "admin": true,
                         "color": "#FF5733",
                         "created_at": "2025-06-30T12:00:00Z",
                         "id": 1,
@@ -1221,7 +2293,7 @@
                         "updated_at": "2025-06-30T15:00:00Z"
                       },
                       {
-                        "admin": false,
+                        "admin": true,
                         "color": "#FF5733",
                         "created_at": "2025-06-30T12:00:00Z",
                         "id": 1,
@@ -1229,7 +2301,7 @@
                         "updated_at": "2025-06-30T15:00:00Z"
                       },
                       {
-                        "admin": false,
+                        "admin": true,
                         "color": "#FF5733",
                         "created_at": "2025-06-30T12:00:00Z",
                         "id": 1,
@@ -1237,7 +2309,7 @@
                         "updated_at": "2025-06-30T15:00:00Z"
                       },
                       {
-                        "admin": false,
+                        "admin": true,
                         "color": "#FF5733",
                         "created_at": "2025-06-30T12:00:00Z",
                         "id": 1,
@@ -1422,7 +2494,7 @@
                       "id": 1,
                       "roles": [
                         {
-                          "admin": true,
+                          "admin": false,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1430,7 +2502,23 @@
                           "updated_at": "2025-06-30T15:00:00Z"
                         },
                         {
-                          "admin": true,
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1446,7 +2534,7 @@
                       "id": 1,
                       "roles": [
                         {
-                          "admin": true,
+                          "admin": false,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1454,7 +2542,23 @@
                           "updated_at": "2025-06-30T15:00:00Z"
                         },
                         {
-                          "admin": true,
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1470,7 +2574,7 @@
                       "id": 1,
                       "roles": [
                         {
-                          "admin": true,
+                          "admin": false,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1478,7 +2582,23 @@
                           "updated_at": "2025-06-30T15:00:00Z"
                         },
                         {
-                          "admin": true,
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
+                          "color": "#FF5733",
+                          "created_at": "2025-06-30T12:00:00Z",
+                          "id": 1,
+                          "name": "admin",
+                          "updated_at": "2025-06-30T15:00:00Z"
+                        },
+                        {
+                          "admin": false,
                           "color": "#FF5733",
                           "created_at": "2025-06-30T12:00:00Z",
                           "id": 1,
@@ -1497,7 +2617,7 @@
                     "id": 1,
                     "roles": [
                       {
-                        "admin": true,
+                        "admin": false,
                         "color": "#FF5733",
                         "created_at": "2025-06-30T12:00:00Z",
                         "id": 1,
@@ -1505,7 +2625,23 @@
                         "updated_at": "2025-06-30T15:00:00Z"
                       },
                       {
-                        "admin": true,
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": false,
                         "color": "#FF5733",
                         "created_at": "2025-06-30T12:00:00Z",
                         "id": 1,
@@ -1521,7 +2657,7 @@
                     "id": 1,
                     "roles": [
                       {
-                        "admin": true,
+                        "admin": false,
                         "color": "#FF5733",
                         "created_at": "2025-06-30T12:00:00Z",
                         "id": 1,
@@ -1529,7 +2665,23 @@
                         "updated_at": "2025-06-30T15:00:00Z"
                       },
                       {
-                        "admin": true,
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": false,
                         "color": "#FF5733",
                         "created_at": "2025-06-30T12:00:00Z",
                         "id": 1,
@@ -1545,7 +2697,7 @@
                     "id": 1,
                     "roles": [
                       {
-                        "admin": true,
+                        "admin": false,
                         "color": "#FF5733",
                         "created_at": "2025-06-30T12:00:00Z",
                         "id": 1,
@@ -1553,7 +2705,23 @@
                         "updated_at": "2025-06-30T15:00:00Z"
                       },
                       {
-                        "admin": true,
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": false,
                         "color": "#FF5733",
                         "created_at": "2025-06-30T12:00:00Z",
                         "id": 1,
@@ -1569,7 +2737,7 @@
                     "id": 1,
                     "roles": [
                       {
-                        "admin": true,
+                        "admin": false,
                         "color": "#FF5733",
                         "created_at": "2025-06-30T12:00:00Z",
                         "id": 1,
@@ -1577,7 +2745,23 @@
                         "updated_at": "2025-06-30T15:00:00Z"
                       },
                       {
-                        "admin": true,
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": false,
+                        "color": "#FF5733",
+                        "created_at": "2025-06-30T12:00:00Z",
+                        "id": 1,
+                        "name": "admin",
+                        "updated_at": "2025-06-30T15:00:00Z"
+                      },
+                      {
+                        "admin": false,
                         "color": "#FF5733",
                         "created_at": "2025-06-30T12:00:00Z",
                         "id": 1,
@@ -1894,18 +3078,18 @@
           "index": {
             "type": "integer",
             "description": "The index of the share added",
-            "example": 908796951079181226,
+            "example": 2796387555308127863,
             "format": "int64"
           },
           "unlocked": {
             "type": "boolean",
             "description": "Whether the master key has been unlocked",
-            "example": false
+            "example": true
           }
         },
         "example": {
-          "index": 2634242440342999069,
-          "unlocked": true
+          "index": 5559864121080140975,
+          "unlocked": false
         },
         "required": [
           "index",
@@ -2030,7 +3214,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "example": "Eos est sit dignissimos ex."
+              "example": "Quo eveniet deleniti praesentium ex eum."
             },
             "description": "The generated key shares",
             "example": [
@@ -2112,7 +3296,7 @@
             "type": "array",
             "items": {
               "type": "integer",
-              "example": 516397163871956071,
+              "example": 5307465963483410584,
               "format": "int64"
             },
             "description": "Role IDs authorized to access the secret",
@@ -2125,7 +3309,7 @@
             "type": "array",
             "items": {
               "type": "integer",
-              "example": 341127503104855258,
+              "example": 9081188271671549769,
               "format": "int64"
             },
             "description": "Users IDs authorized to access the secret",
@@ -2259,7 +3443,7 @@
           "temporary": {
             "type": "boolean",
             "description": "Is the error temporary?",
-            "example": false
+            "example": true
           },
           "timeout": {
             "type": "boolean",
@@ -2274,7 +3458,7 @@
           "message": "parameter 'p' must be an integer",
           "name": "bad_request",
           "temporary": false,
-          "timeout": false
+          "timeout": true
         },
         "required": [
           "name",
@@ -2291,7 +3475,7 @@
           "current_shares": {
             "type": "integer",
             "description": "Number of shares currently held",
-            "example": 2900553972583198744,
+            "example": 6270886963709009251,
             "format": "int64"
           },
           "is_locked": {
@@ -2302,21 +3486,21 @@
           "min_shares": {
             "type": "integer",
             "description": "Minimum number of shares required",
-            "example": 2431615301122470772,
+            "example": 6406596838761087719,
             "format": "int64"
           },
           "total_shares": {
             "type": "integer",
             "description": "Total number of shares",
-            "example": 4042449222842363142,
+            "example": 6375203484372856336,
             "format": "int64"
           }
         },
         "example": {
-          "current_shares": 7259916586993169848,
-          "is_locked": false,
-          "min_shares": 7162640890096176202,
-          "total_shares": 6020274338472822433
+          "current_shares": 7599343677805568476,
+          "is_locked": true,
+          "min_shares": 3385299684669022029,
+          "total_shares": 3456749425558812587
         },
         "required": [
           "is_locked",
@@ -2407,6 +3591,22 @@
             },
             "description": "Roles authorized to access the secret",
             "example": [
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
               {
                 "admin": false,
                 "color": "#FF5733",
@@ -2638,6 +3838,14 @@
               "id": 1,
               "name": "admin",
               "updated_at": "2025-06-30T15:00:00Z"
+            },
+            {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
             }
           ],
           "authorized_users": [
@@ -2831,10 +4039,140 @@
             "description": "The original path of the secret",
             "example": "customers/google/api_key"
           },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            },
+            "description": "Roles authorized to access the secret",
+            "example": [
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              },
+              {
+                "admin": false,
+                "color": "#FF5733",
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "name": "admin",
+                "updated_at": "2025-06-30T15:00:00Z"
+              }
+            ]
+          },
           "updated_at": {
             "type": "string",
             "description": "Last update timestamp of the secret",
             "example": "2025-06-30T15:00:00Z"
+          },
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            },
+            "description": "Users authorized to access the secret",
+            "example": [
+              {
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "roles": [
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  }
+                ],
+                "updated_at": "2025-06-30T15:00:00Z",
+                "username": "alice"
+              },
+              {
+                "created_at": "2025-06-30T12:00:00Z",
+                "id": 1,
+                "roles": [
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  },
+                  {
+                    "admin": false,
+                    "color": "#FF5733",
+                    "created_at": "2025-06-30T12:00:00Z",
+                    "id": 1,
+                    "name": "admin",
+                    "updated_at": "2025-06-30T15:00:00Z"
+                  }
+                ],
+                "updated_at": "2025-06-30T15:00:00Z",
+                "username": "alice"
+              }
+            ]
           }
         },
         "example": {
@@ -2880,13 +4218,203 @@
             "username": "alice"
           },
           "path": "customers/google/api_key",
-          "updated_at": "2025-06-30T15:00:00Z"
+          "roles": [
+            {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            },
+            {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            },
+            {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            }
+          ],
+          "updated_at": "2025-06-30T15:00:00Z",
+          "users": [
+            {
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "roles": [
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                }
+              ],
+              "updated_at": "2025-06-30T15:00:00Z",
+              "username": "alice"
+            },
+            {
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "roles": [
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                }
+              ],
+              "updated_at": "2025-06-30T15:00:00Z",
+              "username": "alice"
+            },
+            {
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "roles": [
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                }
+              ],
+              "updated_at": "2025-06-30T15:00:00Z",
+              "username": "alice"
+            },
+            {
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "roles": [
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                },
+                {
+                  "admin": false,
+                  "color": "#FF5733",
+                  "created_at": "2025-06-30T12:00:00Z",
+                  "id": 1,
+                  "name": "admin",
+                  "updated_at": "2025-06-30T15:00:00Z"
+                }
+              ],
+              "updated_at": "2025-06-30T15:00:00Z",
+              "username": "alice"
+            }
+          ]
         },
         "required": [
           "path",
           "owner",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "users",
+          "roles"
         ]
       },
       "User": {
@@ -2952,6 +4480,14 @@
           "created_at": "2025-06-30T12:00:00Z",
           "id": 1,
           "roles": [
+            {
+              "admin": false,
+              "color": "#FF5733",
+              "created_at": "2025-06-30T12:00:00Z",
+              "id": 1,
+              "name": "admin",
+              "updated_at": "2025-06-30T15:00:00Z"
+            },
             {
               "admin": false,
               "color": "#FF5733",

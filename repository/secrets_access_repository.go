@@ -13,6 +13,7 @@ type SecretsAccessRepository interface {
 	GrantRolesAccess(ctx context.Context, secretPath string, roleIDs []int) error
 	RevokeUserAccess(ctx context.Context, secretPath string, userID int) error
 	RevokeRoleAccess(ctx context.Context, secretPath string, roleID int) error
+	GetAccessesBySecretPath(ctx context.Context, secretPath string) (userIDs []int, roleIDs []int, err error)
 }
 
 type secretsAccessRepository struct {
@@ -86,6 +87,7 @@ func (r *secretsAccessRepository) RevokeRoleAccess(ctx context.Context, secretPa
 	`, secretPath, roleID)
 	return err
 }
+
 func (r *secretsAccessRepository) GrantUsersAccess(ctx context.Context, secretPath string, userIDs []int) error {
 	if secretPath == "" {
 		return errors.New("secretPath must not be empty")
@@ -138,4 +140,40 @@ func (r *secretsAccessRepository) GrantRolesAccess(ctx context.Context, secretPa
 		}
 	}
 	return nil
+}
+
+func (r *secretsAccessRepository) GetAccessesBySecretPath(ctx context.Context, secretPath string) (userIDs []int, roleIDs []int, err error) {
+	if secretPath == "" {
+		return nil, nil, errors.New("secretPath must not be empty")
+	}
+
+	var secretID int
+	err = r.pool.QueryRow(ctx, `SELECT id FROM secrets WHERE path = $1`, secretPath).Scan(&secretID)
+	if err != nil {
+		return nil, nil, ErrSecretNotFound
+	}
+
+	rows, err := r.pool.Query(ctx, `
+		SELECT user_id, role_id
+		FROM secrets_access
+		WHERE secret_id = $1
+	`, secretID)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var userID, roleID *int
+		if err := rows.Scan(&userID, &roleID); err != nil {
+			return nil, nil, err
+		}
+		if userID != nil {
+			userIDs = append(userIDs, *userID)
+		}
+		if roleID != nil {
+			roleIDs = append(roleIDs, *roleID)
+		}
+	}
+	return userIDs, roleIDs, nil
 }

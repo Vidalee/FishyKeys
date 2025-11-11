@@ -24,6 +24,7 @@ type Server struct {
 	GetSecretValue http.Handler
 	GetSecret      http.Handler
 	CreateSecret   http.Handler
+	UpdateSecret   http.Handler
 	CORS           http.Handler
 }
 
@@ -58,6 +59,7 @@ func New(
 			{"GetSecretValue", "GET", "/secrets/{path}/value"},
 			{"GetSecret", "GET", "/secrets/{path}"},
 			{"CreateSecret", "POST", "/secrets"},
+			{"UpdateSecret", "PATCH", "/secrets"},
 			{"CORS", "OPTIONS", "/secrets"},
 			{"CORS", "OPTIONS", "/secrets/{path}/value"},
 			{"CORS", "OPTIONS", "/secrets/{path}"},
@@ -66,6 +68,7 @@ func New(
 		GetSecretValue: NewGetSecretValueHandler(e.GetSecretValue, mux, decoder, encoder, errhandler, formatter),
 		GetSecret:      NewGetSecretHandler(e.GetSecret, mux, decoder, encoder, errhandler, formatter),
 		CreateSecret:   NewCreateSecretHandler(e.CreateSecret, mux, decoder, encoder, errhandler, formatter),
+		UpdateSecret:   NewUpdateSecretHandler(e.UpdateSecret, mux, decoder, encoder, errhandler, formatter),
 		CORS:           NewCORSHandler(),
 	}
 }
@@ -79,6 +82,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.GetSecretValue = m(s.GetSecretValue)
 	s.GetSecret = m(s.GetSecret)
 	s.CreateSecret = m(s.CreateSecret)
+	s.UpdateSecret = m(s.UpdateSecret)
 	s.CORS = m(s.CORS)
 }
 
@@ -91,6 +95,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetSecretValueHandler(mux, h.GetSecretValue)
 	MountGetSecretHandler(mux, h.GetSecret)
 	MountCreateSecretHandler(mux, h.CreateSecret)
+	MountUpdateSecretHandler(mux, h.UpdateSecret)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -275,6 +280,57 @@ func NewCreateSecretHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "create secret")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "secrets")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountUpdateSecretHandler configures the mux to serve the "secrets" service
+// "update secret" endpoint.
+func MountUpdateSecretHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := HandleSecretsOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("PATCH", "/secrets", f)
+}
+
+// NewUpdateSecretHandler creates a HTTP handler which loads the HTTP request
+// and calls the "secrets" service "update secret" endpoint.
+func NewUpdateSecretHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeUpdateSecretRequest(mux, decoder)
+		encodeResponse = EncodeUpdateSecretResponse(encoder)
+		encodeError    = EncodeUpdateSecretError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "update secret")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "secrets")
 		payload, err := decodeRequest(r)
 		if err != nil {
