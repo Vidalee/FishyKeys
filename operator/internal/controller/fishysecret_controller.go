@@ -34,9 +34,12 @@ import (
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"time"
 )
+
+const fishySecretFinalizer = "fishykeys.2v.pm/finalizer"
 
 // FishySecretReconciler reconciles a FishySecret object
 type FishySecretReconciler struct {
@@ -55,8 +58,38 @@ func (r *FishySecretReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	var fishySecret fishykeysv1alpha1.FishySecret
 	if err := r.Get(ctx, req.NamespacedName, &fishySecret); err != nil {
+		if apierrors.IsNotFound(err) {
+			// Resource deleted, nothing to do
+			return ctrl.Result{}, nil
+		}
 		log.Error(err, "unable to fetch FishySecret")
-		return ctrl.Result{}, client.IgnoreNotFound(err)
+		return ctrl.Result{}, err
+	}
+
+	if !fishySecret.ObjectMeta.DeletionTimestamp.IsZero() {
+		log.Info("Finalizing FishySecret", "name", fishySecret.Name)
+
+		target := fishySecret.Spec.Target
+		secret := &corev1.Secret{}
+		err := r.Get(ctx, client.ObjectKey{Name: target.Name, Namespace: target.Namespace}, secret)
+		if err == nil {
+			_ = r.Delete(ctx, secret)
+			log.Info("Child Secret deleted", "name", target.Name)
+		}
+
+		controllerutil.RemoveFinalizer(&fishySecret, fishySecretFinalizer)
+		if err := r.Update(ctx, &fishySecret); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		return ctrl.Result{}, nil
+	}
+
+	if !controllerutil.ContainsFinalizer(&fishySecret, fishySecretFinalizer) {
+		controllerutil.AddFinalizer(&fishySecret, fishySecretFinalizer)
+		if err := r.Update(ctx, &fishySecret); err != nil {
+			return ctrl.Result{}, err
+		}
 	}
 
 	secretData := make(map[string][]byte)
@@ -95,7 +128,7 @@ func (r *FishySecretReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	var existingSecret corev1.Secret
 	err = r.Get(ctx, client.ObjectKeyFromObject(desiredSecret), &existingSecret)
-	if err != nil && apierrors.IsNotFound(err) {
+	if apierrors.IsNotFound(err) {
 		if err := r.Create(ctx, desiredSecret); err != nil {
 			log.Error(err, "failed to create Secret")
 			return ctrl.Result{}, err
@@ -132,6 +165,7 @@ func (r *FishySecretReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 func (r *FishySecretReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&fishykeysv1alpha1.FishySecret{}).
+		Owns(&corev1.Secret{}).
 		Named("fishysecret").
 		Complete(r)
 }
