@@ -483,8 +483,12 @@ export default function Dashboard() {
                     borderRadius: 8,
                     padding: 24,
                     background: '#fff',
-                    minWidth: 340
+                    minWidth: 340,
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 24,
                 }}>
+                    <div>
                     <h3>Secret Details: {selectedSecret.path}</h3>
                     {secretInfoLoading ? (
                         <div>Loading secret info...</div>
@@ -943,6 +947,9 @@ export default function Dashboard() {
                         setShowRoleSelector(false);
                     }}>Close
                     </button>
+                    </div>
+                    <img src={showValue ? '/fishykeys-fish-eaten.png' : '/fishykeys-looking-left.png'} alt="FishyKeys"
+                         style={{width: 120, alignSelf: 'center'}}/>
                 </div>
             )}
             <CreateSecretModal open={showCreateModal} onClose={() => setShowCreateModal(false)}
