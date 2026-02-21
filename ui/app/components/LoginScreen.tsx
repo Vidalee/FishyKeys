@@ -1,6 +1,7 @@
 'use client'
 
 import {useState} from 'react'
+import Image from 'next/image'
 import {login} from '../api/users'
 import styles from './LoginScreen.module.css'
 
@@ -43,6 +44,7 @@ export default function LoginScreen() {
   return (
     <div className={styles.container}>
       <form className={styles.card} onSubmit={handleLogin}>
+        <Image src="/fishykeys-logo.png" alt="FishyKeys Logo" width={180} height={180} className={styles.logo}/>
         <div className={styles.title}>Login</div>
         <div className={styles.inputGroup}>
           <label htmlFor="username" className={styles.label}>Username</label>

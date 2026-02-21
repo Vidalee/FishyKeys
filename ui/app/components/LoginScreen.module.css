@@ -17,6 +17,11 @@
   gap: 20px;
 }
 
+.logo {
+  display: block;
+  margin: 0 auto 8px;
+}
+
 .title {
   font-size: 2rem;
   font-weight: 800;
