@@ -1,8 +1,12 @@
 <p align="center">
   <img src="./ui/public/fishykeys-logo.png" alt="FishyKeys Logo" width="200"/>
+  <h1 align="center">FishyKeys</h1>
+  <p align="center">
+    <a href="https://github.com/Vidalee/FishyKeys/actions/workflows/test.yaml"><img src="https://github.com/Vidalee/FishyKeys/actions/workflows/test.yaml/badge.svg" alt="Tests"/></a>
+    <a href="https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test.yml"><img src="https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test.yml/badge.svg" alt="Operator Tests"/></a>
+    <a href="https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test-e2e.yml"><img src="https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test-e2e.yml/badge.svg" alt="Operator E2E Tests"/></a>
+  </p>
 </p>
-
-# FishyKeys [![Tests](https://github.com/Vidalee/FishyKeys/actions/workflows/test.yaml/badge.svg)](https://github.com/Vidalee/FishyKeys/actions/workflows/test.yaml) [![Operator Tests](https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test.yml/badge.svg)](https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test.yml) [![Operator E2E Tests](https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test-e2e.yml/badge.svg)](https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test-e2e.yml)
 
 ⚠ This project is still a work in progress, which is why there is no installation instructions ⚠
 
