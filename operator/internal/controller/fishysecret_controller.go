@@ -30,13 +30,19 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"os"
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"time"
 )
+
+const fishySecretFinalizer = "fishykeys.2v.pm/finalizer"
 
 // FishySecretReconciler reconciles a FishySecret object
 type FishySecretReconciler struct {
@@ -47,6 +53,7 @@ type FishySecretReconciler struct {
 // +kubebuilder:rbac:groups=fishykeys.2v.pm,resources=fishysecrets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=fishykeys.2v.pm,resources=fishysecrets/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=fishykeys.2v.pm,resources=fishysecrets/finalizers,verbs=update
+// +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -55,8 +62,44 @@ func (r *FishySecretReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	var fishySecret fishykeysv1alpha1.FishySecret
 	if err := r.Get(ctx, req.NamespacedName, &fishySecret); err != nil {
+		if apierrors.IsNotFound(err) {
+			// Resource deleted, nothing to do
+			return ctrl.Result{}, nil
+		}
 		log.Error(err, "unable to fetch FishySecret")
-		return ctrl.Result{}, client.IgnoreNotFound(err)
+		return ctrl.Result{}, err
+	}
+
+	if !fishySecret.ObjectMeta.DeletionTimestamp.IsZero() {
+		log.Info("Finalizing FishySecret", "name", fishySecret.Name)
+
+		target := fishySecret.Spec.Target
+		secret := &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      target.Name,
+				Namespace: target.Namespace,
+			},
+		}
+		// In case our Secret was deleted manually we may not find it, ignore this error
+		if err := r.Delete(ctx, secret); err != nil && !apierrors.IsNotFound(err) {
+			log.Error(err, "unable to delete child Secret", "name", target.Name)
+			return ctrl.Result{}, err
+		}
+
+		controllerutil.RemoveFinalizer(&fishySecret, fishySecretFinalizer)
+		if err := r.Update(ctx, &fishySecret); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		return ctrl.Result{}, nil
+	}
+
+	if !controllerutil.ContainsFinalizer(&fishySecret, fishySecretFinalizer) {
+		controllerutil.AddFinalizer(&fishySecret, fishySecretFinalizer)
+		if err := r.Update(ctx, &fishySecret); err != nil {
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{}, nil
 	}
 
 	secretData := make(map[string][]byte)
@@ -65,11 +108,26 @@ func (r *FishySecretReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	if err != nil {
 		log.Error(err, "failed to get FishyKeys token")
 		setStatusCondition(&fishySecret, "Ready", metav1.ConditionFalse, "TokenError", err.Error())
+		_ = r.Status().Update(ctx, &fishySecret)
 		return ctrl.Result{}, err
 	}
 
+	conn, err := grpc.NewClient(serverUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Error(err, "failed to connect to FishyKeys server")
+		setStatusCondition(&fishySecret, "Ready", metav1.ConditionFalse, "ConnectionError", err.Error())
+		_ = r.Status().Update(ctx, &fishySecret)
+		return ctrl.Result{}, err
+	}
+	defer conn.Close()
+
+	grpcCtx, grpcCancel := context.WithTimeout(ctx, 5*time.Second)
+	defer grpcCancel()
+	grpcCtx = metadata.NewOutgoingContext(grpcCtx, metadata.Pairs("authorization", token))
+	secretsClient := pb.NewSecretsClient(conn)
+
 	for _, mapping := range fishySecret.Spec.Data {
-		value, err := fetchSecretFromManager(serverUrl, token, mapping.SecretPath)
+		value, err := fetchSecretValue(grpcCtx, secretsClient, mapping.SecretPath)
 		if err != nil {
 			log.Error(err, "failed to fetch from secret manager", "path", mapping.SecretPath)
 			setStatusCondition(&fishySecret, "Ready", metav1.ConditionFalse, "FetchError", err.Error())
@@ -83,19 +141,18 @@ func (r *FishySecretReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fishySecret.Spec.Target.Name,
 			Namespace: fishySecret.Spec.Target.Namespace,
+			Labels: map[string]string{
+				"fishykeys.2v.pm/owner-name":      fishySecret.Name,
+				"fishykeys.2v.pm/owner-namespace": fishySecret.Namespace,
+			},
 		},
 		Data: secretData,
 		Type: corev1.SecretTypeOpaque,
 	}
 
-	if err := ctrl.SetControllerReference(&fishySecret, desiredSecret, r.Scheme); err != nil {
-		log.Error(err, "unable to set owner reference")
-		return ctrl.Result{}, err
-	}
-
 	var existingSecret corev1.Secret
 	err = r.Get(ctx, client.ObjectKeyFromObject(desiredSecret), &existingSecret)
-	if err != nil && apierrors.IsNotFound(err) {
+	if apierrors.IsNotFound(err) {
 		if err := r.Create(ctx, desiredSecret); err != nil {
 			log.Error(err, "failed to create Secret")
 			return ctrl.Result{}, err
@@ -128,10 +185,31 @@ func (r *FishySecretReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	}, nil
 }
 
+// mapSecretToFishySecrets maps Secret events to owning FishySecret resources
+func (r *FishySecretReconciler) mapSecretToFishySecrets(ctx context.Context, obj client.Object) []reconcile.Request {
+	ns := obj.GetLabels()["fishykeys.2v.pm/owner-namespace"]
+	name := obj.GetLabels()["fishykeys.2v.pm/owner-name"]
+
+	if ns == "" || name == "" {
+		return nil
+	}
+
+	return []reconcile.Request{{
+		NamespacedName: types.NamespacedName{
+			Namespace: ns,
+			Name:      name,
+		},
+	}}
+}
+
 // SetupWithManager sets up the controller with the Manager.
 func (r *FishySecretReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&fishykeysv1alpha1.FishySecret{}).
+		Watches(
+			&corev1.Secret{},
+			handler.EnqueueRequestsFromMapFunc(r.mapSecretToFishySecrets),
+		).
 		Named("fishysecret").
 		Complete(r)
 }
@@ -145,25 +223,8 @@ func setStatusCondition(f *fishykeysv1alpha1.FishySecret, conditionType string, 
 		LastTransitionTime: metav1.Now(),
 	})
 }
-func fetchSecretFromManager(server string, token string, path string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
 
-	conn, err := grpc.NewClient(
-		server,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return "", fmt.Errorf("failed to connect: %w", err)
-	}
-	defer conn.Close()
-
-	secretsClient := pb.NewSecretsClient(conn)
-
-	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(
-		"authorization", token,
-	))
-
+func fetchSecretValue(ctx context.Context, secretsClient pb.SecretsClient, path string) (string, error) {
 	encodedPath := base64.StdEncoding.EncodeToString([]byte(path))
 
 	resp, err := secretsClient.OperatorGetSecretValue(ctx, &pb.OperatorGetSecretValueRequest{
@@ -196,11 +257,11 @@ func getFishyKeysUrlAndToken(ctx context.Context, r *FishySecretReconciler) (str
 
 	tokenBytes, ok := tokenSecret.Data["token"]
 	if !ok {
-		return "", "", fmt.Errorf("invalid token secret: missing 'token' key in Secret fishysecret-token")
+		return "", "", fmt.Errorf("invalid token secret: missing 'token' key in Secret fishysecret-config")
 	}
 	urlBytes, ok := tokenSecret.Data["url"]
 	if !ok {
-		return "", "", fmt.Errorf("invalid token secret: missing 'url' key in Secret fishysecret-token")
+		return "", "", fmt.Errorf("invalid token secret: missing 'url' key in Secret fishysecret-config")
 	}
 
 	token := string(tokenBytes)
