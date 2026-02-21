@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./ui/public/fishykeys-logo.png" alt="FishyKeys Logo" width="200"/>
+</p>
+
 # FishyKeys [![Tests](https://github.com/Vidalee/FishyKeys/actions/workflows/test.yaml/badge.svg)](https://github.com/Vidalee/FishyKeys/actions/workflows/test.yaml) [![Operator Tests](https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test.yml/badge.svg)](https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test.yml) [![Operator E2E Tests](https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test-e2e.yml/badge.svg)](https://github.com/Vidalee/FishyKeys/actions/workflows/operator-test-e2e.yml)
 
 ⚠ This project is still a work in progress, which is why there is no installation instructions ⚠
@@ -73,7 +77,7 @@ Keep in mind frontend was not the main focus of this project, so it is focused o
 
 ![secrets dashboard](./ui/public/demo/secrets_dashboard.png)
 
-*Dashboard showing all the secrets you have access to, with the secret `/cat/key_1` selected.*
+*Dashboard showing all the secrets you have access to, with the secret `/cat/key_2` selected.*
 
 ---
 
